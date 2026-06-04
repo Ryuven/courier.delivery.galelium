@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Galelium Courier</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap"/>
+  <style>
+:root{
+  --bg:#040506;--s1:#080c0a;--s2:#0d1210;--s3:#121a16;--s4:#182018;
+  --b:rgba(62,207,142,.07);--bh:rgba(62,207,142,.14);
+  --g:#3ecf8e;--gd:rgba(62,207,142,.10);--gg:rgba(62,207,142,.20);
+  --gr:rgba(62,207,142,.04);
+  --acc:#ff6b35;--accd:rgba(255,107,53,.10);
+  --red:#ff4d6d;--redd:rgba(255,77,109,.10);
+  --yellow:#fbbf24;--yellowd:rgba(251,191,36,.10);
+  --blue:#4d9eff;--blued:rgba(77,158,255,.10);
+  --text:#d4e8de;--muted:#5a7a68;--muted2:#2e4038;--muted3:#1a2820;
+  --fd:'Syne',sans-serif;--fm:'DM Mono',monospace;--fs:'Manrope',system-ui,sans-serif;
+  --ease:cubic-bezier(.4,0,.2,1);--t:.22s;--tf:.14s;
+  --sw:260px;--th:60px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{height:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--fs);font-weight:400;min-height:100svh;overflow:hidden;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--muted2);border-radius:2px}
+
+/* GRID SCAN BG */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(var(--b) 1px,transparent 1px),linear-gradient(90deg,var(--b) 1px,transparent 1px);background-size:40px 40px;z-index:0}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 80% 60% at 20% 50%,rgba(62,207,142,.03) 0%,transparent 70%);z-index:0}
+
+.app{display:flex;height:100svh;position:relative;z-index:1}
+
+/* ═══ SIDEBAR ═══ */
+.sb{width:var(--sw);flex-shrink:0;background:var(--s1);border-right:1px solid var(--b);display:flex;flex-direction:column;transition:transform var(--t) var(--ease);position:relative;z-index:100}
+.sb::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--g),transparent 60%)}
+
+/* Logo */
+.sb-logo{padding:22px 20px 18px;border-bottom:1px solid var(--b);display:flex;align-items:center;gap:12px}
+.sb-logo-icon{width:36px;height:36px;background:var(--gd);border:1px solid var(--gg);display:flex;align-items:center;justify-content:center;color:var(--g);flex-shrink:0}
+.sb-logo-text{font-family:var(--fd);font-weight:800;font-size:.95rem;color:#fff;letter-spacing:-.01em;line-height:1.1}
+.sb-logo-text em{color:var(--g);font-style:normal}
+.sb-logo-sub{font-size:.46rem;letter-spacing:.28em;text-transform:uppercase;color:var(--muted2);margin-top:2px}
+
+/* Online toggle */
+.sb-toggle{margin:14px 16px;background:var(--s2);border:1px solid var(--b);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sb-toggle-info{}
+.sb-toggle-label{font-size:.5rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.sb-toggle-status{font-size:.82rem;font-weight:600;color:var(--text)}
+.sb-toggle-status.online{color:var(--g)}
+.sb-toggle-status.offline{color:var(--muted)}
+.toggle-sw{position:relative;width:38px;height:22px;flex-shrink:0;cursor:pointer}
+.toggle-sw input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;background:var(--muted2);border:1px solid var(--b);transition:background .3s,border-color .3s;border-radius:0}
+.toggle-sw input:checked ~ .toggle-track{background:var(--gd);border-color:var(--g)}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:14px;height:14px;background:var(--muted);transition:transform .3s,background .3s;border-radius:0}
+.toggle-sw input:checked ~ .toggle-track ~ .toggle-thumb,
+.toggle-sw input:checked + .toggle-track + .toggle-thumb{background:var(--g);transform:translateX(16px)}
+
+/* Earnings strip */
+.sb-earn{margin:0 16px 12px;background:var(--s2);border:1px solid var(--b);padding:10px 14px;display:flex;align-items:center;justify-content:space-between}
+.sb-earn-lbl{font-size:.46rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.sb-earn-val{font-family:var(--fm);font-size:.9rem;color:var(--g);font-weight:500}
+
+/* Nav */
+.sb-nav{flex:1;overflow-y:auto;padding:8px 10px}
+.nav-sec{font-size:.44rem;letter-spacing:.28em;text-transform:uppercase;color:var(--muted2);padding:12px 8px 5px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;cursor:pointer;color:var(--muted);font-size:.8rem;font-weight:500;position:relative;transition:color var(--tf),background var(--tf);border:none;background:none;width:100%;text-align:left;font-family:var(--fs)}
+.nav-item:hover{color:var(--text);background:var(--s2)}
+.nav-item.active{color:var(--g);background:var(--gd)}
+.nav-item.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--g)}
+.nav-item svg{flex-shrink:0;opacity:.7}
+.nav-item.active svg{opacity:1}
+.nav-badge{margin-left:auto;min-width:18px;height:18px;padding:0 5px;background:var(--acc);color:#fff;font-size:.52rem;font-weight:700;display:flex;align-items:center;justify-content:center;border-radius:9px;animation:badgePop .3s var(--ease)}
+@keyframes badgePop{from{transform:scale(0)}to{transform:scale(1)}}
+.nav-badge.pulse{animation:badgePop .3s var(--ease),badgePulse 2s ease-in-out infinite .3s}
+@keyframes badgePulse{0%,100%{box-shadow:0 0 0 0 rgba(255,107,53,.4)}50%{box-shadow:0 0 0 5px rgba(255,107,53,0)}}
+
+/* User bottom */
+.sb-bottom{padding:12px 10px;border-top:1px solid var(--b)}
+.sb-user{display:flex;align-items:center;gap:10px;padding:8px 10px;cursor:pointer;transition:background var(--tf)}
+.sb-user:hover{background:var(--s2)}
+.sb-av{width:32px;height:32px;border-radius:50%;background:var(--gd);border:1px solid var(--gg);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--g);flex-shrink:0;overflow:hidden}
+.sb-av img{width:100%;height:100%;object-fit:cover}
+.sb-uinfo{flex:1;min-width:0}
+.sb-uname{font-size:.78rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-urole{font-size:.56rem;color:var(--muted);letter-spacing:.04em}
+.sb-logout{background:none;border:none;cursor:pointer;color:var(--muted2);padding:4px;transition:color var(--tf);flex-shrink:0}
+.sb-logout:hover{color:var(--red)}
+
+/* ═══ MAIN ═══ */
+.main{flex:1;overflow:hidden;display:flex;flex-direction:column}
+
+/* Topbar */
+.topbar{height:var(--th);flex-shrink:0;background:var(--s1);border-bottom:1px solid var(--b);display:flex;align-items:center;padding:0 24px;gap:16px;position:relative}
+.topbar::before{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--g),transparent 40%)}
+.tb-title{font-family:var(--fd);font-weight:800;font-size:1.05rem;color:#fff;flex:1;letter-spacing:-.01em}
+.tb-title em{color:var(--g);font-style:normal}
+
+/* Status chip */
+.tb-chip{display:flex;align-items:center;gap:7px;padding:6px 12px;border:1px solid var(--b);background:var(--s2);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--muted)}
+.tb-chip.online{border-color:var(--gg);color:var(--g);background:var(--gd)}
+.tb-chip.offline{border-color:var(--b);color:var(--muted)}
+.chip-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.tb-chip.online .chip-dot{animation:cPulse 2s ease-in-out infinite}
+@keyframes cPulse{0%,100%{box-shadow:0 0 0 0 rgba(62,207,142,.5)}50%{box-shadow:0 0 0 5px rgba(62,207,142,0)}}
+
+/* Time */
+.tb-time{font-family:var(--fm);font-size:.78rem;color:var(--muted);letter-spacing:.06em}
+
+/* Mobile */
+.mob-btn{display:none;background:none;border:none;cursor:pointer;color:var(--muted);padding:4px}
+
+/* Pages */
+.pages{flex:1;overflow-y:auto;position:relative}
+.page{display:none;padding:24px 24px 40px;animation:pgIn .28s var(--ease) both}
+.page.active{display:block}
+@keyframes pgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ═══ COMPONENTS ═══ */
+
+/* Section head */
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:18px;gap:10px;flex-wrap:wrap}
+.sec-lbl{font-size:.46rem;letter-spacing:.28em;text-transform:uppercase;color:var(--muted2);margin-bottom:3px}
+.sec-title{font-family:var(--fd);font-weight:800;font-size:1.3rem;color:#fff;letter-spacing:-.02em;line-height:1}
+.sec-title em{color:var(--g);font-style:normal}
+.sec-link{font-size:.68rem;color:var(--muted);border:none;background:none;cursor:pointer;font-family:var(--fs);transition:color var(--tf);padding:0;border-bottom:1px solid transparent}
+.sec-link:hover{color:var(--g);border-color:var(--gg)}
+
+/* Grids */
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media(max-width:1000px){.grid-4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.grid-4,.grid-3,.grid-2{grid-template-columns:1fr}}
+
+/* Stat card */
+.scard{background:var(--s1);border:1px solid var(--b);padding:16px 18px;position:relative;overflow:hidden;transition:border-color var(--tf)}
+.scard:hover{border-color:var(--bh)}
+.scard::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--g),transparent 60%)}
+.scard-lbl{font-size:.5rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted2);margin-bottom:8px}
+.scard-val{font-family:var(--fd);font-size:1.7rem;font-weight:800;color:#fff;line-height:1;letter-spacing:-.03em}
+.scard-val.green{color:var(--g)}
+.scard-val.acc{color:var(--acc)}
+.scard-sub{font-size:.64rem;color:var(--muted);margin-top:4px}
+.scard-ico{position:absolute;right:14px;top:50%;transform:translateY(-50%);opacity:.05;font-size:2.6rem}
+
+/* New order card */
+.order-new{background:var(--s1);border:1px solid var(--b);padding:18px 20px;transition:border-color var(--tf),transform var(--t);position:relative;overflow:hidden;margin-bottom:10px;animation:slideIn .35s var(--ease) both}
+@keyframes slideIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
+.order-new:hover{border-color:var(--bh);transform:translateY(-1px)}
+.order-new::before{content:'';position:absolute;top:0;left:0;bottom:0;width:2px;background:var(--acc)}
+.on-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.on-id{font-family:var(--fm);font-size:.65rem;letter-spacing:.12em;color:var(--muted);margin-bottom:3px}
+.on-addr{font-size:.85rem;font-weight:600;color:var(--text);line-height:1.3}
+.on-time{font-family:var(--fm);font-size:.62rem;color:var(--muted);white-space:nowrap}
+.on-items{font-size:.74rem;color:var(--muted);line-height:1.6;margin-bottom:12px;padding:10px 12px;background:var(--s2);border:1px solid var(--b)}
+.on-items-title{font-size:.46rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted2);margin-bottom:5px}
+.on-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.on-meta{display:flex;gap:14px;flex-wrap:wrap}
+.on-meta-item{display:flex;align-items:center;gap:5px;font-size:.68rem;color:var(--muted)}
+.on-meta-item svg{color:var(--g);flex-shrink:0}
+.on-total{font-family:var(--fd);font-weight:800;font-size:1.1rem;color:#fff}
+.on-total span{font-size:.7rem;color:var(--muted);font-family:var(--fs);font-weight:400}
+.btn-accept{padding:8px 20px;background:var(--g);border:none;color:#040506;font-family:var(--fd);font-weight:800;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:opacity var(--tf),transform var(--tf);display:flex;align-items:center;gap:7px;flex-shrink:0}
+.btn-accept:hover{opacity:.88;transform:scale(1.02)}
+.btn-accept:active{transform:scale(.97)}
+.btn-accept:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* Countdown bar */
+.countdown-wrap{margin:10px 0 14px}
+.countdown-bar-bg{height:3px;background:var(--muted2);position:relative;overflow:hidden}
+.countdown-bar-fill{height:100%;background:var(--acc);transition:width .5s linear;transform-origin:left}
+.countdown-txt{font-family:var(--fm);font-size:.6rem;color:var(--muted);margin-top:4px;display:flex;justify-content:space-between}
+
+/* Active order */
+.active-order{background:var(--s1);border:1px solid var(--bh);padding:20px 22px;position:relative;overflow:hidden}
+.active-order::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--g),var(--acc),transparent)}
+.ao-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap}
+.ao-id{font-family:var(--fm);font-size:.65rem;color:var(--muted);letter-spacing:.1em}
+.ao-badge{display:flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid var(--gg);background:var(--gd);color:var(--g);font-size:.56rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.ao-pulse{width:6px;height:6px;border-radius:50%;background:var(--g);animation:cPulse 1.5s ease-in-out infinite}
+
+/* Status steps */
+.st-track{display:flex;position:relative;margin:20px 0}
+.st-step{flex:1;display:flex;flex-direction:column;align-items:center;position:relative}
+.st-step:not(:last-child)::after{content:'';position:absolute;top:13px;left:calc(50% + 13px);right:calc(-50% + 13px);height:2px;background:var(--muted2);transition:background .4s}
+.st-step.done:not(:last-child)::after{background:var(--g)}
+.st-dot{width:26px;height:26px;border-radius:50%;background:var(--s2);border:2px solid var(--muted2);display:flex;align-items:center;justify-content:center;font-size:.65rem;margin-bottom:5px;transition:all .3s;position:relative;z-index:1}
+.st-step.done .st-dot{background:var(--g);border-color:var(--g);color:#040506}
+.st-step.current .st-dot{border-color:var(--g);color:var(--g);box-shadow:0 0 0 4px var(--gd);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 4px var(--gd)}50%{box-shadow:0 0 0 8px rgba(62,207,142,0)}}
+.st-lbl{font-size:.54rem;color:var(--muted);text-align:center;letter-spacing:.04em;line-height:1.3}
+.st-step.done .st-lbl,.st-step.current .st-lbl{color:var(--text)}
+
+/* Status actions */
+.status-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.btn-status{padding:10px 18px;border:1px solid var(--g);background:var(--gd);color:var(--g);font-family:var(--fd);font-weight:800;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all var(--tf);flex:1;min-width:120px;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn-status:hover{background:var(--g);color:#040506}
+.btn-status.delivered{border-color:var(--g);background:var(--g);color:#040506}
+.btn-status.delivered:hover{opacity:.88}
+
+/* Order info grid */
+.oinfo-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.oinfo-item{}
+.oinfo-lbl{font-size:.46rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted2);margin-bottom:4px}
+.oinfo-val{font-size:.8rem;color:var(--text);line-height:1.4}
+.divider{height:1px;background:var(--b);margin:16px 0}
+
+/* Items list */
+.items-list{}
+.item-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--b);font-size:.76rem}
+.item-row:last-child{border-bottom:none}
+.item-name{color:var(--text)}
+.item-qty{color:var(--muted);font-family:var(--fm);font-size:.68rem;margin:0 8px}
+.item-price{color:var(--g);font-family:var(--fm);font-size:.72rem}
+
+/* History card */
+.hcard{background:var(--s1);border:1px solid var(--b);padding:14px 16px;display:flex;align-items:center;gap:14px;transition:border-color var(--tf);margin-bottom:8px}
+.hcard:hover{border-color:var(--bh)}
+.hcard-ico{width:36px;height:36px;background:var(--gd);border:1px solid var(--gg);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;color:var(--g)}
+.hcard-info{flex:1;min-width:0}
+.hcard-id{font-family:var(--fm);font-size:.6rem;color:var(--muted);letter-spacing:.1em;margin-bottom:2px}
+.hcard-addr{font-size:.78rem;color:var(--text);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hcard-meta{font-size:.65rem;color:var(--muted);margin-top:2px}
+.hcard-earn{font-family:var(--fd);font-weight:800;font-size:1rem;color:var(--g);flex-shrink:0}
+
+/* Profile */
+.pg{display:grid;grid-template-columns:280px 1fr;gap:18px;align-items:start}
+@media(max-width:800px){.pg{grid-template-columns:1fr}}
+.pcard{background:var(--s1);border:1px solid var(--b);padding:22px 18px;text-align:center;position:relative;overflow:hidden}
+.pcard::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--g),transparent 60%)}
+.p-av{width:68px;height:68px;border-radius:50%;background:var(--gd);border:2px solid var(--gg);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;color:var(--g);margin:0 auto 12px;overflow:hidden}
+.p-av img{width:100%;height:100%;object-fit:cover}
+.p-name{font-family:var(--fd);font-weight:800;font-size:1.1rem;color:#fff;margin-bottom:2px}
+.p-email{font-size:.7rem;color:var(--muted);margin-bottom:12px}
+.p-vehicle{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border:1px solid var(--gg);background:var(--gd);color:var(--g);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;margin-bottom:14px}
+.p-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--b)}
+.p-stat{background:var(--s2);padding:10px 6px;text-align:center}
+.p-stat-val{font-family:var(--fd);font-weight:800;font-size:1.1rem;color:var(--g)}
+.p-stat-lbl{font-size:.48rem;color:var(--muted2);letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+.pf{background:var(--s1);border:1px solid var(--b);padding:20px 18px;margin-bottom:14px}
+.pf-title{font-weight:700;font-size:.86rem;color:var(--text);margin-bottom:14px}
+.ff{margin-bottom:12px}
+.fl{font-size:.48rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted2);display:block;margin-bottom:5px}
+.fi{width:100%;background:var(--s2);border:1px solid var(--b);color:var(--text);font-family:var(--fs);font-size:.82rem;padding:9px 12px;outline:none;transition:border-color var(--tf)}
+.fi:focus{border-color:var(--gg)}
+.fi::placeholder{color:var(--muted2)}
+.fi:read-only{opacity:.4;cursor:not-allowed}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* Buttons */
+.btn-p{padding:8px 16px;background:var(--g);border:none;color:#040506;font-size:.64rem;font-family:var(--fs);font-weight:700;cursor:pointer;transition:opacity var(--tf);letter-spacing:.06em;text-transform:uppercase}
+.btn-p:hover{opacity:.88}
+.btn-o{padding:8px 16px;background:none;border:1px solid var(--b);color:var(--muted);font-size:.64rem;font-family:var(--fs);cursor:pointer;transition:all var(--tf);letter-spacing:.06em;text-transform:uppercase}
+.btn-o:hover{border-color:var(--bh);color:var(--text)}
+.btn-o.danger:hover{border-color:var(--red);color:var(--red)}
+
+/* Toast */
+.toast-wrap{position:fixed;bottom:22px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.toast{background:var(--s2);border:1px solid var(--bh);padding:11px 15px;display:flex;align-items:center;gap:9px;font-size:.76rem;color:var(--text);animation:tIn .3s var(--ease) both,tOut .3s var(--ease) forwards;animation-delay:0s,2.8s;pointer-events:all;max-width:280px}
+@keyframes tIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes tOut{to{opacity:0;transform:translateY(10px)}}
+.toast.ok{border-color:rgba(62,207,142,.25)}
+.toast.ok .tdot{background:var(--g)}
+.toast.err{border-color:rgba(255,77,109,.25)}
+.toast.err .tdot{background:var(--red)}
+.toast.info{border-color:rgba(77,158,255,.25)}
+.toast.info .tdot{background:var(--blue)}
+.tdot{width:6px;height:6px;border-radius:50%;background:var(--g);flex-shrink:0}
+
+/* Empty */
+.empty{text-align:center;padding:50px 20px;color:var(--muted)}
+.empty-ico{font-size:2.8rem;opacity:.25;margin-bottom:10px}
+.empty-title{font-size:.88rem;font-weight:600;color:var(--muted);margin-bottom:5px}
+.empty-sub{font-size:.72rem}
+
+/* Loader */
+.pload{display:flex;align-items:center;justify-content:center;padding:60px;gap:10px;color:var(--muted);font-size:.78rem}
+.spinner{width:16px;height:16px;border-radius:50%;border:2px solid var(--s3);border-top-color:var(--g);animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Notification banner */
+.notif-banner{background:linear-gradient(135deg,rgba(255,107,53,.12),rgba(255,107,53,.05));border:1px solid rgba(255,107,53,.3);padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:14px;animation:slideIn .4s var(--ease) both;cursor:pointer;transition:border-color var(--tf)}
+.notif-banner:hover{border-color:rgba(255,107,53,.5)}
+.notif-pulse{width:10px;height:10px;border-radius:50%;background:var(--acc);flex-shrink:0;animation:accPulse 1.5s ease-in-out infinite}
+@keyframes accPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,107,53,.5)}50%{box-shadow:0 0 0 7px rgba(255,107,53,0)}}
+.notif-info{flex:1}
+.notif-lbl{font-size:.48rem;letter-spacing:.24em;text-transform:uppercase;color:var(--acc);margin-bottom:2px}
+.notif-txt{font-size:.82rem;font-weight:600;color:var(--text)}
+.notif-arrow{color:var(--acc)}
+
+/* Sound toggle */
+.sound-btn{background:none;border:1px solid var(--b);cursor:pointer;color:var(--muted);padding:7px 10px;display:flex;align-items:center;gap:5px;font-size:.62rem;font-family:var(--fs);transition:all var(--tf)}
+.sound-btn:hover{border-color:var(--bh);color:var(--text)}
+.sound-btn.on{border-color:var(--gg);color:var(--g);background:var(--gd)}
+
+/* Mobile overlay */
+.sb-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.7);backdrop-filter:blur(2px)}
+@media(max-width:800px){
+  .sb{position:fixed;left:0;top:0;bottom:0;z-index:200;transform:translateX(-100%)}
+  .sb.open{transform:translateX(0)}
+  .sb-overlay.open{display:block}
+  .mob-btn{display:flex}
+  .page{padding:16px 14px 32px}
+  .topbar{padding:0 14px}
+  .oinfo-grid{grid-template-columns:1fr}
+  .pg{grid-template-columns:1fr}
+}
+  </style>
+</head>
+<body>
+
+<div class="toast-wrap" id="toast-wrap"></div>
+<div class="sb-overlay" id="sb-overlay"></div>
+
+<div class="app">
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sb" id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/>
+        <rect x="9" y="11" width="14" height="10" rx="1"/>
+        <circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+      </svg>
+    </div>
+    <div>
+      <div class="sb-logo-text">Galelium <em>·</em></div>
+      <div class="sb-logo-sub">Панель курьера</div>
+    </div>
+  </div>
+
+  <!-- Online toggle -->
+  <div class="sb-toggle">
+    <div class="sb-toggle-info">
+      <div class="sb-toggle-label">Статус смены</div>
+      <div class="sb-toggle-status offline" id="sb-status-txt">Офлайн</div>
+    </div>
+    <label class="toggle-sw" title="Включить / выключить онлайн">
+      <input type="checkbox" id="online-toggle" onchange="toggleOnline(this.checked)"/>
+      <div class="toggle-track"></div>
+      <div class="toggle-thumb"></div>
+    </label>
+  </div>
+
+  <!-- Today earnings -->
+  <div class="sb-earn">
+    <div>
+      <div class="sb-earn-lbl">Заработок сегодня</div>
+      <div class="sb-earn-val" id="sb-earn-val">0 ₽</div>
+    </div>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="1.8" opacity=".4">
+      <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+    </svg>
+  </div>
+
+  <nav class="sb-nav">
+    <div class="nav-sec">Работа</div>
+    <button class="nav-item active" data-page="dashboard" onclick="goPage('dashboard')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Дашборд
+    </button>
+    <button class="nav-item" data-page="new-orders" onclick="goPage('new-orders')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      Новые заказы
+      <span class="nav-badge pulse" id="new-badge" style="display:none">0</span>
+    </button>
+    <button class="nav-item" data-page="active" onclick="goPage('active')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="1"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>
+      Активный заказ
+      <span class="nav-badge" id="active-badge" style="display:none;background:var(--g)">1</span>
+    </button>
+    <div class="nav-sec">История</div>
+    <button class="nav-item" data-page="history" onclick="goPage('history')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22C6.48 22 2 17.52 2 12S6.48 2 12 2s10 4.48 10 10"/><polyline points="12 6 12 12 16 14"/><path d="M22 22l-3-3m0 0a5 5 0 10-7.07-7.07A5 5 0 0019 19z"/></svg>
+      История доставок
+    </button>
+    <div class="nav-sec">Аккаунт</div>
+    <button class="nav-item" data-page="profile" onclick="goPage('profile')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Профиль
+    </button>
+  </nav>
+
+  <div class="sb-bottom">
+    <div class="sb-user" onclick="goPage('profile')">
+      <div class="sb-av" id="sb-av">?</div>
+      <div class="sb-uinfo">
+        <div class="sb-uname" id="sb-uname">Загрузка…</div>
+        <div class="sb-urole">Курьер</div>
+      </div>
+      <button class="sb-logout" onclick="event.stopPropagation();doLogout()" title="Выйти">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+  <div class="topbar">
+    <button class="mob-btn" onclick="toggleSidebar()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+    <div class="tb-title" id="tb-title">Дашборд</div>
+    <button class="sound-btn" id="sound-btn" onclick="toggleSound()" title="Звук уведомлений">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg>
+      Звук
+    </button>
+    <div class="tb-chip offline" id="tb-chip">
+      <div class="chip-dot"></div>
+      <span id="tb-chip-txt">Офлайн</span>
+    </div>
+    <div class="tb-time" id="tb-time">--:--</div>
+  </div>
+
+  <div class="pages" id="pages">
+
+    <!-- ════ DASHBOARD ════ -->
+    <div class="page active" id="page-dashboard">
+      <div id="notif-wrap"></div>
+
+      <div class="sec-head">
+        <div><div class="sec-lbl">Обзор смены</div><div class="sec-title">Дашборд</div></div>
+        <button class="sound-btn" id="sound-btn2" onclick="toggleSound()" style="display:none"></button>
+      </div>
+
+      <div class="grid-4" style="margin-bottom:22px">
+        <div class="scard"><div class="scard-lbl">Заработок сегодня</div><div class="scard-val green" id="d-earn">0 ₽</div><div class="scard-sub">Без учёта чаевых</div><div class="scard-ico">💰</div></div>
+        <div class="scard"><div class="scard-lbl">Доставок сегодня</div><div class="scard-val" id="d-today">0</div><div class="scard-sub">За текущую смену</div><div class="scard-ico">📦</div></div>
+        <div class="scard"><div class="scard-lbl">Всего доставок</div><div class="scard-val" id="d-total">0</div><div class="scard-sub">За всё время</div><div class="scard-ico">🏆</div></div>
+        <div class="scard"><div class="scard-lbl">Рейтинг</div><div class="scard-val acc" id="d-rating">—</div><div class="scard-sub">Средняя оценка</div><div class="scard-ico">⭐</div></div>
+      </div>
+
+      <!-- Активный заказ краткий -->
+      <div id="dash-active-wrap" style="margin-bottom:22px"></div>
+
+      <div class="sec-head">
+        <div><div class="sec-lbl">Очередь</div><div class="sec-title">Новые <em>заказы</em></div></div>
+        <button class="sec-link" onclick="goPage('new-orders')">Все заказы →</button>
+      </div>
+      <div id="dash-new-orders"><div class="pload"><div class="spinner"></div> Ожидаем заказы…</div></div>
+    </div>
+
+    <!-- ════ NEW ORDERS ════ -->
+    <div class="page" id="page-new-orders">
+      <div class="sec-head">
+        <div><div class="sec-lbl">Доступные</div><div class="sec-title">Новые <em>заказы</em></div></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-size:.62rem;color:var(--muted)" id="new-count-txt">0 заказов</div>
+        </div>
+      </div>
+      <div id="new-orders-list"><div class="pload"><div class="spinner"></div> Ожидаем заказы…</div></div>
+    </div>
+
+    <!-- ════ ACTIVE ORDER ════ -->
+    <div class="page" id="page-active">
+      <div class="sec-head">
+        <div><div class="sec-lbl">В работе</div><div class="sec-title">Активный <em>заказ</em></div></div>
+      </div>
+      <div id="active-order-content">
+        <div class="empty"><div class="empty-ico">🚴</div><div class="empty-title">Нет активного заказа</div><div class="empty-sub">Возьмите заказ из списка новых</div></div>
+      </div>
+    </div>
+
+    <!-- ════ HISTORY ════ -->
+    <div class="page" id="page-history">
+      <div class="sec-head">
+        <div><div class="sec-lbl">Архив</div><div class="sec-title">История <em>доставок</em></div></div>
+        <div style="font-size:.62rem;color:var(--muted)" id="hist-total-txt"></div>
+      </div>
+      <div id="history-list"><div class="pload"><div class="spinner"></div> Загрузка…</div></div>
+    </div>
+
+    <!-- ════ PROFILE ════ -->
+    <div class="page" id="page-profile">
+      <div class="sec-head"><div><div class="sec-lbl">Настройки</div><div class="sec-title">Профиль</div></div></div>
+      <div class="pg">
+        <div>
+          <div class="pcard">
+            <div class="p-av" id="p-av">?</div>
+            <div class="p-name" id="p-name">—</div>
+            <div class="p-email" id="p-email">—</div>
+            <div class="p-vehicle" id="p-vehicle">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+              —
+            </div>
+            <div class="p-stats">
+              <div class="p-stat"><div class="p-stat-val" id="ps-total">0</div><div class="p-stat-lbl">Доставок</div></div>
+              <div class="p-stat"><div class="p-stat-val" id="ps-earn">0</div><div class="p-stat-lbl">₽ заработано</div></div>
+              <div class="p-stat"><div class="p-stat-val" id="ps-rating">—</div><div class="p-stat-lbl">Рейтинг</div></div>
+            </div>
+          </div>
+          <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
+            <button class="btn-o danger" style="width:100%;padding:10px" onclick="doLogout()">Выйти из аккаунта</button>
+          </div>
+        </div>
+        <div>
+          <div class="pf">
+            <div class="pf-title">Личные данные</div>
+            <div class="fr">
+              <div class="ff"><label class="fl">Имя и фамилия</label><input class="fi" type="text" id="pf-name" placeholder="Иван Петров"/></div>
+              <div class="ff"><label class="fl">Телефон</label><input class="fi" type="tel" id="pf-phone" placeholder="+7 900 000-00-00"/></div>
+            </div>
+            <div class="ff"><label class="fl">Email</label><input class="fi" type="email" id="pf-email" readonly/></div>
+            <div class="ff">
+              <label class="fl">Транспорт</label>
+              <select class="fi" id="pf-vehicle" style="cursor:pointer">
+                <option value="bicycle">🚴 Велосипед</option>
+                <option value="scooter">🛵 Самокат / мопед</option>
+                <option value="car">🚗 Автомобиль</option>
+                <option value="foot">🚶 Пешком</option>
+              </select>
+            </div>
+            <button class="btn-p" onclick="saveProfile()">Сохранить</button>
+          </div>
+          <div class="pf">
+            <div class="pf-title">Фото профиля</div>
+            <input type="file" id="av-inp" accept="image/*" style="display:none" onchange="uploadAvUI(this)"/>
+            <button class="btn-o" onclick="document.getElementById('av-inp').click()">Загрузить фото</button>
+            <div style="font-size:.64rem;color:var(--muted);margin-top:6px">JPG, PNG до 2 МБ</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /pages -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js';
+import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js';
+import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, orderBy, onSnapshot, serverTimestamp, limit } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js';
+import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-storage.js';
+
+const cfg = {
+  apiKey:'AIzaSyCjIAMFuwLKwmjChCuiz-MHLv5WZOczAAE',
+  authDomain:'delivery-galelium.firebaseapp.com',
+  projectId:'delivery-galelium',
+  storageBucket:'delivery-galelium.firebasestorage.app',
+  messagingSenderId:'982466555080',
+  appId:'1:982466555080:web:c77ccbff0e71e540ddc9fd'
+};
+const app = initializeApp(cfg);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
+
+/* STATE */
+let CU=null, UD=null, CD=null;
+let newOrders=[], activeOrder=null, historyOrders=[];
+let unsubNew=null, unsubActive=null;
+let soundEnabled=true;
+let todayDeliveries=0, todayEarnings=0;
+
+const COURIER_EARN_PER = 80; /* ₽ за доставку */
+const SL={pending:'Ожидает',confirmed:'Подтверждён',preparing:'Готовится',delivering:'В пути',delivered:'Доставлен',cancelled:'Отменён'};
+const VTYPES={bicycle:'🚴 Велосипед',scooter:'🛵 Самокат',car:'🚗 Автомобиль',foot:'🚶 Пешком'};
+
+/* ── CLOCK ── */
+function updateClock(){
+  const now=new Date();
+  document.getElementById('tb-time').textContent=now.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(updateClock,1000); updateClock();
+
+/* ── AUTH ── */
+onAuthStateChanged(auth, async u=>{
+  if(!u){window.location.href='courier-login.html';return;}
+  CU=u;
+  const snap=await getDoc(doc(db,'users',CU.uid));
+  if(!snap.exists()||snap.data().role!=='courier'){
+    await signOut(auth); window.location.href='courier-login.html'; return;
+  }
+  UD=snap.data();
+  const csnap=await getDoc(doc(db,'couriers',CU.uid));
+  CD=csnap.exists()?csnap.data():{totalDeliveries:0,earnings:0,rating:0,vehicle:'foot',isOnline:false};
+  renderSidebar(); renderProfilePage(); calcTodayStats();
+  startListeners();
+});
+
+/* ── SIDEBAR ── */
+function renderSidebar(){
+  const name=UD?.displayName||CU.email||'Курьер';
+  const init=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'?';
+  document.getElementById('sb-uname').textContent=name;
+  const av=document.getElementById('sb-av');
+  av.innerHTML=UD?.avatarUrl?`<img src="${UD.avatarUrl}" alt="">`:(UD?.avatarUrl===''?init:init);
+  if(UD?.avatarUrl) av.innerHTML=`<img src="${UD.avatarUrl}" alt="">`;
+  else av.textContent=init;
+  updateOnlineUI(CD?.isOnline||false);
+  updateEarnUI();
+}
+
+/* ── ONLINE TOGGLE ── */
+window.toggleOnline=async function(checked){
+  try{
+    await setDoc(doc(db,'couriers',CU.uid),{isOnline:checked,updatedAt:serverTimestamp()},{merge:true});
+    CD={...CD,isOnline:checked};
+    updateOnlineUI(checked);
+    toast(checked?'Вы онлайн — принимаем заказы 🟢':'Вы офлайн','ok');
+  }catch(e){toast('Ошибка','err');}
+};
+
+function updateOnlineUI(online){
+  document.getElementById('online-toggle').checked=online;
+  const stxt=document.getElementById('sb-status-txt');
+  stxt.textContent=online?'Онлайн':'Офлайн';
+  stxt.className='sb-toggle-status '+(online?'online':'offline');
+  const chip=document.getElementById('tb-chip');
+  chip.className='tb-chip '+(online?'online':'offline');
+  document.getElementById('tb-chip-txt').textContent=online?'Онлайн':'Офлайн';
+}
+
+function updateEarnUI(){
+  const earn=todayEarnings;
+  document.getElementById('sb-earn-val').textContent=earn+' ₽';
+  document.getElementById('d-earn').textContent=earn+' ₽';
+}
+
+/* ── STATS ── */
+async function calcTodayStats(){
+  try{
+    const today=new Date(); today.setHours(0,0,0,0);
+    const q=query(collection(db,'orders'),where('courierId','==',CU.uid),where('status','==','delivered'));
+    const snap=await getDocs2(q);
+    const all=snap.docs.map(d=>({id:d.id,...d.data()}));
+    const todayArr=all.filter(o=>{
+      if(!o.updatedAt?.toDate) return false;
+      return o.updatedAt.toDate()>=today;
+    });
+    todayDeliveries=todayArr.length;
+    todayEarnings=todayDeliveries*COURIER_EARN_PER;
+    document.getElementById('d-today').textContent=todayDeliveries;
+    document.getElementById('d-total').textContent=CD?.totalDeliveries||0;
+    document.getElementById('d-rating').textContent=CD?.rating?CD.rating.toFixed(1):'—';
+    updateEarnUI();
+    document.getElementById('ps-total').textContent=CD?.totalDeliveries||0;
+    document.getElementById('ps-earn').textContent=CD?.earnings||0;
+    document.getElementById('ps-rating').textContent=CD?.rating?CD.rating.toFixed(1):'—';
+  }catch(e){}
+}
+
+/* getDocs fallback */
+async function getDocs2(q){
+  const {getDocs}=await import('https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js');
+  return getDocs(q);
+}
+
+/* ── LISTENERS ── */
+function startListeners(){
+  listenNewOrders();
+  listenActiveOrder();
+}
+
+/* New orders realtime */
+function listenNewOrders(){
+  if(unsubNew){unsubNew();unsubNew=null;}
+  // Слушаем pending и confirmed без courierId — без orderBy чтобы не требовал составной индекс
+  const q=query(collection(db,'orders'),where('status','in',['pending','confirmed']),where('courierId','==',null));
+  let first=true;
+  unsubNew=onSnapshot(q,snap=>{
+    const prev=newOrders.length;
+    newOrders=snap.docs.map(d=>({id:d.id,...d.data()}));
+    updateNewBadge();
+    renderNewOrders();
+    renderDashNewOrders();
+    /* Уведомление если новый заказ */
+    if(!first&&newOrders.length>prev){
+      playBeep();
+      toast('🔔 Новый заказ поступил!','info');
+      renderNotifBanner();
+    }
+    first=false;
+  });
+}
+
+/* Active order realtime */
+function listenActiveOrder(){
+  if(unsubActive){unsubActive();unsubActive=null;}
+  const q=query(collection(db,'orders'),where('courierId','==',CU.uid),where('status','in',['delivering','preparing']),limit(1));
+  unsubActive=onSnapshot(q,snap=>{
+    if(snap.empty){activeOrder=null;}
+    else{activeOrder={id:snap.docs[0].id,...snap.docs[0].data()};}
+    renderActiveOrder();
+    renderDashActive();
+    updateActiveBadge();
+  });
+}
+
+/* ── BADGES ── */
+function updateNewBadge(){
+  const b=document.getElementById('new-badge');
+  const cnt=newOrders.length;
+  b.style.display=cnt>0?'':'none'; b.textContent=cnt;
+  document.getElementById('new-count-txt').textContent=cnt+' заказов';
+}
+function updateActiveBadge(){
+  const b=document.getElementById('active-badge');
+  b.style.display=activeOrder?'':'none';
+}
+
+/* ── SOUND ── */
+window.toggleSound=function(){
+  soundEnabled=!soundEnabled;
+  ['sound-btn','sound-btn2'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.className='sound-btn'+(soundEnabled?' on':''); el.innerHTML=soundEnabled?`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg> Звук`:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg> Беззвучно`;}
+  });
+  toast(soundEnabled?'Звук включён':'Звук выключен','ok');
+};
+
+function playBeep(){
+  if(!soundEnabled) return;
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    [0,150,300].forEach((delay,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value=880-(i*80);
+      g.gain.setValueAtTime(.18,ctx.currentTime+delay/1000);
+      g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+delay/1000+.22);
+      o.start(ctx.currentTime+delay/1000);
+      o.stop(ctx.currentTime+delay/1000+.22);
+    });
+  }catch(e){}
+}
+
+/* ── NOTIF BANNER ── */
+function renderNotifBanner(){
+  const wrap=document.getElementById('notif-wrap');
+  if(!newOrders.length){wrap.innerHTML='';return;}
+  wrap.innerHTML=`<div class="notif-banner" onclick="goPage('new-orders')">
+    <div class="notif-pulse"></div>
+    <div class="notif-info"><div class="notif-lbl">Новые заказы</div><div class="notif-txt">${newOrders.length} заказ(а) ожидают курьера</div></div>
+    <svg class="notif-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+  </div>`;
+}
+
+/* ── RENDER NEW ORDERS ── */
+function orderCardHTML(o, showCountdown=false){
+  const items=(o.items||[]).map(i=>`${i.name} ×${i.quantity}`).join(', ');
+  const date=o.createdAt?.toDate?o.createdAt.toDate().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}):'—';
+  const pay=o.paymentMethod==='cash'?'Наличными':o.paymentMethod==='card'?'Картой':'Онлайн';
+  const statusColor=o.status==='confirmed'?'var(--g)':'var(--yellow)';
+  const statusLabel=o.status==='confirmed'?'Подтверждён':'Ожидает';
+  return `<div class="order-new" id="order-${o.id}">
+    <div class="on-head">
+      <div>
+        <div class="on-id">#${o.id.slice(-6).toUpperCase()} <span style="color:${statusColor};font-size:.58rem;margin-left:4px">● ${statusLabel}</span></div>
+        <div class="on-addr">${o.address||'Адрес не указан'}</div>
+      </div>
+      <div class="on-time">${date}</div>
+    </div>
+    ${showCountdown?`<div class="countdown-wrap"><div class="countdown-bar-bg"><div class="countdown-bar-fill" id="cd-${o.id}" style="width:100%"></div></div><div class="countdown-txt"><span>Принять заказ</span><span id="cd-txt-${o.id}">60с</span></div></div>`:''}
+    <div class="on-items">
+      <div class="on-items-title">Состав заказа</div>
+      ${items}
+    </div>
+    <div class="on-footer">
+      <div class="on-meta">
+        <div class="on-meta-item">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          ${COURIER_EARN_PER} ₽ заработок
+        </div>
+        <div class="on-meta-item">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="1"/><path d="M2 10h20"/></svg>
+          ${pay}
+        </div>
+        ${o.comment?`<div class="on-meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>${o.comment}</div>`:''}
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div><div class="on-total">${COURIER_EARN_PER} <span>₽</span></div></div>
+        <button class="btn-accept" onclick="acceptOrder('${o.id}')" id="btn-acc-${o.id}" ${activeOrder?'disabled title="У вас уже есть активный заказ"':''}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Взять заказ
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderNewOrders(){
+  const el=document.getElementById('new-orders-list');
+  // Сортируем на клиенте по времени создания
+  const sorted=[...newOrders].sort((a,b)=>{
+    const ta=a.createdAt?.toDate?a.createdAt.toDate().getTime():0;
+    const tb=b.createdAt?.toDate?b.createdAt.toDate().getTime():0;
+    return ta-tb;
+  });
+  if(!sorted.length){
+    el.innerHTML='<div class="empty"><div class="empty-ico">📭</div><div class="empty-title">Нет новых заказов</div><div class="empty-sub">Заказы появятся здесь автоматически</div></div>';
+    return;
+  }
+  el.innerHTML=sorted.map((o,i)=>orderCardHTML(o,i===0)).join('');
+  if(sorted[0]) startCountdown(sorted[0].id);
+}
+
+function renderDashNewOrders(){
+  const el=document.getElementById('dash-new-orders');
+  if(!newOrders.length){
+    el.innerHTML='<div class="empty" style="padding:30px 20px"><div class="empty-ico">📭</div><div class="empty-title">Новых заказов нет</div><div class="empty-sub">Ожидаем поступления…</div></div>';
+    renderNotifBanner();
+    return;
+  }
+  const sorted=[...newOrders].sort((a,b)=>{const ta=a.createdAt?.toDate?a.createdAt.toDate().getTime():0;const tb=b.createdAt?.toDate?b.createdAt.toDate().getTime():0;return ta-tb;});
+  el.innerHTML=sorted.slice(0,3).map(o=>orderCardHTML(o)).join('');
+  renderNotifBanner();
+}
+
+/* Countdown */
+const countdowns={};
+function startCountdown(oid){
+  if(countdowns[oid]) return;
+  let secs=60;
+  countdowns[oid]=setInterval(()=>{
+    secs--;
+    const bar=document.getElementById('cd-'+oid);
+    const txt=document.getElementById('cd-txt-'+oid);
+    if(bar) bar.style.width=(secs/60*100)+'%';
+    if(txt) txt.textContent=secs+'с';
+    if(bar) bar.style.background=secs<15?'var(--red)':secs<30?'var(--yellow)':'var(--acc)';
+    if(secs<=0){clearInterval(countdowns[oid]);delete countdowns[oid];}
+  },1000);
+}
+
+/* ── ACCEPT ORDER ── */
+window.acceptOrder=async function(oid){
+  if(activeOrder){toast('У вас уже есть активный заказ','err');return;}
+  const btn=document.getElementById('btn-acc-'+oid);
+  if(btn){btn.disabled=true;btn.innerHTML='<div class="spinner" style="border-color:rgba(4,5,6,.2);border-top-color:#040506"></div>';}
+  try{
+    // Принять заказ: ставим delivering (независимо от pending/confirmed)
+    await updateDoc(doc(db,'orders',oid),{
+      courierId:CU.uid,
+      courierName:UD?.displayName||'',
+      status:'delivering',
+      updatedAt:serverTimestamp()
+    });
+    await setDoc(doc(db,'couriers',CU.uid),{currentOrderId:oid,isActive:true,isOnline:true,updatedAt:serverTimestamp()},{merge:true});
+    CD={...CD,currentOrderId:oid,isActive:true,isOnline:true};
+    toast('Заказ принят! Вперёд 🚴','ok');
+    goPage('active');
+    /* Включаем онлайн автоматически */
+    document.getElementById('online-toggle').checked=true;
+    updateOnlineUI(true);
+  }catch(e){toast('Ошибка: '+e.message,'err');if(btn){btn.disabled=false;btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Взять заказ';}}
+};
+
+/* ── ACTIVE ORDER ── */
+const STATUS_STEPS=['confirmed','preparing','delivering','delivered'];
+const STEP_ICONS=['✅','👨‍🍳','🚴','🎉'];
+const STEP_LABELS=['Подтверждён','Готовится','В пути','Доставлен'];
+const STEP_NEXT_BTN=['Начать готовить','Выехал','Доставлен'];
+const STEP_NEXT_STATUS=['preparing','delivering','delivered'];
+
+function renderActiveOrder(){
+  const el=document.getElementById('active-order-content');
+  if(!activeOrder){
+    el.innerHTML='<div class="empty"><div class="empty-ico">🚴</div><div class="empty-title">Нет активного заказа</div><div class="empty-sub">Возьмите заказ из списка новых</div></div>';
+    return;
+  }
+  const o=activeOrder;
+  const si=STATUS_STEPS.indexOf(o.status);
+  const date=o.createdAt?.toDate?o.createdAt.toDate().toLocaleString('ru-RU'):'—';
+  const pay=o.paymentMethod==='cash'?'Наличными':o.paymentMethod==='card'?'Картой':'Онлайн';
+  const steps=STATUS_STEPS.map((s,i)=>{
+    let cls='';if(i<si)cls='done';else if(i===si)cls='current';
+    return `<div class="st-step ${cls}"><div class="st-dot">${i<=si?STEP_ICONS[i]:''}</div><div class="st-lbl">${STEP_LABELS[i]}</div></div>`;
+  }).join('');
+
+  const nextIdx=si+1;
+  const canAdvance=nextIdx<STATUS_STEPS.length;
+
+  el.innerHTML=`<div class="active-order">
+    <div class="ao-head">
+      <div>
+        <div class="ao-id">Заказ #${o.id.slice(-6).toUpperCase()}</div>
+        <div style="font-size:.85rem;font-weight:600;color:var(--text);margin-top:3px">${o.address||'—'}</div>
+      </div>
+      <div class="ao-badge"><div class="ao-pulse"></div>${SL[o.status]||o.status}</div>
+    </div>
+    <div class="st-track">${steps}</div>
+    <div class="divider"></div>
+    <div class="oinfo-grid">
+      <div class="oinfo-item"><div class="oinfo-lbl">Клиент</div><div class="oinfo-val">${o.clientName||'—'}</div></div>
+      <div class="oinfo-item"><div class="oinfo-lbl">Оплата</div><div class="oinfo-val">${pay}</div></div>
+      <div class="oinfo-item"><div class="oinfo-lbl">Комментарий</div><div class="oinfo-val">${o.comment||'Нет'}</div></div>
+      <div class="oinfo-item"><div class="oinfo-lbl">Время заказа</div><div class="oinfo-val">${date}</div></div>
+    </div>
+    <div class="divider"></div>
+    <div class="oinfo-lbl" style="margin-bottom:8px">Состав заказа</div>
+    <div class="items-list">
+      ${(o.items||[]).map(i=>`<div class="item-row"><span class="item-name">${i.name}</span><span class="item-qty">×${i.quantity}</span><span class="item-price">${i.price*i.quantity} ₽</span></div>`).join('')}
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--b)">
+      <span style="font-weight:600;font-size:.8rem">Итого клиент</span>
+      <span style="font-family:var(--fm);font-size:.88rem;color:var(--text)">${o.total} ₽</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:6px">
+      <span style="font-size:.8rem;color:var(--muted)">Ваш заработок</span>
+      <span style="font-family:var(--fm);font-size:.88rem;color:var(--g)">${COURIER_EARN_PER} ₽</span>
+    </div>
+    ${canAdvance?`<div class="status-actions">
+      <button class="btn-status${STEP_NEXT_STATUS[si]==='delivered'?' delivered':''}" onclick="advanceStatus('${o.id}','${STEP_NEXT_STATUS[si]}')">
+        ${STEP_NEXT_BTN[si]} →
+      </button>
+    </div>`:''}
+  </div>`;
+}
+
+function renderDashActive(){
+  const wrap=document.getElementById('dash-active-wrap');
+  if(!activeOrder){wrap.innerHTML='';return;}
+  const o=activeOrder;
+  wrap.innerHTML=`<div style="margin-bottom:4px"><div class="sec-lbl">Текущий заказ</div></div>
+  <div class="notif-banner" onclick="goPage('active')" style="background:linear-gradient(135deg,rgba(62,207,142,.1),rgba(62,207,142,.04));border-color:rgba(62,207,142,.25)">
+    <div class="notif-pulse" style="background:var(--g)"></div>
+    <div class="notif-info"><div class="notif-lbl" style="color:var(--g)">Активный заказ</div><div class="notif-txt">#${o.id.slice(-6).toUpperCase()} · ${SL[o.status]} · ${o.address||''}</div></div>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+  </div>`;
+}
+
+/* ── ADVANCE STATUS ── */
+window.advanceStatus=async function(oid,newStatus){
+  try{
+    await updateDoc(doc(db,'orders',oid),{status:newStatus,updatedAt:serverTimestamp()});
+    if(newStatus==='delivered'){
+      await setDoc(doc(db,'couriers',CU.uid),{
+        currentOrderId:null,isActive:false,
+        totalDeliveries:(CD?.totalDeliveries||0)+1,
+        earnings:(CD?.earnings||0)+COURIER_EARN_PER,
+        updatedAt:serverTimestamp()
+      },{merge:true});
+      CD={...CD,currentOrderId:null,isActive:false,totalDeliveries:(CD?.totalDeliveries||0)+1,earnings:(CD?.earnings||0)+COURIER_EARN_PER};
+      todayDeliveries++; todayEarnings+=COURIER_EARN_PER;
+      document.getElementById('d-today').textContent=todayDeliveries;
+      document.getElementById('d-total').textContent=CD.totalDeliveries;
+      updateEarnUI();
+      document.getElementById('ps-total').textContent=CD.totalDeliveries;
+      document.getElementById('ps-earn').textContent=CD.earnings;
+      toast('🎉 Доставка выполнена! +'+COURIER_EARN_PER+' ₽','ok');
+      loadHistory();
+    }else{
+      toast('Статус обновлён: '+SL[newStatus],'ok');
+    }
+  }catch(e){toast('Ошибка обновления','err');}
+};
+
+/* ── HISTORY ── */
+async function loadHistory(){
+  const el=document.getElementById('history-list');
+  el.innerHTML='<div class="pload"><div class="spinner"></div> Загрузка…</div>';
+  try{
+    const {getDocs}=await import('https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js');
+    const q=query(collection(db,'orders'),where('courierId','==',CU.uid),where('status','==','delivered'),orderBy('updatedAt','desc'),limit(50));
+    const snap=await getDocs(q);
+    historyOrders=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderHistory();
+  }catch(e){el.innerHTML='<div class="empty"><div class="empty-ico">📭</div><div class="empty-title">Нет доставок</div></div>';}
+}
+
+function renderHistory(){
+  const el=document.getElementById('history-list');
+  const totalEarned=historyOrders.length*COURIER_EARN_PER;
+  document.getElementById('hist-total-txt').textContent=historyOrders.length+' доставок · '+totalEarned+' ₽';
+  if(!historyOrders.length){
+    el.innerHTML='<div class="empty"><div class="empty-ico">📭</div><div class="empty-title">Нет доставок</div><div class="empty-sub">Выполненные доставки появятся здесь</div></div>';
+    return;
+  }
+  el.innerHTML=historyOrders.map(o=>{
+    const date=o.updatedAt?.toDate?o.updatedAt.toDate().toLocaleDateString('ru-RU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'—';
+    const items=(o.items||[]).map(i=>i.name).join(', ');
+    return `<div class="hcard">
+      <div class="hcard-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="hcard-info">
+        <div class="hcard-id">#${o.id.slice(-6).toUpperCase()}</div>
+        <div class="hcard-addr">${o.address||'—'}</div>
+        <div class="hcard-meta">${date} · ${items}</div>
+      </div>
+      <div class="hcard-earn">+${COURIER_EARN_PER} ₽</div>
+    </div>`;
+  }).join('');
+}
+
+/* ── PROFILE ── */
+function renderProfilePage(){
+  const name=UD?.displayName||CU.displayName||'';
+  const init=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'?';
+  document.getElementById('p-name').textContent=name||'Курьер';
+  document.getElementById('p-email').textContent=CU.email||'';
+  const av=document.getElementById('p-av');
+  if(UD?.avatarUrl) av.innerHTML=`<img src="${UD.avatarUrl}" alt="">`;
+  else av.textContent=init;
+  const veh=CD?.vehicle||'foot';
+  document.getElementById('p-vehicle').innerHTML=`${VTYPES[veh]||veh}`;
+  document.getElementById('pf-name').value=name;
+  document.getElementById('pf-email').value=CU.email||'';
+  document.getElementById('pf-phone').value=UD?.phone||'';
+  document.getElementById('pf-vehicle').value=CD?.vehicle||'foot';
+  document.getElementById('ps-total').textContent=CD?.totalDeliveries||0;
+  document.getElementById('ps-earn').textContent=CD?.earnings||0;
+  document.getElementById('ps-rating').textContent=CD?.rating?CD.rating.toFixed(1):'—';
+}
+
+window.saveProfile=async function(){
+  const name=document.getElementById('pf-name').value.trim();
+  const phone=document.getElementById('pf-phone').value.trim();
+  const vehicle=document.getElementById('pf-vehicle').value;
+  try{
+    await setDoc(doc(db,'users',CU.uid),{displayName:name,phone,updatedAt:serverTimestamp()},{merge:true});
+    await setDoc(doc(db,'couriers',CU.uid),{displayName:name,phone,vehicle,updatedAt:serverTimestamp()},{merge:true});
+    UD={...UD,displayName:name,phone};
+    CD={...CD,vehicle};
+    renderSidebar(); renderProfilePage();
+    toast('Профиль сохранён','ok');
+  }catch(e){toast('Ошибка','err');}
+};
+
+window.uploadAvUI=async function(inp){
+  const f=inp.files[0];if(!f)return;
+  if(f.size>2*1024*1024){toast('Файл слишком большой','err');return;}
+  toast('Загружаем…');
+  try{
+    const sr=sRef(storage,`avatars/${CU.uid}`);
+    await uploadBytes(sr,f);
+    const url=await getDownloadURL(sr);
+    await setDoc(doc(db,'users',CU.uid),{avatarUrl:url,updatedAt:serverTimestamp()},{merge:true});
+    UD.avatarUrl=url; renderSidebar(); renderProfilePage(); toast('Аватар обновлён','ok');
+  }catch(e){toast('Ошибка загрузки','err');}
+};
+
+/* ── NAV ── */
+window.goPage=function(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page)?.classList.add('active');
+  document.querySelector(`.nav-item[data-page="${page}"]`)?.classList.add('active');
+  const titles={dashboard:'Дашборд','new-orders':'Новые заказы',active:'Активный заказ',history:'История доставок',profile:'Профиль'};
+  document.getElementById('tb-title').textContent=titles[page]||'Galelium Courier';
+  if(page==='history') loadHistory();
+  if(page==='active') renderActiveOrder();
+  if(page==='dashboard'){renderDashNewOrders();renderDashActive();}
+  closeSidebar();
+  document.getElementById('pages').scrollTop=0;
+};
+
+window.toggleSidebar=function(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sb-overlay').classList.toggle('open');};
+window.closeSidebar=function(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').classList.remove('open');};
+document.getElementById('sb-overlay').addEventListener('click',closeSidebar);
+
+window.doLogout=async function(){
+  if(unsubNew)unsubNew();if(unsubActive)unsubActive();
+  try{await setDoc(doc(db,'couriers',CU.uid),{isOnline:false,updatedAt:serverTimestamp()},{merge:true});}catch(e){}
+  await signOut(auth);
+  window.location.href='courier-login.html';
+};
+
+window.toast=function(msg,type=''){
+  const wrap=document.getElementById('toast-wrap');
+  const el=document.createElement('div');
+  el.className='toast '+type;
+  el.innerHTML=`<div class="tdot"></div><span>${msg}</span>`;
+  wrap.appendChild(el);
+  setTimeout(()=>el.remove(),3300);
+};
+</script>
+</body>
+</html>
