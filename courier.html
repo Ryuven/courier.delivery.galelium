@@ -475,7 +475,7 @@ a{color:inherit;text-decoration:none}
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js';
 import{getAuth,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js';
-import{getFirestore,doc,getDoc,setDoc,updateDoc,getDocs,collection,query,where,orderBy,onSnapshot,serverTimestamp,limit}from'https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js';
+import{getFirestore,doc,getDoc,setDoc,updateDoc,getDocs,collection,query,where,onSnapshot,serverTimestamp}from'https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js';
 import{getStorage,ref as sRef,uploadBytes,getDownloadURL}from'https://www.gstatic.com/firebasejs/11.8.1/firebase-storage.js';
 const cfg={apiKey:'AIzaSyCjIAMFuwLKwmjChCuiz-MHLv5WZOczAAE',authDomain:'delivery-galelium.firebaseapp.com',projectId:'delivery-galelium',storageBucket:'delivery-galelium.firebasestorage.app',messagingSenderId:'982466555080',appId:'1:982466555080:web:c77ccbff0e71e540ddc9fd'};
 const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app),storage=getStorage(app);
@@ -496,12 +496,13 @@ setInterval(tick,10000);tick();
 onAuthStateChanged(auth,async u=>{
   if(!u){location.href='courier-login.html';return;}
   CU=u;
+  try{
   const s=await getDoc(doc(db,'users',CU.uid));
-  if(!s.exists()||s.data().role!=='courier'){await signOut(auth);location.href='courier-login.html';return;}
-  UD=s.data();
+  UD=s.exists()?s.data():{displayName:CU.displayName||'',email:CU.email,phone:'',role:'courier',avatarUrl:''};
   const cs=await getDoc(doc(db,'couriers',CU.uid));
   CD=cs.exists()?cs.data():{totalDeliveries:0,earnings:0,rating:0,vehicle:'foot',isOnline:false};
   renderSB();renderProfile();calcStats();startListeners();
+  }catch(e){console.error('Init error:',e);toast('Хато дар боргузорӣ: '+e.message,'err');}
 });
 
 function renderSB(){
@@ -534,8 +535,10 @@ function updateEarnUI(){
 async function calcStats(){
   try{
     const today=new Date();today.setHours(0,0,0,0);
-    const q=query(collection(db,'orders'),where('courierId','==',CU.uid),where('status','==','delivered'));
-    const sn=await getDocs(q);const all=sn.docs.map(d=>({id:d.id,...d.data()}));
+    // Simple single-field query to avoid needing composite index
+    const q=query(collection(db,'orders'),where('courierId','==',CU.uid));
+    const sn=await getDocs(q);
+    const all=sn.docs.map(d=>({id:d.id,...d.data()})).filter(o=>o.status==='delivered');
     const td=all.filter(o=>o.updatedAt?.toDate&&o.updatedAt.toDate()>=today);
     todayDeliveries=td.length;todayEarnings=todayDeliveries*EPD;
     const dt=document.getElementById('d-today');if(dt)dt.textContent=todayDeliveries;
@@ -552,25 +555,38 @@ async function calcStats(){
 function startListeners(){listenNew();listenActive();}
 function listenNew(){
   if(unsubNew){unsubNew();unsubNew=null;}
-  // Listen for pending/confirmed orders with no courier
-  const q=query(collection(db,'orders'),where('status','in',['pending','confirmed']));
+  // Simple single-field query — no composite index needed
+  const q=query(collection(db,'orders'),where('status','==','pending'));
   let first=true;
   unsubNew=onSnapshot(q,sn=>{
     const prev=newOrders.length;
-    // filter out orders that already have a courier
+    // Filter client-side: no courier assigned yet
     newOrders=sn.docs.map(d=>({id:d.id,...d.data()})).filter(o=>!o.courierId);
     updateNewBadge();renderNewOrders();renderDashNew();
     if(!first&&newOrders.length>prev){playBeep();toast('🔔 Фармоиши нав!','info');}
     first=false;
+  },err=>{
+    console.error('listenNew error:',err);
+    const el=document.getElementById('new-orders-list');
+    if(el)el.innerHTML='<div class="empty"><span class="empty-ico">📭</span><div class="empty-t">Фармоишҳои нав нест</div></div>';
+    const el2=document.getElementById('dash-new-orders');
+    if(el2)el2.innerHTML='<div class="empty" style="padding:28px 20px"><span class="empty-ico">📭</span><div class="empty-t">Нет новых заказов</div></div>';
   });
 }
 function listenActive(){
   if(unsubActive){unsubActive();unsubActive=null;}
-  const q=query(collection(db,'orders'),where('courierId','==',CU.uid),where('status','in',['preparing','delivering']));
+  // Query only by courierId — single field, no index needed
+  const q=query(collection(db,'orders'),where('courierId','==',CU.uid));
   unsubActive=onSnapshot(q,sn=>{
-    activeOrder=sn.empty?null:{id:sn.docs[0].id,...sn.docs[0].data()};
-    if(activeOrder)checkedItems={};
+    // Find the one that is active (client-side filter)
+    const active=sn.docs.map(d=>({id:d.id,...d.data()})).find(o=>['preparing','delivering'].includes(o.status));
+    const wasActive=!!activeOrder;
+    activeOrder=active||null;
+    // Only reset checklist if new order came in
+    if(activeOrder&&!wasActive)checkedItems={};
     renderActive();renderDashActive();updateActiveBadge();
+  },err=>{
+    console.error('listenActive error:',err);
   });
 }
 
@@ -854,11 +870,18 @@ async function loadHistory(){
   const el=document.getElementById('history-list');if(!el)return;
   el.innerHTML='<div class="pload"><div class="spin"></div> Боргузорӣ…</div>';
   try{
-    const q=query(collection(db,'orders'),where('courierId','==',CU.uid),where('status','==','delivered'),orderBy('updatedAt','desc'),limit(50));
+    // Query by courierId only, filter delivered client-side
+    const q=query(collection(db,'orders'),where('courierId','==',CU.uid));
     const sn=await getDocs(q);
-    historyOrders=sn.docs.map(d=>({id:d.id,...d.data()}));
+    historyOrders=sn.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(o=>o.status==='delivered')
+      .sort((a,b)=>{
+        const ta=a.updatedAt?.toDate?a.updatedAt.toDate().getTime():0;
+        const tb=b.updatedAt?.toDate?b.updatedAt.toDate().getTime():0;
+        return tb-ta;
+      }).slice(0,50);
     renderHistory();
-  }catch{el.innerHTML='<div class="empty"><span class="empty-ico">📭</span><div class="empty-t">Таърих нест</div></div>';}
+  }catch(e){console.error('loadHistory:',e);el.innerHTML='<div class="empty"><span class="empty-ico">📭</span><div class="empty-t">Таърих нест</div></div>';}
 }
 function renderHistory(){
   const el=document.getElementById('history-list');if(!el)return;
