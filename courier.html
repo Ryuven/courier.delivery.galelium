@@ -296,7 +296,7 @@ a{color:inherit;text-decoration:none}
 
 /* ── MOBILE ── */
 .mob-nav{display:none}
-.sb-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
+.sb-overlay{display:none;position:fixed;inset:0;z-index:199;background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
 @media(max-width:820px){
   .sb{position:fixed;left:0;top:0;bottom:0;z-index:200;transform:translateX(-110%)}
   .sb.open{transform:translateX(0);box-shadow:20px 0 60px rgba(0,0,0,.5)}
@@ -545,12 +545,30 @@ onAuthStateChanged(auth,async u=>{
   if(!u){location.href='courier-login.html';return;}
   CU=u;
   try{
-  const s=await getDoc(doc(db,'users',CU.uid));
-  UD=s.exists()?s.data():{displayName:CU.displayName||'',email:CU.email,phone:'',role:'courier',avatarUrl:''};
-  const cs=await getDoc(doc(db,'couriers',CU.uid));
-  CD=cs.exists()?cs.data():{totalDeliveries:0,earnings:0,rating:0,vehicle:'foot',isOnline:false};
-  renderSB();renderProfile();calcStats();startListeners();
-  }catch(e){console.error('Init error:',e);toast('Хато дар боргузорӣ: '+e.message,'err');}
+    const s=await getDoc(doc(db,'users',CU.uid));
+    UD=s.exists()?s.data():{displayName:CU.displayName||u.email||'Курьер',email:u.email,phone:'',role:'courier',avatarUrl:''};
+    const cs=await getDoc(doc(db,'couriers',CU.uid));
+    CD=cs.exists()?cs.data():{totalDeliveries:0,earnings:0,rating:0,vehicle:'foot',isOnline:false};
+    renderSB();renderProfile();calcStats();startListeners();
+  }catch(e){
+    console.error('Init error:',e);
+    // Show error in UI instead of infinite spinner
+    const errMsg=e.code==='permission-denied'
+      ?'Дастрас рад шуд. Қоидаҳои Firestore-ро санҷед (Rules).'
+      :'Хато: '+e.message;
+    toast(errMsg,'err');
+    // Still render what we can with defaults
+    UD={displayName:u.displayName||u.email||'Курьер',email:u.email,phone:'',role:'courier',avatarUrl:''};
+    CD={totalDeliveries:0,earnings:0,rating:0,vehicle:'foot',isOnline:false};
+    renderSB();renderProfile();
+    // Show error in orders list
+    ['dash-new-orders','new-orders-list'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el)el.innerHTML='<div class="empty"><span class="empty-ico">⚠️</span><div class="empty-t">Хато дар пайвастшавӣ</div><div class="empty-s">'+errMsg+'</div></div>';
+    });
+    // Try listeners anyway — they have their own error handlers
+    try{startListeners();}catch{}
+  }
 });
 
 function renderSB(){
@@ -603,38 +621,34 @@ async function calcStats(){
 function startListeners(){listenNew();listenActive();}
 function listenNew(){
   if(unsubNew){unsubNew();unsubNew=null;}
-  // Simple single-field query — no composite index needed
   const q=query(collection(db,'orders'),where('status','==','pending'));
   let first=true;
   unsubNew=onSnapshot(q,sn=>{
     const prev=newOrders.length;
-    // Filter client-side: no courier assigned yet
     newOrders=sn.docs.map(d=>({id:d.id,...d.data()})).filter(o=>!o.courierId);
     updateNewBadge();renderNewOrders();renderDashNew();
     if(!first&&newOrders.length>prev){playBeep();toast('🔔 Фармоиши нав!','info');}
     first=false;
   },err=>{
-    console.error('listenNew error:',err);
-    const el=document.getElementById('new-orders-list');
-    if(el)el.innerHTML='<div class="empty"><span class="empty-ico">📭</span><div class="empty-t">Фармоишҳои нав нест</div></div>';
-    const el2=document.getElementById('dash-new-orders');
-    if(el2)el2.innerHTML='<div class="empty" style="padding:28px 20px"><span class="empty-ico">📭</span><div class="empty-t">Нет новых заказов</div></div>';
+    console.error('listenNew error:',err.code,err.message);
+    const msg=err.code==='permission-denied'?'Дастрас рад шуд (Rules)':err.message;
+    ['new-orders-list','dash-new-orders'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el)el.innerHTML=`<div class="empty"><span class="empty-ico">⚠️</span><div class="empty-t">Хато</div><div class="empty-s">${msg}</div></div>`;
+    });
   });
 }
 function listenActive(){
   if(unsubActive){unsubActive();unsubActive=null;}
-  // Query only by courierId — single field, no index needed
   const q=query(collection(db,'orders'),where('courierId','==',CU.uid));
   unsubActive=onSnapshot(q,sn=>{
-    // Find the one that is active (client-side filter)
     const active=sn.docs.map(d=>({id:d.id,...d.data()})).find(o=>['preparing','delivering'].includes(o.status));
     const wasActive=!!activeOrder;
     activeOrder=active||null;
-    // Only reset checklist if new order came in
     if(activeOrder&&!wasActive)checkedItems={};
     renderActive();renderDashActive();updateActiveBadge();
   },err=>{
-    console.error('listenActive error:',err);
+    console.error('listenActive error:',err.code,err.message);
   });
 }
 
