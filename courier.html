@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="tg">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
@@ -9,802 +9,368 @@
 <title>Galelium Courier</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Inter:wght@300;400;500;600;700&display=swap"/>
 <style>
 :root{
-  --bg:#050807;
-  --s1:#09100d;
-  --s2:#0f1a14;
-  --s3:#162019;
-  --s4:#1d2b22;
-  --b:rgba(62,207,142,.08);
-  --bh:rgba(62,207,142,.18);
-  --g:#3ecf8e;
-  --g2:#2db87a;
-  --gd:rgba(62,207,142,.10);
-  --gg:rgba(62,207,142,.22);
-  --gs:rgba(62,207,142,.06);
-  --acc:#ff6b35;
-  --accd:rgba(255,107,53,.12);
-  --red:#f5425d;
-  --redd:rgba(245,66,93,.10);
-  --yellow:#f5a623;
-  --yellowd:rgba(245,166,35,.10);
-  --blue:#4d9eff;
-  --text:#cce8d8;
-  --text2:#8aad98;
-  --muted:#4a6b57;
-  --muted2:#253730;
-  --muted3:#162018;
-  --fd:'Syne',sans-serif;
-  --fm:'DM Mono',monospace;
-  --fs:'Inter',system-ui,sans-serif;
-  --ease:cubic-bezier(.32,0,.18,1);
-  --spring:cubic-bezier(.34,1.56,.64,1);
-  --t:.2s;
-  --tf:.12s;
-  --sw:268px;
-  --th:58px;
-  --nb:64px; /* mobile nav bar */
+  --bg:#0b0f0c;--s1:#111812;--s2:#162019;--s3:#1c2b1f;--s4:#243328;
+  --b0:rgba(62,207,142,.07);--b1:rgba(62,207,142,.14);--b2:rgba(62,207,142,.22);
+  --g:#2ecc7a;--g2:#1ea85e;--gd:rgba(46,204,122,.09);--gg:rgba(46,204,122,.22);
+  --g-shadow:rgba(46,204,122,.22);
+  --acc:#f59e0b;--acc-d:rgba(245,158,11,.1);--acc-g:rgba(245,158,11,.2);
+  --red:#ef4444;--redd:rgba(239,68,68,.1);
+  --blue:#3b82f6;--blue-d:rgba(59,130,246,.1);
+  --purple:#a855f7;
+  --tx:#d4edd9;--tx2:#8aad96;--tx3:#4d7a5b;
+  --fd:'Nunito',sans-serif;--fs:'Inter',system-ui,sans-serif;
+  --ease:cubic-bezier(.32,0,.18,1);--spring:cubic-bezier(.34,1.56,.64,1);
+  --t:.22s;--tf:.13s;
+  --sw:264px;--th:58px;--nb:66px;
   --safe-b:env(safe-area-inset-bottom,0px);
+  --shadow:0 1px 4px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.2);
+  --shadow-g:0 4px 20px rgba(46,204,122,.15);
 }
-
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{height:100%;-webkit-text-size-adjust:100%}
-body{
-  background:var(--bg);color:var(--text);
-  font-family:var(--fs);font-weight:400;
-  min-height:100svh;overflow:hidden;
-  -webkit-font-smoothing:antialiased;
-}
-::-webkit-scrollbar{width:3px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--muted2);border-radius:99px}
-
-/* === NOISE TEXTURE === */
-body::before{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-  opacity:.4;
-}
-/* glow */
-body::after{
-  content:'';position:fixed;pointer-events:none;z-index:0;
-  width:600px;height:600px;border-radius:50%;
-  background:radial-gradient(circle,rgba(62,207,142,.04) 0%,transparent 70%);
-  top:-100px;left:-100px;
-}
-
+body{background:var(--bg);color:var(--tx);font-family:var(--fs);font-weight:400;min-height:100svh;overflow:hidden;-webkit-font-smoothing:antialiased}
+body::after{content:'';position:fixed;pointer-events:none;z-index:0;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(46,204,122,.04),transparent 70%);top:-80px;left:-80px;}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--g);color:#0b0f0c}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--s4);border-radius:99px}
 .app{display:flex;height:100svh;position:relative;z-index:1}
 
-/* ═══════════════════════════════════
-   SIDEBAR — DESKTOP
-═══════════════════════════════════ */
-.sb{
-  width:var(--sw);flex-shrink:0;
-  background:var(--s1);
-  border-right:1px solid var(--b);
-  display:flex;flex-direction:column;
-  transition:transform var(--t) var(--ease);
-  position:relative;z-index:100;
-  overflow:hidden;
-}
-.sb::after{
-  content:'';position:absolute;top:0;left:0;right:0;height:200px;pointer-events:none;
-  background:radial-gradient(ellipse 100% 200px at 50% 0%,rgba(62,207,142,.06),transparent);
-}
-
-/* Logo */
-.sb-logo{
-  padding:20px 20px 16px;
-  border-bottom:1px solid var(--b);
-  display:flex;align-items:center;gap:11px;
-  position:relative;z-index:1;
-}
-.sb-logo-mark{
-  width:34px;height:34px;flex-shrink:0;
-  background:linear-gradient(135deg,var(--g),var(--g2));
-  display:flex;align-items:center;justify-content:center;
-  color:#05080a;border-radius:8px;
-  box-shadow:0 4px 12px rgba(62,207,142,.25);
-}
-.sb-wordmark{
-  font-family:var(--fd);font-weight:800;font-size:.88rem;
-  color:#fff;letter-spacing:-.02em;line-height:1;
-}
-.sb-wordmark em{color:var(--g);font-style:normal}
-.sb-wordmark-sub{
-  font-size:.42rem;letter-spacing:.3em;text-transform:uppercase;
-  color:var(--muted);margin-top:3px;
-}
-
-/* Online card */
-.sb-online{
-  margin:12px 14px 8px;
-  background:var(--s2);
-  border:1px solid var(--b);
-  border-radius:10px;
-  padding:12px 14px;
-  display:flex;align-items:center;justify-content:space-between;
-  gap:10px;position:relative;z-index:1;
-  transition:border-color var(--tf);
-}
-.sb-online.is-online{border-color:var(--gg);background:var(--gs)}
-.sb-online-info{}
-.sb-online-lbl{font-size:.5rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
-.sb-online-val{font-size:.8rem;font-weight:600;color:var(--muted)}
+/* ── SIDEBAR ── */
+.sb{width:var(--sw);flex-shrink:0;background:var(--s1);border-right:1px solid var(--b0);display:flex;flex-direction:column;z-index:100;overflow:hidden;transition:transform var(--t) var(--ease)}
+.sb::after{content:'';position:absolute;top:0;left:0;right:0;height:160px;pointer-events:none;background:radial-gradient(ellipse 100% 160px at 50% 0%,rgba(46,204,122,.05),transparent)}
+.sb-logo{padding:18px 18px 14px;border-bottom:1px solid var(--b0);display:flex;align-items:center;gap:10px;position:relative;z-index:1}
+.sb-logo-mark{width:34px;height:34px;flex-shrink:0;background:linear-gradient(135deg,var(--g),var(--g2));border-radius:10px;display:flex;align-items:center;justify-content:center;color:#0b0f0c;box-shadow:0 4px 12px var(--g-shadow)}
+.sb-logo-text{font-family:var(--fd);font-weight:900;font-size:.9rem;color:var(--tx);line-height:1.1}
+.sb-logo-text em{color:var(--g);font-style:normal}
+.sb-logo-sub{font-size:.44rem;letter-spacing:.26em;text-transform:uppercase;color:var(--tx3);margin-top:2px}
+/* online card */
+.sb-online{margin:10px 14px 8px;padding:11px 14px;background:var(--s2);border:1px solid var(--b0);border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;z-index:1;transition:border-color var(--tf)}
+.sb-online.on{border-color:var(--gg);background:var(--gd)}
+.sb-online-lbl{font-size:.44rem;letter-spacing:.2em;text-transform:uppercase;color:var(--tx3);margin-bottom:2px}
+.sb-online-val{font-size:.78rem;font-weight:600;color:var(--tx3)}
 .sb-online-val.on{color:var(--g)}
-
-/* pill toggle */
-.tog{position:relative;width:42px;height:24px;cursor:pointer;flex-shrink:0}
+.tog{position:relative;width:40px;height:22px;cursor:pointer;flex-shrink:0}
 .tog input{opacity:0;position:absolute;width:0;height:0}
-.tog-track{
-  position:absolute;inset:0;border-radius:99px;
-  background:var(--muted2);border:1px solid var(--b);
-  transition:background .3s,border-color .3s;
-}
+.tog-track{position:absolute;inset:0;border-radius:99px;background:var(--s4);border:1px solid var(--b0);transition:background .25s,border-color .25s}
 .tog input:checked~.tog-track{background:var(--g);border-color:var(--g)}
-.tog-thumb{
-  position:absolute;top:3px;left:3px;
-  width:16px;height:16px;border-radius:50%;
-  background:#fff;
-  box-shadow:0 1px 4px rgba(0,0,0,.3);
-  transition:transform .25s var(--spring);
-}
-.tog input:checked~.tog-track~.tog-thumb,
-.tog input:checked+.tog-track+.tog-thumb{transform:translateX(18px)}
-
-/* Earn strip */
-.sb-earn{
-  margin:0 14px 10px;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:9px 13px;
-  background:var(--s2);border:1px solid var(--b);border-radius:8px;
-  position:relative;z-index:1;
-}
-.sb-earn-lbl{font-size:.46rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
-.sb-earn-val{font-family:var(--fm);font-size:.88rem;color:var(--g);font-weight:500;letter-spacing:.02em}
-
-/* Nav */
+.tog-thumb{position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.4);transition:transform .25s var(--spring)}
+.tog input:checked~.tog-track~.tog-thumb{transform:translateX(18px)}
+/* earn */
+.sb-earn{margin:0 14px 8px;padding:10px 14px;background:var(--s2);border:1px solid var(--b0);border-radius:10px;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
+.sb-earn-lbl{font-size:.44rem;letter-spacing:.2em;text-transform:uppercase;color:var(--tx3);margin-bottom:2px}
+.sb-earn-val{font-size:.9rem;font-weight:700;color:var(--g);font-family:var(--fd)}
+/* nav */
 .sb-nav{flex:1;overflow-y:auto;padding:6px 10px;position:relative;z-index:1}
-.nav-grp{font-size:.42rem;letter-spacing:.3em;text-transform:uppercase;color:var(--muted2);padding:12px 8px 4px}
-.ni{
-  display:flex;align-items:center;gap:10px;
-  padding:9px 10px;cursor:pointer;
-  color:var(--muted);font-size:.78rem;font-weight:500;
-  border-radius:8px;
-  position:relative;transition:color var(--tf),background var(--tf);
-  border:none;background:none;width:100%;text-align:left;font-family:var(--fs);
-}
-.ni:hover{color:var(--text2);background:var(--s2)}
+.nav-grp{font-size:.42rem;letter-spacing:.28em;text-transform:uppercase;color:var(--tx3);padding:12px 8px 4px}
+.ni{display:flex;align-items:center;gap:10px;padding:9px 10px;cursor:pointer;color:var(--tx3);font-size:.76rem;font-weight:500;border-radius:8px;position:relative;transition:color var(--tf),background var(--tf);border:none;background:none;width:100%;text-align:left;font-family:var(--fs)}
+.ni:hover{color:var(--tx2);background:var(--s2)}
 .ni.active{color:var(--g);background:var(--gd)}
-.ni svg{flex-shrink:0;opacity:.6;transition:opacity var(--tf)}
-.ni.active svg{opacity:1}
-.ni-badge{
-  margin-left:auto;min-width:18px;height:18px;padding:0 5px;
-  background:var(--acc);color:#fff;
-  font-size:.5rem;font-weight:700;
-  display:flex;align-items:center;justify-content:center;
-  border-radius:99px;
-}
-.ni-badge.new-pulse{animation:nbPop .35s var(--spring) both,nbPulse 2s ease-in-out infinite .35s}
-@keyframes nbPop{from{transform:scale(0)}to{transform:scale(1)}}
-@keyframes nbPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,107,53,.5)}60%{box-shadow:0 0 0 5px rgba(255,107,53,0)}}
-
-/* User */
-.sb-bottom{padding:10px;border-top:1px solid var(--b);position:relative;z-index:1}
-.sb-user{
-  display:flex;align-items:center;gap:10px;
-  padding:8px 10px;cursor:pointer;border-radius:8px;
-  transition:background var(--tf);
-}
+.ni.active::before{content:'';position:absolute;left:0;top:4px;bottom:4px;width:3px;background:var(--g);border-radius:0 3px 3px 0}
+.ni svg{flex-shrink:0;opacity:.5;transition:opacity var(--tf)}
+.ni.active svg,.ni:hover svg{opacity:1}
+.ni-badge{margin-left:auto;min-width:18px;height:18px;padding:0 5px;background:var(--acc);color:#fff;font-size:.5rem;font-weight:700;display:flex;align-items:center;justify-content:center;border-radius:99px;animation:bPop .3s var(--spring) both}
+.ni-badge.g{background:var(--g)}
+@keyframes bPop{from{transform:scale(0)}to{transform:scale(1)}}
+.sb-bottom{padding:10px;border-top:1px solid var(--b0);position:relative;z-index:1}
+.sb-user{display:flex;align-items:center;gap:10px;padding:8px 10px;cursor:pointer;border-radius:8px;transition:background var(--tf)}
 .sb-user:hover{background:var(--s2)}
-.sb-av{
-  width:32px;height:32px;border-radius:50%;
-  background:var(--gd);border:1.5px solid var(--gg);
-  display:flex;align-items:center;justify-content:center;
-  font-size:.65rem;font-weight:700;color:var(--g);
-  flex-shrink:0;overflow:hidden;
-}
+.sb-av{width:32px;height:32px;border-radius:50%;background:var(--gd);border:1.5px solid var(--gg);display:flex;align-items:center;justify-content:center;font-size:.64rem;font-weight:700;color:var(--g);flex-shrink:0;overflow:hidden}
 .sb-av img{width:100%;height:100%;object-fit:cover}
-.sb-uinfo{flex:1;min-width:0}
-.sb-uname{font-size:.75rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sb-urole{font-size:.54rem;color:var(--muted);letter-spacing:.04em;margin-top:1px}
-.sb-logout{
-  background:none;border:none;cursor:pointer;
-  color:var(--muted2);padding:5px;
-  border-radius:6px;transition:all var(--tf);flex-shrink:0;
-}
+.sb-uname{font-size:.76rem;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-urole{font-size:.52rem;color:var(--tx3);margin-top:1px}
+.sb-logout{background:none;border:none;cursor:pointer;color:var(--tx3);padding:5px;border-radius:6px;flex-shrink:0;transition:all var(--tf)}
 .sb-logout:hover{color:var(--red);background:var(--redd)}
 
-/* ═══════════════════════════════════
-   MAIN
-═══════════════════════════════════ */
+/* ── MAIN ── */
 .main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-width:0}
-
-/* Topbar */
-.topbar{
-  height:var(--th);flex-shrink:0;
-  background:rgba(9,16,13,.92);
-  backdrop-filter:blur(20px) saturate(1.5);
-  -webkit-backdrop-filter:blur(20px) saturate(1.5);
-  border-bottom:1px solid var(--b);
-  display:flex;align-items:center;
-  padding:0 22px;gap:12px;
-  position:relative;z-index:50;
-}
-.tb-title{
-  font-family:var(--fd);font-weight:800;
-  font-size:.95rem;color:#fff;flex:1;
-  letter-spacing:-.01em;
-}
+.topbar{height:var(--th);flex-shrink:0;background:rgba(11,15,12,.94);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--b0);display:flex;align-items:center;padding:0 20px;gap:12px;z-index:50}
+.tb-title{font-family:var(--fd);font-weight:900;font-size:.92rem;color:var(--tx);flex:1;letter-spacing:-.01em}
 .tb-title em{color:var(--g);font-style:normal}
-
-/* online chip */
-.tb-chip{
-  display:flex;align-items:center;gap:6px;
-  padding:5px 11px;border-radius:99px;
-  border:1px solid var(--b);background:var(--s2);
-  font-size:.58rem;letter-spacing:.08em;
-  text-transform:uppercase;font-weight:600;color:var(--muted);
-  transition:all .3s;
-}
-.tb-chip.online{border-color:var(--gg);color:var(--g);background:var(--gd)}
-.chip-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
-.tb-chip.online .chip-dot{animation:cp 2s ease-in-out infinite}
-@keyframes cp{0%,100%{box-shadow:0 0 0 0 rgba(62,207,142,.6)}50%{box-shadow:0 0 0 4px rgba(62,207,142,0)}}
-
-.tb-time{font-family:var(--fm);font-size:.72rem;color:var(--muted);letter-spacing:.06em}
-.tb-sound{
-  background:none;border:1px solid var(--b);border-radius:6px;
-  cursor:pointer;color:var(--muted);
-  width:30px;height:30px;display:flex;align-items:center;justify-content:center;
-  transition:all var(--tf);flex-shrink:0;
-}
-.tb-sound:hover{border-color:var(--bh);color:var(--text)}
+.tb-chip{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:99px;border:1px solid var(--b0);background:var(--s2);font-size:.58rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);transition:all .25s;white-space:nowrap}
+.tb-chip.on{border-color:var(--gg);color:var(--g);background:var(--gd)}
+.chip-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.tb-chip.on .chip-dot{animation:cp 2s ease-in-out infinite}
+@keyframes cp{0%,100%{box-shadow:0 0 0 0 rgba(46,204,122,.6)}50%{box-shadow:0 0 0 4px rgba(46,204,122,0)}}
+.tb-time{font-size:.7rem;color:var(--tx3);letter-spacing:.06em;white-space:nowrap;font-variant-numeric:tabular-nums}
+.tb-sound{background:none;border:1px solid var(--b0);border-radius:7px;cursor:pointer;color:var(--tx3);width:30px;height:30px;display:flex;align-items:center;justify-content:center;transition:all var(--tf);flex-shrink:0}
+.tb-sound:hover{border-color:var(--b1);color:var(--tx2)}
 .tb-sound.on{border-color:var(--gg);color:var(--g);background:var(--gd)}
-.mob-btn{
-  display:none;background:none;border:none;
-  cursor:pointer;color:var(--muted);
-  width:34px;height:34px;border-radius:8px;
-  align-items:center;justify-content:center;
-  transition:all var(--tf);
-}
-.mob-btn:hover{background:var(--s2);color:var(--text)}
+.mob-btn{display:none;background:none;border:none;cursor:pointer;color:var(--tx3);width:34px;height:34px;border-radius:8px;align-items:center;justify-content:center;transition:all var(--tf)}
+.mob-btn:hover{background:var(--s2);color:var(--tx2)}
 
-/* Pages container */
-.pages{
-  flex:1;overflow-y:auto;position:relative;
-  scroll-behavior:smooth;
-}
-.page{
-  display:none;
-  padding:22px 22px 32px;
-  animation:pgFade .25s var(--ease) both;
-}
+/* ── PAGES ── */
+.pages{flex:1;overflow-y:auto}
+.page{display:none;padding:22px 22px 36px;animation:pgIn .25s var(--ease) both}
 .page.active{display:block}
-@keyframes pgFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes pgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
-/* ═══════════════════════════════════
-   COMPONENTS
-═══════════════════════════════════ */
-
-/* Section header */
+/* ── SHARED ── */
 .sh{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:16px;gap:10px;flex-wrap:wrap}
-.sh-left{}
-.sh-tag{font-size:.44rem;letter-spacing:.3em;text-transform:uppercase;color:var(--muted2);margin-bottom:3px}
-.sh-title{font-family:var(--fd);font-weight:800;font-size:1.25rem;color:#fff;letter-spacing:-.02em;line-height:1.05}
+.sh-tag{font-size:.44rem;letter-spacing:.28em;text-transform:uppercase;color:var(--tx3);margin-bottom:3px}
+.sh-title{font-family:var(--fd);font-weight:900;font-size:1.2rem;color:var(--tx);letter-spacing:-.02em;line-height:1}
 .sh-title em{color:var(--g);font-style:normal}
-.sh-link{font-size:.66rem;color:var(--muted);border:none;background:none;cursor:pointer;font-family:var(--fs);padding:0;transition:color var(--tf)}
+.sh-link{font-size:.68rem;color:var(--tx3);border:none;background:none;cursor:pointer;font-family:var(--fs);transition:color var(--tf);padding:0;font-weight:500}
 .sh-link:hover{color:var(--g)}
+.divider{height:1px;background:var(--b0);margin:14px 0}
 
-/* Stat cards row */
+/* ── STAT CARDS ── */
 .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
-.sc{
-  background:var(--s1);
-  border:1px solid var(--b);
-  border-radius:12px;
-  padding:14px 16px;
-  position:relative;overflow:hidden;
-  transition:border-color var(--tf),transform var(--t);
-}
-.sc:hover{border-color:var(--bh);transform:translateY(-1px)}
-.sc::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,var(--g) 0%,transparent 70%);
-  opacity:.6;
-}
-.sc-lbl{font-size:.48rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
-.sc-val{
-  font-family:var(--fd);font-size:1.55rem;font-weight:800;
-  color:#fff;line-height:1;letter-spacing:-.03em;
-}
-.sc-val.g{color:var(--g)}
-.sc-val.a{color:var(--acc)}
-.sc-sub{font-size:.6rem;color:var(--muted2);margin-top:4px}
-.sc-ico{
-  position:absolute;right:12px;bottom:10px;
-  font-size:1.8rem;opacity:.07;
-  pointer-events:none;
-}
+.sc{background:var(--s1);border:1px solid var(--b0);border-radius:13px;padding:14px 16px;position:relative;overflow:hidden;transition:border-color var(--tf),transform var(--t)}
+.sc:hover{border-color:var(--b1);transform:translateY(-1px)}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--g),transparent 60%);opacity:.6}
+.sc-lbl{font-size:.46rem;letter-spacing:.18em;text-transform:uppercase;color:var(--tx3);margin-bottom:7px}
+.sc-val{font-family:var(--fd);font-size:1.5rem;font-weight:900;color:var(--tx);line-height:1;letter-spacing:-.03em}
+.sc-val.g{color:var(--g)}.sc-val.a{color:var(--acc)}
+.sc-sub{font-size:.58rem;color:var(--tx3);margin-top:4px}
+.sc-ico{position:absolute;right:12px;bottom:10px;font-size:1.7rem;opacity:.06;pointer-events:none}
 
-/* New order card */
-.oc{
-  background:var(--s1);
-  border:1px solid var(--b);
-  border-radius:12px;
-  padding:16px 18px;
-  margin-bottom:10px;
-  position:relative;overflow:hidden;
-  transition:border-color var(--tf),transform var(--t),box-shadow var(--t);
-  animation:ocIn .3s var(--ease) both;
-}
-@keyframes ocIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
-.oc:hover{border-color:var(--bh);transform:translateY(-1px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+/* ── NEW ORDER CARD ── */
+.oc{background:var(--s1);border:1px solid var(--b0);border-radius:13px;padding:16px 18px;margin-bottom:10px;position:relative;overflow:hidden;transition:border-color var(--tf),transform var(--t),box-shadow var(--t);animation:ocIn .3s var(--ease) both}
+@keyframes ocIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+.oc:hover{border-color:var(--b1);transform:translateY(-1px);box-shadow:0 8px 28px rgba(0,0,0,.25)}
 .oc::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--acc);border-radius:3px 0 0 3px}
 .oc-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;flex-wrap:wrap}
-.oc-meta{display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap}
-.oc-num{font-family:var(--fm);font-size:.64rem;letter-spacing:.1em;color:var(--muted)}
-.oc-status-pill{
-  padding:2px 8px;border-radius:99px;
-  font-size:.52rem;font-weight:600;letter-spacing:.06em;
-  border:1px solid;
-}
-.oc-addr{font-size:.88rem;font-weight:600;color:var(--text);line-height:1.35}
-.oc-time{font-family:var(--fm);font-size:.6rem;color:var(--muted);white-space:nowrap;flex-shrink:0}
-
-/* Countdown */
+.oc-num{font-family:var(--fd);font-weight:900;font-size:.88rem;color:var(--tx);margin-bottom:2px}
+.oc-pill{padding:2px 9px;border-radius:99px;font-size:.52rem;font-weight:600;letter-spacing:.06em;border:1px solid}
+.oc-addr{font-size:.8rem;color:var(--tx2);line-height:1.4;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.oc-time{font-size:.6rem;color:var(--tx3);white-space:nowrap;flex-shrink:0}
+/* countdown */
 .cd-wrap{margin:8px 0 10px}
-.cd-track{height:3px;background:var(--muted2);border-radius:99px;overflow:hidden}
+.cd-track{height:3px;background:var(--s3);border-radius:99px;overflow:hidden}
 .cd-fill{height:100%;background:var(--acc);border-radius:99px;transition:width .8s linear,background .4s}
-.cd-row{display:flex;justify-content:space-between;margin-top:4px;font-family:var(--fm);font-size:.56rem;color:var(--muted)}
-
-/* Order items */
-.oc-items{
-  font-size:.72rem;color:var(--text2);line-height:1.7;
-  margin-bottom:12px;
-  padding:9px 11px;
-  background:var(--s2);border:1px solid var(--b);border-radius:8px;
-}
-.oc-items-lbl{font-size:.44rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted2);margin-bottom:4px}
-
-/* Order footer */
+.cd-row{display:flex;justify-content:space-between;margin-top:4px;font-size:.56rem;color:var(--tx3)}
+.oc-items-box{background:var(--s2);border:1px solid var(--b0);border-radius:9px;padding:9px 12px;margin-bottom:11px;font-size:.72rem;color:var(--tx2);line-height:1.65}
+.oc-items-lbl{font-size:.44rem;letter-spacing:.2em;text-transform:uppercase;color:var(--tx3);margin-bottom:4px}
 .oc-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.oc-chips{display:flex;gap:8px;flex-wrap:wrap}
-.oc-chip{
-  display:flex;align-items:center;gap:4px;
-  font-size:.64rem;color:var(--muted);
-}
-.oc-chip svg{color:var(--g);flex-shrink:0}
-.oc-earn{font-family:var(--fd);font-weight:800;font-size:1.05rem;color:var(--g)}
-.oc-earn span{font-family:var(--fs);font-size:.62rem;font-weight:400;color:var(--muted)}
-.btn-acc{
-  padding:9px 20px;
-  background:linear-gradient(135deg,var(--g),var(--g2));
-  border:none;border-radius:8px;
-  color:#05080a;font-family:var(--fd);font-weight:800;
-  font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;
-  cursor:pointer;display:flex;align-items:center;gap:6px;
-  box-shadow:0 4px 14px rgba(62,207,142,.25);
-  transition:opacity var(--tf),transform var(--t),box-shadow var(--t);
-  flex-shrink:0;
-}
-.btn-acc:hover{opacity:.9;transform:scale(1.03);box-shadow:0 6px 20px rgba(62,207,142,.35)}
-.btn-acc:active{transform:scale(.97)}
+.oc-chips{display:flex;gap:7px;flex-wrap:wrap}
+.oc-chip{display:flex;align-items:center;gap:4px;padding:4px 10px;background:var(--s2);border:1px solid var(--b0);border-radius:99px;font-size:.6rem;color:var(--tx3)}
+.oc-earn{font-family:var(--fd);font-weight:900;font-size:1rem;color:var(--g)}
+.oc-earn span{font-size:.6rem;color:var(--tx3);font-family:var(--fs);font-weight:400}
+.btn-acc{padding:7px 18px;background:linear-gradient(135deg,var(--g),var(--g2));border:none;border-radius:9px;color:#0b0f0c;font-family:var(--fd);font-weight:900;font-size:.66rem;cursor:pointer;transition:opacity var(--tf),transform var(--tf);white-space:nowrap;display:flex;align-items:center;gap:6px;box-shadow:0 3px 10px var(--g-shadow);letter-spacing:.04em}
+.btn-acc:hover{opacity:.9;transform:scale(1.04)}
+.btn-acc:active{transform:scale(.96)}
 .btn-acc:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
 
-/* Active order panel */
-.ao{
-  background:var(--s1);
-  border:1px solid var(--bh);
-  border-radius:16px;
-  padding:20px 22px;
-  position:relative;overflow:hidden;
-}
-.ao::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,var(--g),var(--acc) 60%,transparent);
-}
-.ao-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap}
-.ao-num{font-family:var(--fm);font-size:.62rem;color:var(--muted);letter-spacing:.1em;margin-bottom:4px}
-.ao-addr{font-size:.9rem;font-weight:700;color:var(--text);line-height:1.3}
-.ao-badge{
-  display:flex;align-items:center;gap:6px;
-  padding:5px 12px;border-radius:99px;
-  border:1px solid var(--gg);background:var(--gd);
-  color:var(--g);font-size:.54rem;font-weight:700;
-  letter-spacing:.1em;text-transform:uppercase;flex-shrink:0;
-}
-.ao-pulse{width:6px;height:6px;border-radius:50%;background:var(--g);animation:cp 1.8s ease-in-out infinite}
-
-/* Steps tracker */
-.steps{display:flex;margin:18px 0;position:relative}
-.step{flex:1;display:flex;flex-direction:column;align-items:center;position:relative}
-.step:not(:last-child)::after{
-  content:'';position:absolute;top:12px;
-  left:calc(50% + 12px);right:calc(-50% + 12px);
-  height:2px;background:var(--muted2);transition:background .4s;
-}
-.step.done:not(:last-child)::after{background:var(--g)}
-.step-dot{
-  width:24px;height:24px;border-radius:50%;
-  background:var(--s2);border:2px solid var(--muted2);
-  display:flex;align-items:center;justify-content:center;
-  font-size:.6rem;margin-bottom:5px;
-  position:relative;z-index:1;
-  transition:all .35s var(--spring);
-}
-.step.done .step-dot{background:var(--g);border-color:var(--g);color:#05080a}
-.step.current .step-dot{
-  border-color:var(--g);color:var(--g);
-  box-shadow:0 0 0 4px var(--gd);
-  animation:sdPulse 2s ease-in-out infinite;
-}
-@keyframes sdPulse{0%,100%{box-shadow:0 0 0 4px var(--gd)}50%{box-shadow:0 0 0 8px rgba(62,207,142,0)}}
-.step-lbl{font-size:.5rem;text-align:center;color:var(--muted);letter-spacing:.04em;line-height:1.4}
-.step.done .step-lbl,.step.current .step-lbl{color:var(--text2)}
-
-/* Order detail rows */
-.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
-.detail-item{}
-.detail-lbl{font-size:.44rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted2);margin-bottom:3px}
-.detail-val{font-size:.78rem;color:var(--text);line-height:1.4}
-.divider{height:1px;background:var(--b);margin:14px 0}
-
-/* Item rows */
-.item-r{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--b);font-size:.74rem}
-.item-r:last-child{border:none}
-.item-n{color:var(--text)}
-.item-q{color:var(--muted);font-family:var(--fm);font-size:.64rem;margin:0 8px}
-.item-p{color:var(--g);font-family:var(--fm);font-size:.68rem}
-
-/* Advance status buttons */
-.sa{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
-.btn-st{
-  flex:1;min-width:130px;padding:11px 16px;border-radius:10px;
-  border:1px solid var(--gg);background:var(--gd);
-  color:var(--g);font-family:var(--fd);font-weight:800;
-  font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;
-  transition:all var(--tf);
-}
-.btn-st:hover{background:var(--g);color:#05080a;box-shadow:0 4px 14px rgba(62,207,142,.3)}
-.btn-st.final{background:var(--g);color:#05080a;box-shadow:0 4px 14px rgba(62,207,142,.25)}
-.btn-st.final:hover{opacity:.88;box-shadow:0 6px 20px rgba(62,207,142,.4)}
-
-/* History cards */
-.hc{
-  background:var(--s1);
-  border:1px solid var(--b);border-radius:12px;
-  padding:13px 16px;display:flex;align-items:center;gap:13px;
-  transition:border-color var(--tf),transform var(--t);
-  margin-bottom:8px;
-}
-.hc:hover{border-color:var(--bh);transform:translateY(-1px)}
-.hc-ico{
-  width:38px;height:38px;border-radius:10px;
-  background:var(--gd);border:1px solid var(--gg);
-  display:flex;align-items:center;justify-content:center;
-  color:var(--g);flex-shrink:0;
-}
-.hc-info{flex:1;min-width:0}
-.hc-num{font-family:var(--fm);font-size:.58rem;color:var(--muted);letter-spacing:.1em;margin-bottom:2px}
-.hc-addr{font-size:.76rem;color:var(--text);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hc-date{font-size:.62rem;color:var(--muted);margin-top:2px}
-.hc-earn{font-family:var(--fd);font-weight:800;font-size:.95rem;color:var(--g);flex-shrink:0}
-
-/* Notif banner */
-.nb{
-  background:linear-gradient(135deg,rgba(255,107,53,.1),rgba(255,107,53,.04));
-  border:1px solid rgba(255,107,53,.28);
-  border-radius:12px;
-  padding:13px 16px;margin-bottom:16px;
-  display:flex;align-items:center;gap:13px;
-  cursor:pointer;
-  transition:border-color var(--tf),transform var(--t);
-  animation:ocIn .35s var(--ease) both;
-}
-.nb:hover{border-color:rgba(255,107,53,.5);transform:translateY(-1px)}
-.nb-pulse{
-  width:9px;height:9px;border-radius:50%;
-  background:var(--acc);flex-shrink:0;
-  animation:accP 1.6s ease-in-out infinite;
-}
-@keyframes accP{0%,100%{box-shadow:0 0 0 0 rgba(255,107,53,.6)}50%{box-shadow:0 0 0 6px rgba(255,107,53,0)}}
-.nb-info{flex:1}
-.nb-lbl{font-size:.46rem;letter-spacing:.24em;text-transform:uppercase;color:var(--acc);margin-bottom:2px}
-.nb-txt{font-size:.8rem;font-weight:600;color:var(--text)}
-.nb-arr{color:var(--acc);flex-shrink:0}
-
-/* Active dash banner */
-.ab{
-  background:linear-gradient(135deg,rgba(62,207,142,.1),rgba(62,207,142,.04));
-  border:1px solid var(--gg);border-radius:12px;
-  padding:13px 16px;margin-bottom:16px;
-  display:flex;align-items:center;gap:13px;
-  cursor:pointer;transition:border-color var(--tf),transform var(--t);
-}
+/* ── NOTIFICATION BANNERS ── */
+.nb{background:linear-gradient(135deg,rgba(245,158,11,.08),rgba(245,158,11,.02));border:1px solid var(--acc-g);border-radius:13px;padding:13px 17px;margin-bottom:15px;display:flex;align-items:center;gap:13px;cursor:pointer;transition:all var(--tf);animation:ocIn .3s var(--ease) both}
+.nb:hover{border-color:var(--acc);transform:translateY(-1px)}
+.nb-pulse{width:9px;height:9px;border-radius:50%;background:var(--acc);flex-shrink:0;animation:aP 1.6s ease-in-out infinite}
+@keyframes aP{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.6)}50%{box-shadow:0 0 0 6px rgba(245,158,11,0)}}
+.nb-info{flex:1;min-width:0}
+.nb-lbl{font-size:.46rem;letter-spacing:.22em;text-transform:uppercase;color:var(--acc);margin-bottom:2px;font-weight:700}
+.nb-txt{font-size:.8rem;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* active banner */
+.ab{background:linear-gradient(135deg,var(--gd),rgba(46,204,122,.02));border:1px solid var(--gg);border-radius:13px;padding:13px 17px;margin-bottom:15px;display:flex;align-items:center;gap:13px;cursor:pointer;transition:all var(--tf)}
 .ab:hover{border-color:var(--g);transform:translateY(-1px)}
-.ab-pulse{width:9px;height:9px;border-radius:50%;background:var(--g);flex-shrink:0;animation:cp 1.8s ease-in-out infinite}
-.ab-info{flex:1}
-.ab-lbl{font-size:.46rem;letter-spacing:.24em;text-transform:uppercase;color:var(--g);margin-bottom:2px}
-.ab-txt{font-size:.8rem;font-weight:600;color:var(--text)}
+.ab-pulse{width:9px;height:9px;border-radius:50%;background:var(--g);flex-shrink:0;animation:gP 1.8s ease-in-out infinite}
+@keyframes gP{0%,100%{box-shadow:0 0 0 0 rgba(46,204,122,.6)}50%{box-shadow:0 0 0 6px rgba(46,204,122,0)}}
+.ab-info{flex:1;min-width:0}
+.ab-lbl{font-size:.46rem;letter-spacing:.22em;text-transform:uppercase;color:var(--g);margin-bottom:2px;font-weight:700}
+.ab-txt{font-size:.8rem;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* Profile */
-.pg{display:grid;grid-template-columns:260px 1fr;gap:16px;align-items:start}
-.p-card{background:var(--s1);border:1px solid var(--b);border-radius:16px;padding:22px 18px;text-align:center;position:relative;overflow:hidden}
-.p-card::before{content:'';position:absolute;top:0;left:0;right:0;height:80px;background:radial-gradient(ellipse 100% 80px at 50% 0%,rgba(62,207,142,.08),transparent);pointer-events:none}
-.p-av{
-  width:70px;height:70px;border-radius:50%;
-  background:var(--gd);border:2px solid var(--gg);
-  display:flex;align-items:center;justify-content:center;
-  font-size:1.5rem;font-weight:700;color:var(--g);
-  margin:0 auto 12px;overflow:hidden;
-}
+/* ── ACTIVE ORDER — 3 STEP FLOW ── */
+/* Step indicator */
+.flow-steps{display:flex;margin:0 0 22px;gap:0}
+.flow-step{flex:1;display:flex;flex-direction:column;align-items:center;position:relative}
+.flow-step:not(:last-child)::after{content:'';position:absolute;top:16px;left:calc(50% + 16px);right:calc(-50% + 16px);height:2px;background:var(--s4);transition:background .4s}
+.flow-step.done:not(:last-child)::after{background:var(--g)}
+.flow-dot{width:32px;height:32px;border-radius:50%;background:var(--s2);border:2px solid var(--s4);display:flex;align-items:center;justify-content:center;margin-bottom:6px;position:relative;z-index:1;transition:all .3s var(--spring);font-size:.7rem}
+.flow-step.done .flow-dot{background:var(--g);border-color:var(--g);color:#0b0f0c}
+.flow-step.current .flow-dot{border-color:var(--g);color:var(--g);background:var(--gd);box-shadow:0 0 0 4px var(--gd);animation:gtp 2s ease-in-out infinite}
+@keyframes gtp{0%,100%{box-shadow:0 0 0 4px var(--gd)}50%{box-shadow:0 0 0 8px rgba(46,204,122,0)}}
+.flow-step.future .flow-dot{opacity:.4}
+.flow-lbl{font-size:.52rem;text-align:center;color:var(--tx3);line-height:1.3}
+.flow-step.done .flow-lbl,.flow-step.current .flow-lbl{color:var(--tx2);font-weight:600}
+
+/* Step panels */
+.flow-panel{display:none;animation:pgIn .28s var(--ease) both}
+.flow-panel.active{display:block}
+
+/* Step 1 — Магазин */
+.store-card{background:var(--s1);border:1.5px solid var(--gg);border-radius:14px;padding:20px 22px;margin-bottom:14px;position:relative;overflow:hidden}
+.store-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(46,204,122,.05),transparent);pointer-events:none}
+.store-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:var(--gd);border:1px solid var(--gg);border-radius:99px;font-size:.56rem;font-weight:700;color:var(--g);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+.store-title{font-family:var(--fd);font-weight:900;font-size:1.1rem;color:var(--tx);margin-bottom:4px}
+.store-sub{font-size:.76rem;color:var(--tx2)}
+
+/* Step 2 — Checklist */
+.checklist{margin-bottom:14px}
+.cli{background:var(--s1);border:1.5px solid var(--b0);border-radius:11px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:13px;cursor:pointer;transition:border-color var(--tf),background var(--tf)}
+.cli:hover{border-color:var(--b1)}
+.cli.checked{border-color:var(--gg);background:var(--gd)}
+.cli-check{width:26px;height:26px;border-radius:8px;border:2px solid var(--s4);background:var(--s2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s var(--spring)}
+.cli.checked .cli-check{background:var(--g);border-color:var(--g)}
+.cli-check svg{opacity:0;transition:opacity .15s;color:#0b0f0c}
+.cli.checked .cli-check svg{opacity:1}
+.cli-info{flex:1;min-width:0}
+.cli-name{font-weight:600;font-size:.82rem;color:var(--tx)}
+.cli-qty{font-size:.64rem;color:var(--tx3);margin-top:2px}
+.checklist-progress{height:4px;background:var(--s3);border-radius:99px;margin-bottom:14px;overflow:hidden}
+.checklist-bar{height:100%;background:linear-gradient(90deg,var(--g),var(--g2));border-radius:99px;transition:width .3s var(--ease)}
+
+/* Step 3 — Delivery */
+.client-card{background:var(--s1);border:1.5px solid var(--b1);border-radius:14px;padding:20px 22px;margin-bottom:14px}
+.client-addr-lbl{font-size:.46rem;letter-spacing:.22em;text-transform:uppercase;color:var(--g);margin-bottom:6px;font-weight:700}
+.client-addr{font-size:1rem;font-weight:700;color:var(--tx);line-height:1.4;margin-bottom:14px}
+.client-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cm-item{}
+.cm-lbl{font-size:.44rem;letter-spacing:.2em;text-transform:uppercase;color:var(--tx3);margin-bottom:3px}
+.cm-val{font-size:.78rem;color:var(--tx2);font-weight:600}
+
+/* Big action buttons */
+.btn-big{width:100%;padding:14px;border:none;border-radius:12px;font-family:var(--fd);font-weight:900;font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all var(--tf)}
+.btn-big.green{background:linear-gradient(135deg,var(--g),var(--g2));color:#0b0f0c;box-shadow:0 4px 16px var(--g-shadow)}
+.btn-big.green:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 6px 24px var(--g-shadow)}
+.btn-big.green:active{transform:scale(.98)}
+.btn-big.green:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-big.outline{background:none;border:1.5px solid var(--b1);color:var(--tx3)}
+.btn-big.outline:hover{border-color:var(--b2);color:var(--tx2)}
+.btn-big.danger{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;box-shadow:0 4px 14px rgba(239,68,68,.25)}
+.btn-big.danger:hover{opacity:.9;transform:translateY(-1px)}
+/* info detail grid */
+.dg{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin-bottom:14px}
+.di-lbl{font-size:.44rem;letter-spacing:.2em;text-transform:uppercase;color:var(--tx3);margin-bottom:3px}
+.di-val{font-size:.78rem;color:var(--tx2);font-weight:600}
+/* order items list */
+.oi{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--b0);font-size:.76rem}
+.oi:last-child{border-bottom:none}
+.oi-name{color:var(--tx)}
+.oi-qty{color:var(--tx3)}
+.oi-price{font-weight:700;color:var(--tx2)}
+
+/* ── HISTORY ── */
+.hc{background:var(--s1);border:1px solid var(--b0);border-radius:12px;padding:13px 15px;margin-bottom:8px;display:flex;align-items:center;gap:13px;transition:border-color var(--tf)}
+.hc:hover{border-color:var(--b1)}
+.hc-ico{width:34px;height:34px;border-radius:9px;background:var(--gd);border:1px solid var(--gg);display:flex;align-items:center;justify-content:center;color:var(--g);flex-shrink:0}
+.hc-info{flex:1;min-width:0}
+.hc-num{font-family:var(--fd);font-weight:900;font-size:.82rem;color:var(--tx)}
+.hc-addr{font-size:.68rem;color:var(--tx3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hc-date{font-size:.58rem;color:var(--tx3);margin-top:2px}
+.hc-earn{font-family:var(--fd);font-weight:900;font-size:.9rem;color:var(--g);white-space:nowrap;flex-shrink:0}
+
+/* ── PROFILE ── */
+.pg{display:grid;grid-template-columns:240px 1fr;gap:16px;align-items:start}
+.p-card{background:var(--s1);border:1px solid var(--b0);border-radius:16px;padding:22px 18px;text-align:center;position:relative;overflow:hidden}
+.p-card::before{content:'';position:absolute;top:0;left:0;right:0;height:80px;background:radial-gradient(ellipse 100% 80px at 50% 0%,rgba(46,204,122,.07),transparent);pointer-events:none}
+.p-av{width:70px;height:70px;border-radius:50%;background:var(--gd);border:2px solid var(--gg);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;color:var(--g);margin:0 auto 12px;overflow:hidden}
 .p-av img{width:100%;height:100%;object-fit:cover}
-.p-name{font-family:var(--fd);font-weight:800;font-size:1.05rem;color:#fff;margin-bottom:2px}
-.p-email{font-size:.68rem;color:var(--muted);margin-bottom:12px}
-.p-veh{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:4px 12px;border-radius:99px;
-  border:1px solid var(--gg);background:var(--gd);
-  color:var(--g);font-size:.58rem;font-weight:600;
-  letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;
-}
-.p-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--b);border-radius:0 0 8px 8px;overflow:hidden}
-.p-st{background:var(--s2);padding:10px 6px;text-align:center}
-.p-st-val{font-family:var(--fd);font-weight:800;font-size:1.05rem;color:var(--g)}
-.p-st-lbl{font-size:.44rem;color:var(--muted2);letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
-
-.pf{background:var(--s1);border:1px solid var(--b);border-radius:12px;padding:18px 16px;margin-bottom:12px}
-.pf-title{font-weight:700;font-size:.84rem;color:var(--text);margin-bottom:14px}
+.p-name{font-family:var(--fd);font-weight:900;font-size:1rem;color:var(--tx);margin-bottom:2px}
+.p-email{font-size:.66rem;color:var(--tx3);margin-bottom:10px}
+.p-veh{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:99px;border:1px solid var(--gg);background:var(--gd);color:var(--g);font-size:.56rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px}
+.p-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--b0);border-radius:0 0 10px 10px;overflow:hidden;margin:0 -18px -22px}
+.p-st{background:var(--s2);padding:11px 6px;text-align:center}
+.p-st-val{font-family:var(--fd);font-weight:900;font-size:1.1rem;color:var(--g)}
+.p-st-lbl{font-size:.44rem;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+.pf{background:var(--s1);border:1px solid var(--b0);border-radius:12px;padding:18px 16px;margin-bottom:12px}
+.pf-title{font-weight:700;font-size:.84rem;color:var(--tx);margin-bottom:14px}
 .ff{margin-bottom:11px}
-.fl{font-size:.46rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted2);display:block;margin-bottom:5px}
-.fi{
-  width:100%;background:var(--s2);
-  border:1px solid var(--b);border-radius:8px;
-  color:var(--text);font-family:var(--fs);font-size:.8rem;
-  padding:9px 12px;outline:none;transition:border-color var(--tf),box-shadow var(--tf);
-}
-.fi:focus{border-color:var(--gg);box-shadow:0 0 0 3px rgba(62,207,142,.08)}
-.fi::placeholder{color:var(--muted2)}
+.fl{font-size:.46rem;letter-spacing:.2em;text-transform:uppercase;color:var(--tx3);display:block;margin-bottom:5px;font-weight:600}
+.fi{width:100%;background:var(--s2);border:1px solid var(--b0);border-radius:8px;color:var(--tx);font-family:var(--fs);font-size:.8rem;padding:9px 12px;outline:none;transition:border-color var(--tf),box-shadow var(--tf)}
+.fi:focus{border-color:var(--gg);box-shadow:0 0 0 3px rgba(46,204,122,.08)}
+.fi::placeholder{color:var(--tx3)}
 .fi:read-only{opacity:.4;cursor:not-allowed}
 .fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.btn-p{
-  padding:9px 18px;background:linear-gradient(135deg,var(--g),var(--g2));
-  border:none;border-radius:8px;color:#05080a;
-  font-size:.62rem;font-family:var(--fs);font-weight:700;
-  cursor:pointer;transition:opacity var(--tf);
-  letter-spacing:.06em;text-transform:uppercase;
-  box-shadow:0 3px 10px rgba(62,207,142,.2);
-}
+.btn-p{padding:9px 18px;background:linear-gradient(135deg,var(--g),var(--g2));border:none;border-radius:8px;color:#0b0f0c;font-size:.62rem;font-family:var(--fs);font-weight:700;cursor:pointer;transition:opacity var(--tf);letter-spacing:.06em;text-transform:uppercase;box-shadow:0 3px 10px var(--g-shadow)}
 .btn-p:hover{opacity:.88}
-.btn-o{
-  padding:9px 18px;background:none;
-  border:1px solid var(--b);border-radius:8px;
-  color:var(--muted);font-size:.62rem;font-family:var(--fs);
-  cursor:pointer;transition:all var(--tf);
-  letter-spacing:.06em;text-transform:uppercase;
-}
-.btn-o:hover{border-color:var(--bh);color:var(--text)}
+.btn-o{padding:9px 18px;background:none;border:1px solid var(--b1);border-radius:8px;color:var(--tx3);font-size:.62rem;font-family:var(--fs);cursor:pointer;transition:all var(--tf);letter-spacing:.06em;text-transform:uppercase}
+.btn-o:hover{border-color:var(--b2);color:var(--tx2)}
 .btn-o.danger:hover{border-color:var(--red);color:var(--red);background:var(--redd)}
 
-/* Empty */
-.empty{text-align:center;padding:48px 20px;color:var(--muted)}
-.empty-ico{font-size:2.6rem;opacity:.2;margin-bottom:10px;display:block}
-.empty-title{font-size:.86rem;font-weight:600;color:var(--muted);margin-bottom:5px}
-.empty-sub{font-size:.7rem}
-
-/* Loader */
-.pload{display:flex;align-items:center;justify-content:center;padding:56px;gap:10px;color:var(--muted);font-size:.76rem}
-.spin{
-  width:16px;height:16px;border-radius:50%;
-  border:2px solid var(--s3);border-top-color:var(--g);
-  animation:sp .7s linear infinite;
-}
+/* ── UTILS ── */
+.empty{text-align:center;padding:48px 20px;color:var(--tx3)}
+.empty-ico{font-size:2.8rem;opacity:.15;margin-bottom:10px;display:block}
+.empty-t{font-size:.86rem;font-weight:700;color:var(--tx3);margin-bottom:5px}
+.empty-s{font-size:.7rem}
+.pload{display:flex;align-items:center;justify-content:center;padding:56px;gap:10px;color:var(--tx3);font-size:.76rem}
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid var(--s3);border-top-color:var(--g);animation:sp .7s linear infinite;flex-shrink:0}
 @keyframes sp{to{transform:rotate(360deg)}}
+.toast-wrap{position:fixed;bottom:22px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.toast{background:rgba(17,24,18,.96);backdrop-filter:blur(20px);border:1px solid var(--b1);border-radius:11px;padding:11px 15px;display:flex;align-items:center;gap:9px;font-size:.74rem;color:var(--tx);animation:tIn .26s var(--ease) both,tOut .26s var(--ease) forwards;animation-delay:0s,2.9s;pointer-events:all;max-width:280px;box-shadow:0 8px 28px rgba(0,0,0,.4)}
+@keyframes tIn{from{opacity:0;transform:translateY(9px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes tOut{to{opacity:0;transform:translateY(9px) scale(.96)}}
+.tdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;background:var(--g)}
+.toast.ok .tdot{background:var(--g)}.toast.err .tdot{background:var(--red)}.toast.info .tdot{background:var(--acc)}
 
-/* Toast */
-.toast-wrap{position:fixed;bottom:24px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:7px;pointer-events:none}
-.toast{
-  background:rgba(15,26,20,.95);
-  backdrop-filter:blur(20px);
-  border:1px solid var(--bh);border-radius:10px;
-  padding:11px 15px;display:flex;align-items:center;gap:9px;
-  font-size:.74rem;color:var(--text);
-  animation:tIn .28s var(--ease) both,tOut .28s var(--ease) forwards;
-  animation-delay:0s,2.9s;pointer-events:all;max-width:270px;
-  box-shadow:0 8px 32px rgba(0,0,0,.4);
-}
-@keyframes tIn{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}
-@keyframes tOut{to{opacity:0;transform:translateY(10px) scale(.96)}}
-.toast.ok .tdot{background:var(--g)}
-.toast.err .tdot{background:var(--red)}
-.toast.info .tdot{background:var(--blue)}
-.tdot{width:6px;height:6px;border-radius:50%;background:var(--g);flex-shrink:0}
-
-/* ═══════════════════════════════════
-   MOBILE — bottom nav bar
-═══════════════════════════════════ */
+/* ── MOBILE ── */
 .mob-nav{display:none}
-
-@media(max-width:800px){
-  .sb{
-    position:fixed;left:0;top:0;bottom:0;
-    z-index:300;
-    transform:translateX(-110%);
-    box-shadow:none;
-  }
-  .sb.open{
-    transform:translateX(0);
-    box-shadow:16px 0 60px rgba(0,0,0,.6);
-  }
-  .sb-overlay{
-    display:none;position:fixed;inset:0;z-index:299;
-    background:rgba(0,0,0,.65);backdrop-filter:blur(4px);
-  }
+.sb-overlay{display:none;position:fixed;inset:0;z-index:199;background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
+@media(max-width:820px){
+  .sb{position:fixed;left:0;top:0;bottom:0;z-index:200;transform:translateX(-110%)}
+  .sb.open{transform:translateX(0);box-shadow:20px 0 60px rgba(0,0,0,.5)}
   .sb-overlay.open{display:block}
   .mob-btn{display:flex}
   .tb-time{display:none}
-
-  /* pages bottom padding for nav bar */
   .pages{padding-bottom:0}
-  .page{padding:16px 14px calc(var(--nb) + var(--safe-b) + 16px)}
-
-  /* MOBILE BOTTOM NAV */
-  .mob-nav{
-    display:flex;
-    position:fixed;bottom:0;left:0;right:0;
-    z-index:200;
-    background:rgba(9,16,13,.96);
-    backdrop-filter:blur(24px) saturate(1.8);
-    -webkit-backdrop-filter:blur(24px) saturate(1.8);
-    border-top:1px solid var(--b);
-    padding-bottom:var(--safe-b);
-    height:calc(var(--nb) + var(--safe-b));
-  }
-  .mob-nav-inner{
-    display:flex;align-items:stretch;width:100%;
-  }
-  .mn-item{
-    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:4px;cursor:pointer;padding:10px 0;
-    color:var(--muted);
-    border:none;background:none;font-family:var(--fs);
-    position:relative;
-    transition:color var(--tf);
-    -webkit-tap-highlight-color:transparent;
-  }
+  .page{padding:14px 14px calc(var(--nb) + var(--safe-b) + 14px)}
+  .mob-nav{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(11,15,12,.97);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-top:1px solid var(--b0);padding-bottom:var(--safe-b);height:calc(var(--nb) + var(--safe-b))}
+  .mn-inner{display:flex;align-items:stretch;width:100%}
+  .mn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;padding:10px 4px;color:var(--tx3);border:none;background:none;font-family:var(--fs);position:relative;transition:color var(--tf)}
   .mn-item svg{transition:transform .2s var(--spring)}
   .mn-item.active{color:var(--g)}
   .mn-item.active svg{transform:scale(1.12)}
-  .mn-item::before{
-    content:'';position:absolute;top:0;left:20%;right:20%;height:2px;
-    background:var(--g);border-radius:0 0 2px 2px;
-    transform:scaleX(0);transition:transform .25s var(--spring);
-  }
+  .mn-item::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2.5px;background:var(--g);border-radius:0 0 3px 3px;transform:scaleX(0);transition:transform .25s var(--spring)}
   .mn-item.active::before{transform:scaleX(1)}
-  .mn-label{font-size:.52rem;font-weight:600;letter-spacing:.04em}
-  .mn-badge{
-    position:absolute;top:8px;right:calc(50% - 18px);
-    min-width:16px;height:16px;padding:0 4px;
-    background:var(--acc);color:#fff;
-    font-size:.48rem;font-weight:700;border-radius:99px;
-    display:flex;align-items:center;justify-content:center;
-    border:2px solid var(--bg);
-    animation:nbPop .3s var(--spring) both;
-  }
-
-  /* hide desktop sidebar elements on mobile */
-  .stats-row{grid-template-columns:repeat(2,1fr)}
-  .pg{grid-template-columns:1fr}
-  .detail-grid{grid-template-columns:1fr}
-  .fr{grid-template-columns:1fr}
+  .mn-lbl{font-size:.5rem;font-weight:700;letter-spacing:.03em}
+  .mn-badge{position:absolute;top:7px;right:calc(50% - 16px);min-width:15px;height:15px;padding:0 3px;background:var(--acc);color:#fff;font-size:.46rem;font-weight:700;border-radius:99px;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg)}
+  .mn-badge.g{background:var(--g)}
   .toast-wrap{bottom:calc(var(--nb) + var(--safe-b) + 12px);right:14px}
-}
-@media(max-width:400px){
   .stats-row{grid-template-columns:1fr 1fr}
+  .pg{grid-template-columns:1fr}
+  .dg{grid-template-columns:1fr}
+  .fr{grid-template-columns:1fr}
+  .client-meta{grid-template-columns:1fr}
 }
+@media(max-width:400px){.stats-row{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
-
 <div class="toast-wrap" id="toast-wrap"></div>
 <div class="sb-overlay" id="sb-overlay"></div>
-
 <div class="app">
 
-<!-- ═══ SIDEBAR (desktop) ═══ -->
+<!-- SIDEBAR -->
 <aside class="sb" id="sidebar">
   <div class="sb-logo">
-    <div class="sb-logo-mark">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-        <path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/>
-        <rect x="9" y="11" width="14" height="10" rx="1"/>
-        <circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-      </svg>
-    </div>
-    <div>
-      <div class="sb-wordmark">Galelium <em>·</em></div>
-      <div class="sb-wordmark-sub">Courier Panel</div>
-    </div>
+    <div class="sb-logo-mark"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="1"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg></div>
+    <div><div class="sb-logo-text">Galelium <em>·</em></div><div class="sb-logo-sub">Панели курьер</div></div>
   </div>
-
-  <div class="sb-online" id="sb-online-card">
-    <div class="sb-online-info">
-      <div class="sb-online-lbl">Статус смены</div>
-      <div class="sb-online-val" id="sb-online-val">Офлайн</div>
-    </div>
-    <label class="tog">
-      <input type="checkbox" id="online-tog" onchange="toggleOnline(this.checked)"/>
-      <div class="tog-track"></div>
-      <div class="tog-thumb"></div>
-    </label>
+  <div class="sb-online" id="sb-online">
+    <div><div class="sb-online-lbl">Ҳолати навбат</div><div class="sb-online-val" id="sb-online-val">Офлайн</div></div>
+    <label class="tog"><input type="checkbox" id="online-tog" onchange="toggleOnline(this.checked)"/><div class="tog-track"></div><div class="tog-thumb"></div></label>
   </div>
-
   <div class="sb-earn">
-    <div>
-      <div class="sb-earn-lbl">Сегодня заработано</div>
-      <div class="sb-earn-val" id="sb-earn-val">0 ₽</div>
-    </div>
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="1.8" opacity=".4">
-      <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
-    </svg>
+    <div><div class="sb-earn-lbl">Имрӯз</div><div class="sb-earn-val" id="sb-earn">0 см</div></div>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="1.8" opacity=".4"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
   </div>
-
   <nav class="sb-nav">
-    <div class="nav-grp">Работа</div>
-    <button class="ni active" data-page="dashboard" onclick="goPage('dashboard')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      Дашборд
-    </button>
-    <button class="ni" data-page="new-orders" onclick="goPage('new-orders')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-      Новые заказы
-      <span class="ni-badge new-pulse" id="new-badge" style="display:none">0</span>
-    </button>
-    <button class="ni" data-page="active" onclick="goPage('active')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="1"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>
-      Активный заказ
-      <span class="ni-badge" id="active-badge" style="display:none;background:var(--g)">1</span>
-    </button>
-    <div class="nav-grp">История</div>
-    <button class="ni" data-page="history" onclick="goPage('history')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      История доставок
-    </button>
+    <div class="nav-grp">Кор</div>
+    <button class="ni active" data-page="dashboard" onclick="goPage('dashboard')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Дашборд</button>
+    <button class="ni" data-page="new-orders" onclick="goPage('new-orders')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Фармоишҳои нав<span class="ni-badge" id="new-badge" style="display:none">0</span></button>
+    <button class="ni" data-page="active" onclick="goPage('active')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="1"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>Фармоиши фаъол<span class="ni-badge g" id="active-badge" style="display:none">!</span></button>
+    <div class="nav-grp">Таърих</div>
+    <button class="ni" data-page="history" onclick="goPage('history')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Таърихи расонидан</button>
     <div class="nav-grp">Аккаунт</div>
-    <button class="ni" data-page="profile" onclick="goPage('profile')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      Профиль
-    </button>
+    <button class="ni" data-page="profile" onclick="goPage('profile')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Профил</button>
   </nav>
-
   <div class="sb-bottom">
     <div class="sb-user" onclick="goPage('profile')">
       <div class="sb-av" id="sb-av">?</div>
-      <div class="sb-uinfo">
-        <div class="sb-uname" id="sb-uname">Загрузка…</div>
-        <div class="sb-urole">Курьер · Galelium</div>
-      </div>
-      <button class="sb-logout" onclick="event.stopPropagation();doLogout()" title="Выйти">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-      </button>
+      <div style="flex:1;min-width:0"><div class="sb-uname" id="sb-uname">Боргузорӣ…</div><div class="sb-urole">Курьер · Galelium</div></div>
+      <button class="sb-logout" onclick="event.stopPropagation();doLogout()" title="Баромадан"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
     </div>
   </div>
 </aside>
 
-<!-- ═══ MAIN ═══ -->
+<!-- MAIN -->
 <div class="main">
   <div class="topbar">
-    <button class="mob-btn" onclick="toggleSidebar()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h12"/></svg>
-    </button>
-    <div class="tb-title" id="tb-title">Дашборд</div>
-    <button class="tb-sound on" id="sound-btn" onclick="toggleSound()" title="Звук">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg>
-    </button>
-    <div class="tb-chip offline" id="tb-chip"><div class="chip-dot"></div><span id="tb-chip-txt">Офлайн</span></div>
+    <button class="mob-btn" onclick="toggleSB()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h12"/></svg></button>
+    <div class="tb-title" id="tb-title">Galelium <em>Courier</em></div>
+    <button class="tb-sound on" id="sound-btn" onclick="toggleSound()" title="Овоз"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg></button>
+    <div class="tb-chip" id="tb-chip"><div class="chip-dot"></div><span id="tb-chip-txt">Офлайн</span></div>
     <div class="tb-time" id="tb-time">--:--</div>
   </div>
 
@@ -814,54 +380,40 @@ body::after{
     <div class="page active" id="page-dashboard">
       <div id="notif-wrap"></div>
       <div id="dash-active-wrap"></div>
-
-      <div class="sh" style="margin-bottom:14px">
-        <div><div class="sh-tag">Обзор смены</div><div class="sh-title">Дашборд</div></div>
-      </div>
-
+      <div class="sh" style="margin-bottom:14px"><div><div class="sh-tag">Шарҳи навбат</div><div class="sh-title">Дашборд</div></div></div>
       <div class="stats-row">
-        <div class="sc"><div class="sc-lbl">Сегодня</div><div class="sc-val g" id="d-earn">0 ₽</div><div class="sc-sub">Заработано</div><div class="sc-ico">💰</div></div>
-        <div class="sc"><div class="sc-lbl">Доставок</div><div class="sc-val" id="d-today">0</div><div class="sc-sub">За смену</div><div class="sc-ico">📦</div></div>
-        <div class="sc"><div class="sc-lbl">Всего</div><div class="sc-val" id="d-total">0</div><div class="sc-sub">За всё время</div><div class="sc-ico">🏆</div></div>
-        <div class="sc"><div class="sc-lbl">Рейтинг</div><div class="sc-val a" id="d-rating">—</div><div class="sc-sub">Средняя оценка</div><div class="sc-ico">⭐</div></div>
+        <div class="sc"><div class="sc-lbl">Имрӯз</div><div class="sc-val g" id="d-earn">0 см</div><div class="sc-sub">Даромад</div><div class="sc-ico">💰</div></div>
+        <div class="sc"><div class="sc-lbl">Расонидан</div><div class="sc-val" id="d-today">0</div><div class="sc-sub">Имрӯз</div><div class="sc-ico">📦</div></div>
+        <div class="sc"><div class="sc-lbl">Ҳамаги</div><div class="sc-val" id="d-total">0</div><div class="sc-sub">Ҳамаи вақт</div><div class="sc-ico">🏆</div></div>
+        <div class="sc"><div class="sc-lbl">Рейтинг</div><div class="sc-val a" id="d-rating">—</div><div class="sc-sub">Миёнаи баҳо</div><div class="sc-ico">⭐</div></div>
       </div>
-
-      <div class="sh">
-        <div><div class="sh-tag">Очередь</div><div class="sh-title">Новые <em>заказы</em></div></div>
-        <button class="sh-link" onclick="goPage('new-orders')">Все →</button>
-      </div>
-      <div id="dash-new-orders"><div class="pload"><div class="spin"></div> Ожидаем…</div></div>
+      <div class="sh"><div><div class="sh-tag">Навбат</div><div class="sh-title">Фармоишҳои <em>нав</em></div></div><button class="sh-link" onclick="goPage('new-orders')">Ҳама →</button></div>
+      <div id="dash-new-orders"><div class="pload"><div class="spin"></div> Интизор…</div></div>
     </div>
 
     <!-- NEW ORDERS -->
     <div class="page" id="page-new-orders">
-      <div class="sh">
-        <div><div class="sh-tag">Доступные</div><div class="sh-title">Новые <em>заказы</em></div></div>
-        <div style="font-size:.6rem;color:var(--muted)" id="new-count-txt">0 заказов</div>
-      </div>
-      <div id="new-orders-list"><div class="pload"><div class="spin"></div> Ожидаем…</div></div>
+      <div class="sh"><div><div class="sh-tag">Дастрас</div><div class="sh-title">Фармоишҳои <em>нав</em></div></div><div style="font-size:.6rem;color:var(--tx3)" id="new-count-txt">0 фармоиш</div></div>
+      <div id="new-orders-list"><div class="pload"><div class="spin"></div> Интизор…</div></div>
     </div>
 
-    <!-- ACTIVE -->
+    <!-- ACTIVE ORDER -->
     <div class="page" id="page-active">
-      <div class="sh"><div><div class="sh-tag">В работе</div><div class="sh-title">Активный <em>заказ</em></div></div></div>
+      <div class="sh"><div><div class="sh-tag">Дар кор</div><div class="sh-title">Фармоиши <em>фаъол</em></div></div></div>
       <div id="active-content">
-        <div class="empty"><span class="empty-ico">🚴</span><div class="empty-title">Нет активного заказа</div><div class="empty-sub">Возьмите заказ из списка</div></div>
+        <div class="empty"><span class="empty-ico">🛵</span><div class="empty-t">Фармоиши фаъол нест</div><div class="empty-s">Аз рӯйхат фармоишро қабул кунед</div></div>
       </div>
     </div>
 
     <!-- HISTORY -->
     <div class="page" id="page-history">
-      <div class="sh">
-        <div><div class="sh-tag">Архив</div><div class="sh-title">История <em>доставок</em></div></div>
-        <div style="font-size:.6rem;color:var(--muted)" id="hist-total-txt"></div>
-      </div>
-      <div id="history-list"><div class="pload"><div class="spin"></div> Загрузка…</div></div>
+      <div class="sh"><div><div class="sh-tag">Архив</div><div class="sh-title">Таърихи <em>расонидан</em></div></div><div style="font-size:.6rem;color:var(--tx3)" id="hist-txt"></div></div>
+      <div id="history-list"><div class="pload"><div class="spin"></div> Боргузорӣ…</div></div>
     </div>
 
     <!-- PROFILE -->
     <div class="page" id="page-profile">
-      <div class="sh"><div><div class="sh-tag">Аккаунт</div><div class="sh-title">Профиль</div></div></div>
+      <div class="sh"><div><div class="sh-tag">Аккаунт</div><div class="sh-title">Профил</div></div></div>
       <div class="pg">
         <div>
           <div class="p-card">
@@ -870,111 +422,156 @@ body::after{
             <div class="p-email" id="p-email">—</div>
             <div class="p-veh" id="p-veh">—</div>
             <div class="p-stats">
-              <div class="p-st"><div class="p-st-val" id="ps-total">0</div><div class="p-st-lbl">Доставок</div></div>
-              <div class="p-st"><div class="p-st-val" id="ps-earn">0</div><div class="p-st-lbl">₽ Заработок</div></div>
+              <div class="p-st"><div class="p-st-val" id="ps-total">0</div><div class="p-st-lbl">Расонидан</div></div>
+              <div class="p-st"><div class="p-st-val" id="ps-earn">0</div><div class="p-st-lbl">Даромад см</div></div>
               <div class="p-st"><div class="p-st-val" id="ps-rating">—</div><div class="p-st-lbl">Рейтинг</div></div>
             </div>
           </div>
-          <div style="margin-top:10px">
-            <button class="btn-o danger" style="width:100%;padding:11px" onclick="doLogout()">Выйти из аккаунта</button>
-          </div>
+          <div style="margin-top:10px"><button class="btn-o danger" style="width:100%;padding:11px" onclick="doLogout()">Баромадан аз аккаунт</button></div>
         </div>
         <div>
           <div class="pf">
-            <div class="pf-title">Личные данные</div>
+            <div class="pf-title">Маълумоти шахсӣ</div>
             <div class="fr">
-              <div class="ff"><label class="fl">Имя и фамилия</label><input class="fi" type="text" id="pf-name" placeholder="Иван Петров"/></div>
-              <div class="ff"><label class="fl">Телефон</label><input class="fi" type="tel" id="pf-phone" placeholder="+7 900 000-00-00"/></div>
+              <div class="ff"><label class="fl">Ном</label><input class="fi" type="text" id="pf-name" placeholder="Исмонов Баҳром"/></div>
+              <div class="ff"><label class="fl">Телефон</label><input class="fi" type="tel" id="pf-phone" placeholder="+992 900 000-000"/></div>
             </div>
             <div class="ff"><label class="fl">Email</label><input class="fi" type="email" id="pf-email" readonly/></div>
-            <div class="ff">
-              <label class="fl">Транспорт</label>
+            <div class="ff"><label class="fl">Нақлиёт</label>
               <select class="fi" id="pf-vehicle">
                 <option value="bicycle">🚴 Велосипед</option>
-                <option value="scooter">🛵 Самокат / мопед</option>
-                <option value="car">🚗 Автомобиль</option>
-                <option value="foot">🚶 Пешком</option>
+                <option value="scooter">🛵 Самокат / скутер</option>
+                <option value="car">🚗 Мошин</option>
+                <option value="foot">🚶 Пиёда</option>
               </select>
             </div>
-            <button class="btn-p" onclick="saveProfile()">Сохранить изменения</button>
+            <button class="btn-p" onclick="saveProfile()">Тағйиротро сақл кунед</button>
           </div>
           <div class="pf">
-            <div class="pf-title">Фото профиля</div>
+            <div class="pf-title">Акси профил</div>
             <input type="file" id="av-inp" accept="image/*" style="display:none" onchange="uploadAvUI(this)"/>
-            <button class="btn-o" onclick="document.getElementById('av-inp').click()">Загрузить фото</button>
-            <div style="font-size:.62rem;color:var(--muted);margin-top:6px">JPG, PNG до 2 МБ</div>
+            <button class="btn-o" onclick="document.getElementById('av-inp').click()">Боргузории акс</button>
+            <div style="font-size:.62rem;color:var(--tx3);margin-top:6px">JPG, PNG то 2 МБ</div>
           </div>
         </div>
       </div>
     </div>
 
   </div>
-</div><!-- /main -->
+</div>
+</div>
 
-</div><!-- /app -->
-
-<!-- ═══ MOBILE BOTTOM NAV ═══ -->
+<!-- MOBILE NAV -->
 <nav class="mob-nav" id="mob-nav">
-  <div class="mob-nav-inner">
-    <button class="mn-item active" data-page="dashboard" onclick="goPage('dashboard')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      <span class="mn-label">Главная</span>
-    </button>
-    <button class="mn-item" data-page="new-orders" onclick="goPage('new-orders')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-      <span class="mn-label">Заказы</span>
-      <span class="mn-badge" id="mob-new-badge" style="display:none">0</span>
-    </button>
-    <button class="mn-item" data-page="active" onclick="goPage('active')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="1"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>
-      <span class="mn-label">В работе</span>
-      <span class="mn-badge" id="mob-active-badge" style="display:none;background:var(--g)">!</span>
-    </button>
-    <button class="mn-item" data-page="history" onclick="goPage('history')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      <span class="mn-label">История</span>
-    </button>
-    <button class="mn-item" data-page="profile" onclick="goPage('profile')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <span class="mn-label">Профиль</span>
-    </button>
+  <div class="mn-inner">
+    <button class="mn-item active" data-page="dashboard" onclick="goPage('dashboard')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="mn-lbl">Асосӣ</span></button>
+    <button class="mn-item" data-page="new-orders" onclick="goPage('new-orders')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg><span class="mn-lbl">Навҳо</span><span class="mn-badge" id="mob-new-b" style="display:none">0</span></button>
+    <button class="mn-item" data-page="active" onclick="goPage('active')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="1"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg><span class="mn-lbl">Фаъол</span><span class="mn-badge g" id="mob-active-b" style="display:none">!</span></button>
+    <button class="mn-item" data-page="history" onclick="goPage('history')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="mn-lbl">Таърих</span></button>
+    <button class="mn-item" data-page="profile" onclick="goPage('profile')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="mn-lbl">Профил</span></button>
   </div>
 </nav>
 
+<script>
+// Эти функции доступны сразу — до загрузки Firebase
+window.goPage=function(p){
+  document.querySelectorAll('.page').forEach(function(x){x.classList.remove('active');});
+  document.querySelectorAll('.ni,.mn-item').forEach(function(x){x.classList.remove('active');});
+  var pg=document.getElementById('page-'+p);if(pg)pg.classList.add('active');
+  document.querySelectorAll('.ni[data-page="'+p+'"],.mn-item[data-page="'+p+'"]').forEach(function(x){x.classList.add('active');});
+  var T={dashboard:'Дашборд','new-orders':'Фармоишҳои нав',active:'Фармоиши фаъол',history:'Таърих',profile:'Профил'};
+  var tb=document.getElementById('tb-title');if(tb)tb.innerHTML='Galelium <em>'+(T[p]||'Courier')+'</em>';
+  if(window._afterNav)window._afterNav(p);
+  var sb=document.getElementById('sidebar');if(sb)sb.classList.remove('open');
+  var ov=document.getElementById('sb-overlay');if(ov)ov.classList.remove('open');
+  var pgs=document.getElementById('pages');if(pgs)pgs.scrollTop=0;
+};
+window.toggleSB=function(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sb-overlay').classList.toggle('open');
+};
+window.closeSB=function(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sb-overlay').classList.remove('open');
+};
+window.toast=function(msg,type){
+  var w=document.getElementById('toast-wrap');
+  var el=document.createElement('div');
+  el.className='toast '+(type||'');
+  el.innerHTML='<div class="tdot"></div><span>'+msg+'</span>';
+  w.appendChild(el);
+  setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},3400);
+};
+window.toggleOnline=function(){toast('Боргузорӣ…','info');};
+window.toggleSound=function(){};
+window.acceptOrder=function(){toast('Боргузорӣ…','info');};
+window.arriveAtStore=function(){};
+window.toggleCheck=function(){};
+window.confirmItems=function(){};
+window.arrivedAtClient=function(){};
+window.markDelivered=function(){};
+window.saveProfile=function(){toast('Боргузорӣ…','info');};
+window.uploadAvUI=function(){};
+window.doLogout=function(){window.location.href='courier-login.html';};
+window._afterNav=null;
+document.addEventListener('DOMContentLoaded',function(){
+  var ov=document.getElementById('sb-overlay');
+  if(ov)ov.addEventListener('click',window.closeSB);
+});
+</script>
 <script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js';
-import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js';
-import { getFirestore, doc, getDoc, setDoc, updateDoc, getDocs, collection, query, where, orderBy, onSnapshot, serverTimestamp, limit } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js';
-import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-storage.js';
+import{initializeApp,getApps}from'https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js';
+import{getAuth,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js';
+import{getFirestore,doc,getDoc,setDoc,updateDoc,getDocs,collection,query,where,onSnapshot,serverTimestamp,limit}from'https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js';
+import{getStorage,ref as sRef,uploadBytes,getDownloadURL}from'https://www.gstatic.com/firebasejs/11.8.1/firebase-storage.js';
 
 const cfg={apiKey:'AIzaSyCjIAMFuwLKwmjChCuiz-MHLv5WZOczAAE',authDomain:'delivery-galelium.firebaseapp.com',projectId:'delivery-galelium',storageBucket:'delivery-galelium.firebasestorage.app',messagingSenderId:'982466555080',appId:'1:982466555080:web:c77ccbff0e71e540ddc9fd'};
-const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app),storage=getStorage(app);
-
+const app=getApps().length?getApps()[0]:initializeApp(cfg);
+const auth=getAuth(app),db=getFirestore(app),storage=getStorage(app);
 let CU=null,UD=null,CD=null;
 let newOrders=[],activeOrder=null,historyOrders=[];
 let unsubNew=null,unsubActive=null;
 let soundEnabled=true,todayDeliveries=0,todayEarnings=0;
-const EPD=80;
-const SL={pending:'Ожидает',confirmed:'Подтверждён',preparing:'Готовится',delivering:'В пути',delivered:'Доставлен',cancelled:'Отменён'};
-const VT={bicycle:'🚴 Велосипед',scooter:'🛵 Самокат',car:'🚗 Автомобиль',foot:'🚶 Пешком'};
+let checkedItems={};// pid -> bool
+const EPD=10;
+const SL={pending:'Интизор',confirmed:'Тасдиқ шуд',preparing:'Омода мешавад',delivering:'Дар роҳ',delivered:'Расонида шуд',cancelled:'Бекор шуд'};
+const VT={bicycle:'🚴 Велосипед',scooter:'🛵 Скутер',car:'🚗 Мошин',foot:'🚶 Пиёда'};
 
-/* CLOCK */
-function tick(){document.getElementById('tb-time').textContent=new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
-setInterval(tick,1000);tick();
+// CLOCK
+function tick(){const t=new Date();document.getElementById('tb-time').textContent=t.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});}
+setInterval(tick,10000);tick();
 
-/* AUTH */
+// AUTH
 onAuthStateChanged(auth,async u=>{
   if(!u){location.href='courier-login.html';return;}
   CU=u;
-  const s=await getDoc(doc(db,'users',CU.uid));
-  if(!s.exists()||s.data().role!=='courier'){await signOut(auth);location.href='courier-login.html';return;}
-  UD=s.data();
-  const cs=await getDoc(doc(db,'couriers',CU.uid));
-  CD=cs.exists()?cs.data():{totalDeliveries:0,earnings:0,rating:0,vehicle:'foot',isOnline:false};
-  renderSB();renderProfile();calcStats();startListeners();
+  try{
+    const s=await getDoc(doc(db,'users',CU.uid));
+    UD=s.exists()?s.data():{displayName:CU.displayName||u.email||'Курьер',email:u.email,phone:'',role:'courier',avatarUrl:''};
+    const cs=await getDoc(doc(db,'couriers',CU.uid));
+    CD=cs.exists()?cs.data():{totalDeliveries:0,earnings:0,rating:0,vehicle:'foot',isOnline:false};
+    renderSB();renderProfile();calcStats();startListeners();
+  }catch(e){
+    console.error('Init error:',e);
+    // Show error in UI instead of infinite spinner
+    const errMsg=e.code==='permission-denied'
+      ?'Дастрас рад шуд. Қоидаҳои Firestore-ро санҷед (Rules).'
+      :'Хато: '+e.message;
+    toast(errMsg,'err');
+    // Still render what we can with defaults
+    UD={displayName:u.displayName||u.email||'Курьер',email:u.email,phone:'',role:'courier',avatarUrl:''};
+    CD={totalDeliveries:0,earnings:0,rating:0,vehicle:'foot',isOnline:false};
+    renderSB();renderProfile();
+    // Show error in orders list
+    ['dash-new-orders','new-orders-list'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el)el.innerHTML='<div class="empty"><span class="empty-ico">⚠️</span><div class="empty-t">Хато дар пайвастшавӣ</div><div class="empty-s">'+errMsg+'</div></div>';
+    });
+    // Try listeners anyway — they have their own error handlers
+    try{startListeners();}catch{}
+  }
 });
 
-/* SIDEBAR */
 function renderSB(){
   const name=UD?.displayName||CU.email||'Курьер';
   const init=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'?';
@@ -985,91 +582,87 @@ function renderSB(){
   updateEarnUI();
 }
 
-/* ONLINE */
+// ONLINE
 window.toggleOnline=async function(v){
-  try{
-    await setDoc(doc(db,'couriers',CU.uid),{isOnline:v,updatedAt:serverTimestamp()},{merge:true});
-    CD={...CD,isOnline:v};updateOnlineUI(v);
-    toast(v?'Вы онлайн 🟢':'Вы офлайн','ok');
-  }catch{toast('Ошибка','err');}
+  try{await setDoc(doc(db,'couriers',CU.uid),{isOnline:v,updatedAt:serverTimestamp()},{merge:true});CD={...CD,isOnline:v};updateOnlineUI(v);toast(v?'Шумо онлайн 🟢':'Шумо офлайн','ok');}catch{toast('Хато','err');}
 };
 function updateOnlineUI(on){
-  document.getElementById('online-tog').checked=on;
-  const v=document.getElementById('sb-online-val');
-  v.textContent=on?'Онлайн':'Офлайн';
-  v.className='sb-online-val'+(on?' on':'');
-  document.getElementById('sb-online-card').className='sb-online'+(on?' is-online':'');
-  const c=document.getElementById('tb-chip');
-  c.className='tb-chip'+(on?' online':' offline');
-  document.getElementById('tb-chip-txt').textContent=on?'Онлайн':'Офлайн';
+  const tog=document.getElementById('online-tog');if(tog)tog.checked=on;
+  const v=document.getElementById('sb-online-val');if(v){v.textContent=on?'Онлайн':'Офлайн';v.className='sb-online-val'+(on?' on':'');}
+  const c=document.getElementById('sb-online');if(c)c.className='sb-online'+(on?' on':'');
+  const chip=document.getElementById('tb-chip');if(chip)chip.className='tb-chip'+(on?' on':'');
+  const ct=document.getElementById('tb-chip-txt');if(ct)ct.textContent=on?'Онлайн':'Офлайн';
 }
 function updateEarnUI(){
-  document.getElementById('sb-earn-val').textContent=todayEarnings+' ₽';
-  document.getElementById('d-earn').textContent=todayEarnings+' ₽';
+  const se=document.getElementById('sb-earn');if(se)se.textContent=todayEarnings+' см';
+  const de=document.getElementById('d-earn');if(de)de.textContent=todayEarnings+' см';
 }
 
-/* STATS */
+// STATS
 async function calcStats(){
   try{
     const today=new Date();today.setHours(0,0,0,0);
+    // Точно как в рабочем старом файле — два where на одном поле
     const q=query(collection(db,'orders'),where('courierId','==',CU.uid),where('status','==','delivered'));
     const sn=await getDocs(q);
     const all=sn.docs.map(d=>({id:d.id,...d.data()}));
     const td=all.filter(o=>o.updatedAt?.toDate&&o.updatedAt.toDate()>=today);
     todayDeliveries=td.length;todayEarnings=todayDeliveries*EPD;
-    document.getElementById('d-today').textContent=todayDeliveries;
-    document.getElementById('d-total').textContent=CD?.totalDeliveries||0;
-    document.getElementById('d-rating').textContent=CD?.rating?CD.rating.toFixed(1):'—';
+    const dt=document.getElementById('d-today');if(dt)dt.textContent=todayDeliveries;
+    const dtot=document.getElementById('d-total');if(dtot)dtot.textContent=CD?.totalDeliveries||0;
+    const dr=document.getElementById('d-rating');if(dr)dr.textContent=CD?.rating?CD.rating.toFixed(1):'—';
     updateEarnUI();
-    document.getElementById('ps-total').textContent=CD?.totalDeliveries||0;
-    document.getElementById('ps-earn').textContent=CD?.earnings||0;
-    document.getElementById('ps-rating').textContent=CD?.rating?CD.rating.toFixed(1):'—';
-  }catch{}
+    const pst=document.getElementById('ps-total');if(pst)pst.textContent=CD?.totalDeliveries||0;
+    const pse=document.getElementById('ps-earn');if(pse)pse.textContent=CD?.earnings||0;
+    const psr=document.getElementById('ps-rating');if(psr)psr.textContent=CD?.rating?CD.rating.toFixed(1):'—';
+  }catch(e){console.error('calcStats:',e);}
 }
 
-/* LISTENERS */
+// LISTENERS
 function startListeners(){listenNew();listenActive();}
-
 function listenNew(){
   if(unsubNew){unsubNew();unsubNew=null;}
-  const q=query(collection(db,'orders'),where('status','in',['pending','confirmed']),where('courierId','==',null));
+  // Точно как в рабочем старом файле
+  const q=query(collection(db,'orders'),where('status','==','pending'),where('courierId','==',null));
   let first=true;
   unsubNew=onSnapshot(q,sn=>{
     const prev=newOrders.length;
     newOrders=sn.docs.map(d=>({id:d.id,...d.data()}));
     updateNewBadge();renderNewOrders();renderDashNew();
-    if(!first&&newOrders.length>prev){playBeep();toast('🔔 Новый заказ!','info');renderNotif();}
+    if(!first&&newOrders.length>prev){playBeep();toast('🔔 Фармоиши нав!','info');}
     first=false;
+  },err=>{
+    console.error('listenNew:',err.code,err.message);
+    ['new-orders-list','dash-new-orders'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el)el.innerHTML=`<div class="empty"><span class="empty-ico">⚠️</span><div class="empty-t">Хато: ${err.code}</div><div class="empty-s">${err.message}</div></div>`;
+    });
   });
 }
-
 function listenActive(){
   if(unsubActive){unsubActive();unsubActive=null;}
-  const q=query(collection(db,'orders'),where('courierId','==',CU.uid),where('status','in',['delivering','preparing']),limit(1));
+  // Точно как в рабочем старом файле
+  const q=query(collection(db,'orders'),where('courierId','==',CU.uid),where('status','in',['preparing','delivering']),limit(1));
   unsubActive=onSnapshot(q,sn=>{
+    const wasActive=!!activeOrder;
     activeOrder=sn.empty?null:{id:sn.docs[0].id,...sn.docs[0].data()};
+    if(activeOrder&&!wasActive)checkedItems={};
     renderActive();renderDashActive();updateActiveBadge();
+  },err=>{
+    console.error('listenActive:',err.code,err.message);
   });
 }
 
-/* BADGES */
 function updateNewBadge(){
   const cnt=newOrders.length;
-  ['new-badge','mob-new-badge'].forEach(id=>{
-    const b=document.getElementById(id);
-    if(b){b.style.display=cnt>0?'':'none';b.textContent=cnt;}
-  });
-  const el=document.getElementById('new-count-txt');
-  if(el) el.textContent=cnt+' заказов';
+  ['new-badge','mob-new-b'].forEach(id=>{const b=document.getElementById(id);if(b){b.style.display=cnt>0?'':'none';b.textContent=cnt;}});
+  const nc=document.getElementById('new-count-txt');if(nc)nc.textContent=cnt+' фармоиш';
 }
 function updateActiveBadge(){
-  ['active-badge','mob-active-badge'].forEach(id=>{
-    const b=document.getElementById(id);
-    if(b) b.style.display=activeOrder?'':'none';
-  });
+  ['active-badge','mob-active-b'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display=activeOrder?'':'none';});
 }
 
-/* SOUND */
+// SOUND
 window.toggleSound=function(){
   soundEnabled=!soundEnabled;
   const b=document.getElementById('sound-btn');
@@ -1077,309 +670,333 @@ window.toggleSound=function(){
   b.innerHTML=soundEnabled
     ?`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg>`
     :`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>`;
-  toast(soundEnabled?'Звук включён':'Беззвучно','ok');
+  toast(soundEnabled?'Овоз фаъол аст':'Бе овоз','ok');
 };
 function playBeep(){
   if(!soundEnabled)return;
-  try{
-    const ctx=new(window.AudioContext||window.webkitAudioContext)();
-    [0,140,280].forEach((d,i)=>{
-      const o=ctx.createOscillator(),g=ctx.createGain();
-      o.connect(g);g.connect(ctx.destination);
-      o.frequency.value=900-i*90;o.type='sine';
-      g.gain.setValueAtTime(.15,ctx.currentTime+d/1000);
-      g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+d/1000+.2);
-      o.start(ctx.currentTime+d/1000);o.stop(ctx.currentTime+d/1000+.2);
-    });
-  }catch{}
+  try{const ctx=new(window.AudioContext||window.webkitAudioContext)();[0,140,280].forEach((d,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=900-i*90;o.type='sine';g.gain.setValueAtTime(.15,ctx.currentTime+d/1000);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+d/1000+.2);o.start(ctx.currentTime+d/1000);o.stop(ctx.currentTime+d/1000+.2);});}catch{}
 }
 
-/* NOTIF */
+// NOTIF
 function renderNotif(){
-  const w=document.getElementById('notif-wrap');
+  const w=document.getElementById('notif-wrap');if(!w)return;
   if(!newOrders.length){w.innerHTML='';return;}
-  w.innerHTML=`<div class="nb" onclick="goPage('new-orders')">
-    <div class="nb-pulse"></div>
-    <div class="nb-info"><div class="nb-lbl">Новые заказы</div><div class="nb-txt">${newOrders.length} заказ(а) ждут курьера</div></div>
-    <svg class="nb-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-  </div>`;
+  w.innerHTML=`<div class="nb" onclick="goPage('new-orders')"><div class="nb-pulse"></div><div class="nb-info"><div class="nb-lbl">Фармоишҳои нав</div><div class="nb-txt">${newOrders.length} фармоиш курьерро интизор аст</div></div><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--acc)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>`;
 }
 
-/* ORDER CARD */
+// ORDER CARD
+const CDS={};
 function orderCard(o,cdShow=false){
   const items=(o.items||[]).map(i=>`${i.name} ×${i.quantity}`).join(', ');
   const time=o.createdAt?.toDate?o.createdAt.toDate().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}):'—';
-  const pay=o.paymentMethod==='cash'?'Наличными':o.paymentMethod==='card'?'Картой':'Онлайн';
-  const sc=o.status==='confirmed'?'var(--g)':'var(--yellow)';
-  const sl=o.status==='confirmed'?'Подтверждён':'Ожидает';
-  return `<div class="oc" id="oc-${o.id}">
+  const pay=o.paymentMethod==='cash'?'Нақдӣ':o.paymentMethod==='card'?'Корт':'Онлайн';
+  const num=o.orderNumber?'#'+o.orderNumber:'#'+o.id.slice(-6);
+  return`<div class="oc">
     <div class="oc-head">
       <div>
-        <div class="oc-meta">
-          <span class="oc-num">#${o.id.slice(-6).toUpperCase()}</span>
-          <span class="oc-status-pill" style="color:${sc};border-color:${sc}40;background:${sc}10">${sl}</span>
-        </div>
-        <div class="oc-addr">${o.address||'Адрес не указан'}</div>
+        <div class="oc-num">Фармоиш ${num}</div>
+        <div class="oc-addr">${o.address||'Суроғ нишон дода нашудааст'}</div>
       </div>
       <div class="oc-time">${time}</div>
     </div>
-    ${cdShow?`<div class="cd-wrap"><div class="cd-track"><div class="cd-fill" id="cd-${o.id}" style="width:100%"></div></div><div class="cd-row"><span>Принять заказ</span><span id="cd-txt-${o.id}">60с</span></div></div>`:''}
-    <div class="oc-items"><div class="oc-items-lbl">Состав</div>${items}</div>
+    ${cdShow?`<div class="cd-wrap"><div class="cd-track"><div class="cd-fill" id="cd-${o.id}" style="width:100%"></div></div><div class="cd-row"><span>Қабул кунед</span><span id="cd-txt-${o.id}">60с</span></div></div>`:''}
+    <div class="oc-items-box"><div class="oc-items-lbl">Таркиб</div>${items}</div>
     <div class="oc-foot">
-      <div>
-        <div class="oc-chips">
-          <div class="oc-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>${EPD} ₽</div>
-          <div class="oc-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="1"/><path d="M2 10h20"/></svg>${pay}</div>
-          ${o.comment?`<div class="oc-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>${o.comment}</div>`:''}
-        </div>
+      <div class="oc-chips">
+        <div class="oc-chip"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>${EPD} см</div>
+        <div class="oc-chip">${pay}</div>
+        ${o.comment?`<div class="oc-chip">${o.comment}</div>`:''}
       </div>
       <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
-        <div class="oc-earn">${EPD} <span>₽</span></div>
+        <div class="oc-earn">${o.total}<span> см</span></div>
         <button class="btn-acc" onclick="acceptOrder('${o.id}')" id="btn-${o.id}" ${activeOrder?'disabled':''}>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          Взять
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Гирифтан
         </button>
       </div>
     </div>
   </div>`;
 }
-
-const CDS={};
 function startCD(oid){
-  if(CDS[oid])return;
-  let s=60;
-  CDS[oid]=setInterval(()=>{
-    s--;
-    const bar=document.getElementById('cd-'+oid),txt=document.getElementById('cd-txt-'+oid);
-    if(bar){bar.style.width=(s/60*100)+'%';bar.style.background=s<15?'var(--red)':s<30?'var(--yellow)':'var(--acc)';}
-    if(txt) txt.textContent=s+'с';
-    if(s<=0){clearInterval(CDS[oid]);delete CDS[oid];}
-  },1000);
+  if(CDS[oid])return;let s=60;
+  CDS[oid]=setInterval(()=>{s--;const bar=document.getElementById('cd-'+oid),txt=document.getElementById('cd-txt-'+oid);if(bar){bar.style.width=(s/60*100)+'%';bar.style.background=s<15?'var(--red)':s<30?'var(--acc)':'var(--g)';}if(txt)txt.textContent=s+'с';if(s<=0){clearInterval(CDS[oid]);delete CDS[oid];}},1000);
 }
-
-function sortByTime(arr){
-  return [...arr].sort((a,b)=>{
-    const ta=a.createdAt?.toDate?a.createdAt.toDate().getTime():0;
-    const tb=b.createdAt?.toDate?b.createdAt.toDate().getTime():0;
-    return ta-tb;
-  });
-}
-
+function sortByTime(arr){return[...arr].sort((a,b)=>{const ta=a.createdAt?.toDate?a.createdAt.toDate().getTime():0,tb=b.createdAt?.toDate?b.createdAt.toDate().getTime():0;return ta-tb;});}
 function renderNewOrders(){
-  const el=document.getElementById('new-orders-list');
+  const el=document.getElementById('new-orders-list');if(!el)return;
   const sorted=sortByTime(newOrders);
-  if(!sorted.length){el.innerHTML='<div class="empty"><span class="empty-ico">📭</span><div class="empty-title">Нет новых заказов</div><div class="empty-sub">Заказы появятся автоматически</div></div>';return;}
+  if(!sorted.length){el.innerHTML='<div class="empty"><span class="empty-ico">📭</span><div class="empty-t">Фармоишҳои нав нест</div><div class="empty-s">Фармоишҳо худкор намоён мешаванд</div></div>';return;}
   el.innerHTML=sorted.map((o,i)=>orderCard(o,i===0)).join('');
   if(sorted[0])startCD(sorted[0].id);
 }
-
 function renderDashNew(){
-  const el=document.getElementById('dash-new-orders');
+  const el=document.getElementById('dash-new-orders');if(!el)return;
   const sorted=sortByTime(newOrders);
-  if(!sorted.length){el.innerHTML='<div class="empty" style="padding:30px 20px"><span class="empty-ico">📭</span><div class="empty-title">Новых заказов нет</div><div class="empty-sub">Ожидаем поступления…</div></div>';renderNotif();return;}
-  el.innerHTML=sorted.slice(0,3).map(o=>orderCard(o)).join('');
-  renderNotif();
+  if(!sorted.length){el.innerHTML='<div class="empty" style="padding:28px 20px"><span class="empty-ico">📭</span><div class="empty-t">Фармоишҳои нав нест</div></div>';renderNotif();return;}
+  el.innerHTML=sorted.slice(0,2).map(o=>orderCard(o)).join('');renderNotif();
+}
+function renderDashActive(){
+  const w=document.getElementById('dash-active-wrap');if(!w)return;
+  if(!activeOrder){w.innerHTML='';return;}
+  const o=activeOrder;const num=o.orderNumber?'#'+o.orderNumber:'#'+o.id.slice(-6);
+  w.innerHTML=`<div class="ab" onclick="goPage('active')"><div class="ab-pulse"></div><div class="ab-info"><div class="ab-lbl">Дар кор ҳозир</div><div class="ab-txt">Фармоиш ${num} · ${SL[o.status]} · ${o.address||''}</div></div><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>`;
 }
 
-/* ACCEPT */
+// ACCEPT ORDER
 window.acceptOrder=async function(oid){
-  if(activeOrder){toast('Уже есть активный заказ','err');return;}
+  if(activeOrder){toast('Аллакай фармоиши фаъол дорад','err');return;}
   const btn=document.getElementById('btn-'+oid);
-  if(btn){btn.disabled=true;btn.innerHTML='<div class="spin" style="border-color:rgba(5,8,10,.2);border-top-color:#05080a;width:12px;height:12px"></div>';}
+  if(btn){btn.disabled=true;btn.innerHTML='<div class="spin" style="border-color:rgba(0,0,0,.15);border-top-color:#0b0f0c;width:11px;height:11px"></div>';}
   try{
-    await updateDoc(doc(db,'orders',oid),{courierId:CU.uid,courierName:UD?.displayName||'',status:'delivering',updatedAt:serverTimestamp()});
+    await updateDoc(doc(db,'orders',oid),{courierId:CU.uid,courierName:UD?.displayName||'',status:'preparing',updatedAt:serverTimestamp()});
     await setDoc(doc(db,'couriers',CU.uid),{currentOrderId:oid,isActive:true,isOnline:true,updatedAt:serverTimestamp()},{merge:true});
     CD={...CD,currentOrderId:oid,isActive:true,isOnline:true};
-    document.getElementById('online-tog').checked=true;
+    const tog=document.getElementById('online-tog');if(tog)tog.checked=true;
     updateOnlineUI(true);
-    toast('Заказ принят! Вперёд 🚴','ok');
+    checkedItems={};
+    toast('Фармоиш қабул шуд! 🚀','ok');
     goPage('active');
-  }catch(e){
-    toast('Ошибка: '+e.message,'err');
-    if(btn){btn.disabled=false;btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Взять';}
-  }
+  }catch(e){toast('Хато: '+e.message,'err');if(btn){btn.disabled=false;btn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Гирифтан';}}
 };
 
-/* ACTIVE ORDER */
-const SSTEPS=['confirmed','preparing','delivering','delivered'];
-const SICONS=['✅','👨‍🍳','🚴','🎉'];
-const SLBLS=['Подтверждён','Готовится','В пути','Доставлен'];
-const SNBTNS=['Начать готовить','Выехал 🚴','✓ Доставлен'];
-const SNST=['preparing','delivering','delivered'];
+// ── ACTIVE ORDER — 3 STEP FLOW ──
+// Steps: 0=магазин, 1=товары(чеклист), 2=доставка
+let flowStep=0;
 
 function renderActive(){
-  const el=document.getElementById('active-content');
-  if(!activeOrder){el.innerHTML='<div class="empty"><span class="empty-ico">🚴</span><div class="empty-title">Нет активного заказа</div><div class="empty-sub">Возьмите заказ из списка</div></div>';return;}
-  const o=activeOrder,si=SSTEPS.indexOf(o.status);
-  const date=o.createdAt?.toDate?o.createdAt.toDate().toLocaleString('ru-RU'):'—';
-  const pay=o.paymentMethod==='cash'?'Наличными':o.paymentMethod==='card'?'Картой':'Онлайн';
-  const steps=SSTEPS.map((s,i)=>{
-    const cls=i<si?'done':i===si?'current':'';
-    return `<div class="step ${cls}"><div class="step-dot">${i<=si?SICONS[i]:''}</div><div class="step-lbl">${SLBLS[i]}</div></div>`;
-  }).join('');
-  const ni=si+1,can=ni<SSTEPS.length;
-  el.innerHTML=`<div class="ao">
-    <div class="ao-head">
-      <div>
-        <div class="ao-num">Заказ #${o.id.slice(-6).toUpperCase()}</div>
-        <div class="ao-addr">${o.address||'—'}</div>
-      </div>
-      <div class="ao-badge"><div class="ao-pulse"></div>${SL[o.status]||o.status}</div>
-    </div>
-    <div class="steps">${steps}</div>
-    <div class="divider"></div>
-    <div class="detail-grid">
-      <div class="detail-item"><div class="detail-lbl">Клиент</div><div class="detail-val">${o.clientName||'—'}</div></div>
-      <div class="detail-item"><div class="detail-lbl">Оплата</div><div class="detail-val">${pay}</div></div>
-      <div class="detail-item"><div class="detail-lbl">Комментарий</div><div class="detail-val">${o.comment||'Нет'}</div></div>
-      <div class="detail-item"><div class="detail-lbl">Время заказа</div><div class="detail-val">${date}</div></div>
-    </div>
-    <div class="divider"></div>
-    <div class="detail-lbl" style="margin-bottom:8px">Состав заказа</div>
-    ${(o.items||[]).map(i=>`<div class="item-r"><span class="item-n">${i.name}</span><span class="item-q">×${i.quantity}</span><span class="item-p">${i.price*i.quantity} ₽</span></div>`).join('')}
-    <div style="display:flex;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid var(--b);font-size:.78rem">
-      <span style="color:var(--text2)">Сумма клиента</span><span style="font-family:var(--fm);color:var(--text)">${o.total} ₽</span>
-    </div>
-    <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:.78rem">
-      <span style="color:var(--muted)">Ваш заработок</span>
-      <span style="font-family:var(--fm);color:var(--g);font-weight:600">${EPD} ₽</span>
-    </div>
-    ${can?`<div class="sa"><button class="btn-st${SNST[si]==='delivered'?' final':''}" onclick="advance('${o.id}','${SNST[si]}')">${SNBTNS[si]}</button></div>`:''}
-  </div>`;
-}
-
-function renderDashActive(){
-  const w=document.getElementById('dash-active-wrap');
-  if(!activeOrder){w.innerHTML='';return;}
+  const el=document.getElementById('active-content');if(!el)return;
+  if(!activeOrder){
+    el.innerHTML='<div class="empty"><span class="empty-ico">🛵</span><div class="empty-t">Фармоиши фаъол нест</div><div class="empty-s">Аз рӯйхат фармоишро қабул кунед</div></div>';
+    flowStep=0;return;
+  }
   const o=activeOrder;
-  w.innerHTML=`<div class="ab" onclick="goPage('active')">
-    <div class="ab-pulse"></div>
-    <div class="ab-info"><div class="ab-lbl">В работе сейчас</div><div class="ab-txt">#${o.id.slice(-6).toUpperCase()} · ${SL[o.status]} · ${o.address||''}</div></div>
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-  </div>`;
+  // determine flowStep from status
+  if(o.status==='preparing'&&flowStep===0)flowStep=0;
+  renderFlowUI();
 }
 
-/* ADVANCE */
-window.advance=async function(oid,ns){
-  try{
-    await updateDoc(doc(db,'orders',oid),{status:ns,updatedAt:serverTimestamp()});
-    if(ns==='delivered'){
-      await setDoc(doc(db,'couriers',CU.uid),{
-        currentOrderId:null,isActive:false,
-        totalDeliveries:(CD?.totalDeliveries||0)+1,
-        earnings:(CD?.earnings||0)+EPD,
-        updatedAt:serverTimestamp()
-      },{merge:true});
-      CD={...CD,currentOrderId:null,isActive:false,totalDeliveries:(CD?.totalDeliveries||0)+1,earnings:(CD?.earnings||0)+EPD};
-      todayDeliveries++;todayEarnings+=EPD;
-      document.getElementById('d-today').textContent=todayDeliveries;
-      document.getElementById('d-total').textContent=CD.totalDeliveries;
-      updateEarnUI();
-      document.getElementById('ps-total').textContent=CD.totalDeliveries;
-      document.getElementById('ps-earn').textContent=CD.earnings;
-      toast('🎉 Доставлено! +'+EPD+' ₽','ok');
-      loadHistory();
-    }else{toast('Статус: '+SL[ns],'ok');}
-  }catch{toast('Ошибка','err');}
+function renderFlowUI(){
+  const o=activeOrder;if(!o)return;
+  const num=o.orderNumber?'#'+o.orderNumber:'#'+o.id.slice(-6);
+  const stepNames=['Ба мағоза расидан','Молҳоро гирифтан','Расонидани фармоиш'];
+  const stepIcons=['🏪','✅','🛵'];
+  const stepsHTML=stepNames.map((n,i)=>{
+    const cls=i<flowStep?'done':i===flowStep?'current':'future';
+    return`<div class="flow-step ${cls}"><div class="flow-dot">${i<flowStep?'✓':stepIcons[i]}</div><div class="flow-lbl">${n}</div></div>`;
+  }).join('');
+
+  let panelHTML='';
+  if(flowStep===0){
+    // Step 1 — arrive at store
+    panelHTML=`<div class="flow-panel active" id="fp-0">
+      <div class="store-card">
+        <div class="store-badge"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Мағоза</div>
+        <div class="store-title">Мағозаи Galelium</div>
+        <div class="store-sub">Шаҳри Душанбе, маркази ворид кунандагон</div>
+      </div>
+      <div class="dg">
+        <div><div class="di-lbl">Фармоиш</div><div class="di-val">${num}</div></div>
+        <div><div class="di-lbl">Муштарӣ</div><div class="di-val">${o.clientName||'—'}</div></div>
+        <div><div class="di-lbl">Маблағ</div><div class="di-val">${o.total} см</div></div>
+        <div><div class="di-lbl">Пардохт</div><div class="di-val">${o.paymentMethod==='cash'?'Нақдӣ':o.paymentMethod==='card'?'Корт':'Онлайн'}</div></div>
+      </div>
+      <div class="divider"></div>
+      <div style="margin-bottom:8px;font-size:.46rem;letter-spacing:.2em;text-transform:uppercase;color:var(--tx3)">Молҳои фармоиш</div>
+      ${(o.items||[]).map(i=>`<div class="oi"><span class="oi-name">${i.name}</span><span class="oi-qty">×${i.quantity}</span><span class="oi-price">${i.price*i.quantity} см</span></div>`).join('')}
+      <div class="divider"></div>
+      <button class="btn-big green" onclick="arriveAtStore()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+        Ба мағоза расидам
+      </button>
+    </div>`;
+  } else if(flowStep===1){
+    // Step 2 — checklist
+    const items=o.items||[];const total=items.reduce((s,i)=>s+i.quantity,0);const checked=Object.values(checkedItems).filter(Boolean).length;const allChecked=items.length>0&&items.every(i=>checkedItems[i.productId||i.name]);
+    panelHTML=`<div class="flow-panel active" id="fp-1">
+      <div style="background:var(--s1);border:1.5px solid var(--b1);border-radius:13px;padding:16px 18px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="font-family:var(--fd);font-weight:900;font-size:.9rem;color:var(--tx)">Молҳоро санҷед</div>
+          <div style="font-size:.7rem;color:${allChecked?'var(--g)':'var(--tx3)'};">${checked}/${items.length}</div>
+        </div>
+        <div class="checklist-progress"><div class="checklist-bar" id="cl-bar" style="width:${items.length?checked/items.length*100:0}%"></div></div>
+        <div class="checklist" id="checklist">
+          ${items.map(i=>{const key=i.productId||i.name;const chk=!!checkedItems[key];return`<div class="cli${chk?' checked':''}" onclick="toggleCheck('${key}',this)">
+            <div class="cli-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="cli-info"><div class="cli-name">${i.name}</div><div class="cli-qty">Миқдор: ${i.quantity} дона</div></div>
+          </div>`;}).join('')}
+        </div>
+      </div>
+      <button class="btn-big green" id="confirm-items-btn" onclick="confirmItems()" ${allChecked?'':'disabled'} style="${allChecked?'':'opacity:.4;cursor:not-allowed'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Ҳамаи молҳоро гирифтам — ба роҳ баромадам
+      </button>
+    </div>`;
+  } else if(flowStep===2){
+    // Step 3 — delivery
+    panelHTML=`<div class="flow-panel active" id="fp-2">
+      <div class="client-card">
+        <div class="client-addr-lbl">📍 Суроғи муштарӣ</div>
+        <div class="client-addr">${o.address||'—'}</div>
+        <div class="client-meta">
+          <div class="cm-item"><div class="cm-lbl">Муштарӣ</div><div class="cm-val">${o.clientName||'—'}</div></div>
+          <div class="cm-item"><div class="cm-lbl">Пардохт</div><div class="cm-val">${o.paymentMethod==='cash'?'💵 Нақдӣ':o.paymentMethod==='card'?'💳 Корт':'Онлайн'}</div></div>
+          ${o.comment?`<div class="cm-item" style="grid-column:1/-1"><div class="cm-lbl">Шарҳ</div><div class="cm-val">${o.comment}</div></div>`:''}
+        </div>
+      </div>
+      <div style="background:var(--s1);border:1px solid var(--b0);border-radius:12px;padding:14px 16px;margin-bottom:14px">
+        <div style="font-size:.46rem;letter-spacing:.2em;text-transform:uppercase;color:var(--tx3);margin-bottom:10px">Таркиби фармоиш</div>
+        ${(o.items||[]).map(i=>`<div class="oi"><span class="oi-name">${i.name}</span><span class="oi-qty">×${i.quantity}</span><span class="oi-price">${i.price*i.quantity} см</span></div>`).join('')}
+        <div style="display:flex;justify-content:space-between;padding-top:10px;border-top:1px solid var(--b0);margin-top:8px">
+          <span style="font-size:.76rem;color:var(--tx3)">Ҷамъ</span>
+          <span style="font-family:var(--fd);font-weight:900;color:var(--g)">${o.total} см</span>
+        </div>
+      </div>
+      <button class="btn-big green" onclick="arrivedAtClient()" id="arrived-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Ба муштарӣ расидам
+      </button>
+      <div id="delivered-wrap" style="margin-top:8px;display:none">
+        <button class="btn-big danger" onclick="markDelivered()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Фармоиш тасдиқ шуд — додам!
+        </button>
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('active-content').innerHTML=`
+    <div style="background:var(--s1);border:1px solid var(--b0);border-radius:13px;padding:16px 18px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+        <div><div style="font-family:var(--fd);font-weight:900;font-size:1rem;color:var(--tx)">Фармоиш ${num}</div><div style="font-size:.7rem;color:var(--tx3);margin-top:2px">${o.address||''}</div></div>
+        <div style="padding:3px 11px;border-radius:99px;font-size:.54rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--gg);color:var(--g);background:var(--gd)">${SL[o.status]||o.status}</div>
+      </div>
+      <div class="flow-steps">${stepsHTML}</div>
+    </div>
+    ${panelHTML}
+    <div style="margin-top:8px">
+      <div style="display:flex;align-items:center;justify-content:space-between;font-size:.72rem;padding:10px 14px;background:var(--s1);border:1px solid var(--b0);border-radius:10px">
+        <span style="color:var(--tx3)">Даромади шумо</span>
+        <span style="font-family:var(--fd);font-weight:900;color:var(--g)">${EPD} см</span>
+      </div>
+    </div>`;
+}
+
+// FLOW ACTIONS
+window.arriveAtStore=async function(){
+  flowStep=1;checkedItems={};renderFlowUI();toast('✅ Ба мағоза расидед! Молҳоро санҷед.','ok');
 };
 
-/* HISTORY */
-async function loadHistory(){
-  const el=document.getElementById('history-list');
-  el.innerHTML='<div class="pload"><div class="spin"></div> Загрузка…</div>';
+window.toggleCheck=function(key,el){
+  checkedItems[key]=!checkedItems[key];
+  el.classList.toggle('checked',!!checkedItems[key]);
+  const svg=el.querySelector('.cli-check svg');if(svg)svg.style.opacity=checkedItems[key]?'1':'0';
+  // update bar
+  const o=activeOrder;if(!o)return;
+  const items=o.items||[];const checked=Object.values(checkedItems).filter(Boolean).length;
+  const bar=document.getElementById('cl-bar');if(bar)bar.style.width=(items.length?checked/items.length*100:0)+'%';
+  const allChecked=items.length>0&&items.every(i=>checkedItems[i.productId||i.name]);
+  const btn=document.getElementById('confirm-items-btn');
+  if(btn){btn.disabled=!allChecked;btn.style.opacity=allChecked?'1':'.4';btn.style.cursor=allChecked?'pointer':'not-allowed';}
+};
+
+window.confirmItems=async function(){
+  if(!activeOrder)return;
+  const items=activeOrder.items||[];
+  const allChecked=items.every(i=>checkedItems[i.productId||i.name]);
+  if(!allChecked){toast('Ҳамаи молҳоро тасдиқ кунед','err');return;}
+  flowStep=2;renderFlowUI();
+  toast('🛵 Акнун ба муштарӣ равед!','ok');
+};
+
+window.arrivedAtClient=async function(){
+  const btn=document.getElementById('arrived-btn');if(btn)btn.style.display='none';
+  const dw=document.getElementById('delivered-wrap');if(dw)dw.style.display='block';
+  toast('📍 Ба суроғи муштарӣ расидед!','ok');
+};
+
+window.markDelivered=async function(){
+  if(!activeOrder)return;
+  const btn=document.querySelector('#delivered-wrap button');if(btn){btn.disabled=true;btn.innerHTML='<div class="spin" style="border-color:rgba(255,255,255,.3);border-top-color:#fff;width:14px;height:14px"></div> Тасдиқ…';}
   try{
-    const q=query(collection(db,'orders'),where('courierId','==',CU.uid),where('status','==','delivered'),orderBy('updatedAt','desc'),limit(50));
+    await updateDoc(doc(db,'orders',activeOrder.id),{status:'delivered',updatedAt:serverTimestamp()});
+    await setDoc(doc(db,'couriers',CU.uid),{currentOrderId:null,isActive:false,totalDeliveries:(CD?.totalDeliveries||0)+1,earnings:(CD?.earnings||0)+EPD,updatedAt:serverTimestamp()},{merge:true});
+    CD={...CD,currentOrderId:null,isActive:false,totalDeliveries:(CD?.totalDeliveries||0)+1,earnings:(CD?.earnings||0)+EPD};
+    todayDeliveries++;todayEarnings+=EPD;
+    updateEarnUI();flowStep=0;activeOrder=null;checkedItems={};
+    calcStats();
+    toast('🎉 Расонида шуд! +'+EPD+' см','ok');
+    loadHistory();renderActive();
+  }catch(e){toast('Хато: '+e.message,'err');}
+};
+
+// HISTORY
+async function loadHistory(){
+  const el=document.getElementById('history-list');if(!el)return;
+  el.innerHTML='<div class="pload"><div class="spin"></div> Боргузорӣ…</div>';
+  try{
+    // Query by courierId only, filter delivered client-side
+    const q=query(collection(db,'orders'),where('courierId','==',CU.uid));
     const sn=await getDocs(q);
-    historyOrders=sn.docs.map(d=>({id:d.id,...d.data()}));
+    historyOrders=sn.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(o=>o.status==='delivered')
+      .sort((a,b)=>{
+        const ta=a.updatedAt?.toDate?a.updatedAt.toDate().getTime():0;
+        const tb=b.updatedAt?.toDate?b.updatedAt.toDate().getTime():0;
+        return tb-ta;
+      }).slice(0,50);
     renderHistory();
-  }catch(e){el.innerHTML='<div class="empty"><span class="empty-ico">📭</span><div class="empty-title">Нет доставок</div></div>';}
+  }catch(e){console.error('loadHistory:',e);el.innerHTML='<div class="empty"><span class="empty-ico">📭</span><div class="empty-t">Таърих нест</div></div>';}
 }
 function renderHistory(){
-  const el=document.getElementById('history-list');
-  const te=historyOrders.length*EPD;
-  document.getElementById('hist-total-txt').textContent=historyOrders.length+' доставок · '+te+' ₽';
-  if(!historyOrders.length){el.innerHTML='<div class="empty"><span class="empty-ico">📭</span><div class="empty-title">Нет доставок</div><div class="empty-sub">Выполненные доставки появятся здесь</div></div>';return;}
+  const el=document.getElementById('history-list');if(!el)return;
+  const ht=document.getElementById('hist-txt');if(ht)ht.textContent=historyOrders.length+' расонидан · '+(historyOrders.length*EPD)+' см';
+  if(!historyOrders.length){el.innerHTML='<div class="empty"><span class="empty-ico">📭</span><div class="empty-t">Расонидан нест</div><div class="empty-s">Иҷро шудаҳо ин ҷо намоён мешаванд</div></div>';return;}
   el.innerHTML=historyOrders.map(o=>{
+    const num=o.orderNumber?'#'+o.orderNumber:'#'+o.id.slice(-6);
     const d=o.updatedAt?.toDate?o.updatedAt.toDate().toLocaleDateString('ru-RU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'—';
-    return `<div class="hc">
-      <div class="hc-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
-      <div class="hc-info"><div class="hc-num">#${o.id.slice(-6).toUpperCase()}</div><div class="hc-addr">${o.address||'—'}</div><div class="hc-date">${d}</div></div>
-      <div class="hc-earn">+${EPD} ₽</div>
+    return`<div class="hc">
+      <div class="hc-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="hc-info"><div class="hc-num">Фармоиш ${num}</div><div class="hc-addr">${o.address||'—'}</div><div class="hc-date">${d}</div></div>
+      <div class="hc-earn">+${EPD} см</div>
     </div>`;
   }).join('');
 }
 
-/* PROFILE */
+// PROFILE
 function renderProfile(){
-  const name=UD?.displayName||CU.displayName||'';
-  const init=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'?';
-  document.getElementById('p-name').textContent=name||'Курьер';
-  document.getElementById('p-email').textContent=CU.email||'';
-  const av=document.getElementById('p-av');
-  av.innerHTML=UD?.avatarUrl?`<img src="${UD.avatarUrl}" alt="">`:init;
-  document.getElementById('p-veh').textContent=VT[CD?.vehicle||'foot']||'—';
-  document.getElementById('pf-name').value=name;
-  document.getElementById('pf-email').value=CU.email||'';
-  document.getElementById('pf-phone').value=UD?.phone||'';
-  document.getElementById('pf-vehicle').value=CD?.vehicle||'foot';
-  document.getElementById('ps-total').textContent=CD?.totalDeliveries||0;
-  document.getElementById('ps-earn').textContent=CD?.earnings||0;
-  document.getElementById('ps-rating').textContent=CD?.rating?CD.rating.toFixed(1):'—';
+  const name=UD?.displayName||CU.displayName||'';const init=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'?';
+  const pn=document.getElementById('p-name');if(pn)pn.textContent=name||'Курьер';
+  const pe=document.getElementById('p-email');if(pe)pe.textContent=CU.email||'';
+  const av=document.getElementById('p-av');if(av)av.innerHTML=UD?.avatarUrl?`<img src="${UD.avatarUrl}" alt="">`:init;
+  const pv=document.getElementById('p-veh');if(pv)pv.textContent=VT[CD?.vehicle||'foot']||'—';
+  const pfn=document.getElementById('pf-name');if(pfn)pfn.value=name;
+  const pfe=document.getElementById('pf-email');if(pfe)pfe.value=CU.email||'';
+  const pfp=document.getElementById('pf-phone');if(pfp)pfp.value=UD?.phone||'';
+  const pfv=document.getElementById('pf-vehicle');if(pfv)pfv.value=CD?.vehicle||'foot';
+  const pst=document.getElementById('ps-total');if(pst)pst.textContent=CD?.totalDeliveries||0;
+  const pse=document.getElementById('ps-earn');if(pse)pse.textContent=CD?.earnings||0;
+  const psr=document.getElementById('ps-rating');if(psr)psr.textContent=CD?.rating?CD.rating.toFixed(1):'—';
+  const sbav=document.getElementById('sb-av');if(sbav)sbav.innerHTML=UD?.avatarUrl?`<img src="${UD.avatarUrl}" alt="">`:init;
 }
 window.saveProfile=async function(){
-  const name=document.getElementById('pf-name').value.trim();
-  const phone=document.getElementById('pf-phone').value.trim();
-  const vehicle=document.getElementById('pf-vehicle').value;
-  try{
-    await setDoc(doc(db,'users',CU.uid),{displayName:name,phone,updatedAt:serverTimestamp()},{merge:true});
-    await setDoc(doc(db,'couriers',CU.uid),{displayName:name,phone,vehicle,updatedAt:serverTimestamp()},{merge:true});
-    UD={...UD,displayName:name,phone};CD={...CD,vehicle};
-    renderSB();renderProfile();toast('Сохранено','ok');
-  }catch{toast('Ошибка','err');}
+  const name=document.getElementById('pf-name').value.trim();const phone=document.getElementById('pf-phone').value.trim();const vehicle=document.getElementById('pf-vehicle').value;
+  try{await setDoc(doc(db,'users',CU.uid),{displayName:name,phone,updatedAt:serverTimestamp()},{merge:true});await setDoc(doc(db,'couriers',CU.uid),{displayName:name,phone,vehicle,updatedAt:serverTimestamp()},{merge:true});UD={...UD,displayName:name,phone};CD={...CD,vehicle};renderSB();renderProfile();toast('Сақл шуд','ok');}catch{toast('Хато','err');}
 };
 window.uploadAvUI=async function(inp){
-  const f=inp.files[0];if(!f)return;
-  if(f.size>2*1024*1024){toast('Файл слишком большой','err');return;}
-  toast('Загружаем…');
-  try{
-    const sr=sRef(storage,`avatars/${CU.uid}`);
-    await uploadBytes(sr,f);const url=await getDownloadURL(sr);
-    await setDoc(doc(db,'users',CU.uid),{avatarUrl:url,updatedAt:serverTimestamp()},{merge:true});
-    UD.avatarUrl=url;renderSB();renderProfile();toast('Аватар обновлён','ok');
-  }catch{toast('Ошибка загрузки','err');}
+  const f=inp.files[0];if(!f)return;if(f.size>2*1024*1024){toast('Файл хеле калон аст','err');return;}
+  toast('Боргузорӣ…');
+  try{const sr=sRef(storage,`avatars/${CU.uid}`);await uploadBytes(sr,f);const url=await getDownloadURL(sr);await setDoc(doc(db,'users',CU.uid),{avatarUrl:url,updatedAt:serverTimestamp()},{merge:true});UD.avatarUrl=url;renderSB();renderProfile();toast('Акс навсозӣ шуд','ok');}catch{toast('Хато','err');}
 };
 
-/* NAV */
-window.goPage=function(page){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.ni,.mn-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('page-'+page)?.classList.add('active');
-  document.querySelectorAll(`.ni[data-page="${page}"],.mn-item[data-page="${page}"]`).forEach(n=>n.classList.add('active'));
-  const T={dashboard:'Дашборд','new-orders':'Новые заказы',active:'Активный заказ',history:'История',profile:'Профиль'};
-  document.getElementById('tb-title').textContent=T[page]||'Galelium Courier';
+// NAV hook
+window._afterNav=function(page){
   if(page==='history')loadHistory();
   if(page==='active')renderActive();
   if(page==='dashboard'){renderDashNew();renderDashActive();}
-  closeSB();
-  document.getElementById('pages').scrollTop=0;
 };
-
-window.toggleSidebar=function(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sb-overlay').classList.toggle('open');};
-window.closeSB=function(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').classList.remove('open');};
-document.getElementById('sb-overlay').addEventListener('click',closeSB);
-
 window.doLogout=async function(){
   if(unsubNew)unsubNew();if(unsubActive)unsubActive();
   try{await setDoc(doc(db,'couriers',CU.uid),{isOnline:false,updatedAt:serverTimestamp()},{merge:true});}catch{}
   await signOut(auth);location.href='courier-login.html';
-};
-
-window.toast=function(msg,type=''){
-  const w=document.getElementById('toast-wrap');
-  const el=document.createElement('div');
-  el.className='toast '+type;
-  el.innerHTML=`<div class="tdot"></div><span>${msg}</span>`;
-  w.appendChild(el);setTimeout(()=>el.remove(),3400);
 };
 </script>
 </body>
