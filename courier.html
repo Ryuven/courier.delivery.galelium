@@ -472,11 +472,59 @@ a{color:inherit;text-decoration:none}
   </div>
 </nav>
 
+<script>
+// Эти функции доступны сразу — до загрузки Firebase
+window.goPage=function(p){
+  document.querySelectorAll('.page').forEach(function(x){x.classList.remove('active');});
+  document.querySelectorAll('.ni,.mn-item').forEach(function(x){x.classList.remove('active');});
+  var pg=document.getElementById('page-'+p);if(pg)pg.classList.add('active');
+  document.querySelectorAll('.ni[data-page="'+p+'"],.mn-item[data-page="'+p+'"]').forEach(function(x){x.classList.add('active');});
+  var T={dashboard:'Дашборд','new-orders':'Фармоишҳои нав',active:'Фармоиши фаъол',history:'Таърих',profile:'Профил'};
+  var tb=document.getElementById('tb-title');if(tb)tb.innerHTML='Galelium <em>'+(T[p]||'Courier')+'</em>';
+  if(window._afterNav)window._afterNav(p);
+  var sb=document.getElementById('sidebar');if(sb)sb.classList.remove('open');
+  var ov=document.getElementById('sb-overlay');if(ov)ov.classList.remove('open');
+  var pgs=document.getElementById('pages');if(pgs)pgs.scrollTop=0;
+};
+window.toggleSB=function(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sb-overlay').classList.toggle('open');
+};
+window.closeSB=function(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sb-overlay').classList.remove('open');
+};
+window.toast=function(msg,type){
+  var w=document.getElementById('toast-wrap');
+  var el=document.createElement('div');
+  el.className='toast '+(type||'');
+  el.innerHTML='<div class="tdot"></div><span>'+msg+'</span>';
+  w.appendChild(el);
+  setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},3400);
+};
+window.toggleOnline=function(){toast('Боргузорӣ…','info');};
+window.toggleSound=function(){};
+window.acceptOrder=function(){toast('Боргузорӣ…','info');};
+window.arriveAtStore=function(){};
+window.toggleCheck=function(){};
+window.confirmItems=function(){};
+window.arrivedAtClient=function(){};
+window.markDelivered=function(){};
+window.saveProfile=function(){toast('Боргузорӣ…','info');};
+window.uploadAvUI=function(){};
+window.doLogout=function(){window.location.href='courier-login.html';};
+window._afterNav=null;
+document.addEventListener('DOMContentLoaded',function(){
+  var ov=document.getElementById('sb-overlay');
+  if(ov)ov.addEventListener('click',window.closeSB);
+});
+</script>
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js';
 import{getAuth,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js';
 import{getFirestore,doc,getDoc,setDoc,updateDoc,getDocs,collection,query,where,onSnapshot,serverTimestamp}from'https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js';
 import{getStorage,ref as sRef,uploadBytes,getDownloadURL}from'https://www.gstatic.com/firebasejs/11.8.1/firebase-storage.js';
+
 const cfg={apiKey:'AIzaSyCjIAMFuwLKwmjChCuiz-MHLv5WZOczAAE',authDomain:'delivery-galelium.firebaseapp.com',projectId:'delivery-galelium',storageBucket:'delivery-galelium.firebasestorage.app',messagingSenderId:'982466555080',appId:'1:982466555080:web:c77ccbff0e71e540ddc9fd'};
 const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app),storage=getStorage(app);
 let CU=null,UD=null,CD=null;
@@ -924,28 +972,17 @@ window.uploadAvUI=async function(inp){
   try{const sr=sRef(storage,`avatars/${CU.uid}`);await uploadBytes(sr,f);const url=await getDownloadURL(sr);await setDoc(doc(db,'users',CU.uid),{avatarUrl:url,updatedAt:serverTimestamp()},{merge:true});UD.avatarUrl=url;renderSB();renderProfile();toast('Акс навсозӣ шуд','ok');}catch{toast('Хато','err');}
 };
 
-// NAV
-window.goPage=function(page){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.ni,.mn-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('page-'+page)?.classList.add('active');
-  document.querySelectorAll(`.ni[data-page="${page}"],.mn-item[data-page="${page}"]`).forEach(n=>n.classList.add('active'));
-  const T={dashboard:'Дашборд','new-orders':'Фармоишҳои нав',active:'Фармоиши фаъол',history:'Таърих',profile:'Профил'};
-  const tb=document.getElementById('tb-title');if(tb)tb.innerHTML=`Galelium <em>${T[page]||'Courier'}</em>`;
+// NAV hook
+window._afterNav=function(page){
   if(page==='history')loadHistory();
   if(page==='active')renderActive();
   if(page==='dashboard'){renderDashNew();renderDashActive();}
-  closeSB();document.getElementById('pages').scrollTop=0;
 };
-window.toggleSB=function(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sb-overlay').classList.toggle('open');};
-window.closeSB=function(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').classList.remove('open');};
-document.getElementById('sb-overlay').addEventListener('click',closeSB);
 window.doLogout=async function(){
   if(unsubNew)unsubNew();if(unsubActive)unsubActive();
   try{await setDoc(doc(db,'couriers',CU.uid),{isOnline:false,updatedAt:serverTimestamp()},{merge:true});}catch{}
   await signOut(auth);location.href='courier-login.html';
 };
-window.toast=function(msg,type=''){const w=document.getElementById('toast-wrap');const el=document.createElement('div');el.className='toast '+type;el.innerHTML=`<div class="tdot"></div><span>${msg}</span>`;w.appendChild(el);setTimeout(()=>el.remove(),3400);};
 </script>
 </body>
 </html>
