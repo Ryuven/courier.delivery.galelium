@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Вход | Galelium Courier</title>
+  <meta name="description" content="Портал курьеров Galelium Delivery" />
+  <meta name="robots" content="noindex, nofollow" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="style"
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap"
+    onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript>
+    <link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" />
+  </noscript>
+
+  <style>
+    :root {
+      --bg:           #060a08;
+      --surface:      #0c1210;
+      --surface-2:    #121a17;
+      --surface-3:    #18221e;
+      --border:       rgba(255,255,255,.065);
+      --border-h:     rgba(255,255,255,.12);
+      --accent:       #3ecf8e;
+      --accent-dim:   rgba(62,207,142,.09);
+      --accent-mid:   rgba(62,207,142,.28);
+      --text:         #dce8e2;
+      --muted:        #6e7d76;
+      --muted-2:      #3e4d46;
+      --muted-3:      #252e2a;
+      --red:          #d06070;
+      --yellow:       #d4a843;
+      --font-display: 'Syne', sans-serif;
+      --font-sans:    'DM Sans', system-ui, sans-serif;
+      --ease:   cubic-bezier(.4,0,.2,1);
+      --t:      .22s;
+      --tf:     .14s;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; -webkit-text-size-adjust: 100%; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: var(--font-sans); font-weight: 300;
+      min-height: 100svh; overflow-y: auto;
+      -webkit-font-smoothing: antialiased;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px 16px;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+    body::after {
+      content: ''; position: fixed; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse 60% 60% at 50% 40%, rgba(62,207,142,.04) 0%, transparent 70%);
+    }
+
+    /* ПРОГРЕСС */
+    .fb-bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 999;
+      background: linear-gradient(90deg, var(--accent), var(--accent-mid), transparent);
+      transform-origin: left; transform: scaleX(0);
+      transition: transform .4s var(--ease);
+    }
+    .fb-bar.loading { transform: scaleX(.65); }
+    .fb-bar.done { transform: scaleX(1); opacity: 0; transition: transform .2s, opacity .3s ease .2s; }
+
+    /* КАРТОЧКА */
+    .lock-panel {
+      position: relative; z-index: 1;
+      width: min(420px, calc(100vw - 32px));
+      background: var(--surface); border: 1px solid var(--border);
+      animation: fadeUp .4s var(--ease) both;
+    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .lock-panel::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent 60%);
+    }
+
+    /* БЕЙДЖ КУРЬЕРА */
+    .courier-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--accent-dim); border: 1px solid var(--accent-mid);
+      color: var(--accent); font-size: .54rem; font-weight: 500;
+      letter-spacing: .18em; text-transform: uppercase;
+      padding: 4px 10px; margin-bottom: 14px;
+    }
+    .courier-badge-dot {
+      width: 5px; height: 5px; border-radius: 50%; background: var(--accent);
+      animation: pg 2s ease-in-out infinite;
+    }
+    @keyframes pg { 0%,100%{box-shadow:0 0 0 0 rgba(62,207,142,.4)} 50%{box-shadow:0 0 0 5px rgba(62,207,142,0)} }
+
+    /* ШАПКА */
+    .lock-head { padding: 26px 28px 22px; border-bottom: 1px solid var(--border); }
+    .lock-corp {
+      font-size: .55rem; letter-spacing: .3em; text-transform: uppercase;
+      color: var(--muted-2); margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .lock-corp::before { content: ''; display: block; width: 18px; height: 1px; background: var(--muted-3); }
+    .lock-title { font-family: var(--font-display); font-weight: 800; font-size: 1.6rem; color: #fff; line-height: 1; letter-spacing: -.02em; }
+    .lock-title em { color: var(--accent); font-style: normal; }
+    .lock-subtitle { font-size: .72rem; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+
+    /* ВКЛАДКИ */
+    .mode-tabs { display: grid; grid-template-columns: 1fr 1fr; margin: 18px 0 0; }
+    .mode-tab {
+      padding: 8px 0; text-align: center; cursor: pointer;
+      font-size: .66rem; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--muted-2); border-bottom: 2px solid transparent;
+      transition: color var(--tf), border-color var(--tf);
+      background: none; border-top: none; border-left: none; border-right: none;
+      font-family: var(--font-sans);
+    }
+    .mode-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .mode-tab:hover:not(.active) { color: var(--muted); }
+
+    /* ТЕЛО */
+    .lock-body { padding: 22px 28px 24px; }
+
+    /* АЛЕРТ */
+    .lock-alert {
+      display: none; align-items: flex-start; gap: 9px;
+      padding: 10px 13px; margin-bottom: 16px;
+      font-size: .74rem; color: var(--muted); line-height: 1.5; border: 1px solid;
+    }
+    .lock-alert.show { display: flex; }
+    .lock-alert.err { background: rgba(208,96,112,.07); border-color: rgba(208,96,112,.25); }
+    .lock-alert.ok  { background: var(--accent-dim); border-color: var(--accent-mid); }
+    .lock-alert strong { display: block; font-size: .72rem; margin-bottom: 2px; }
+    .lock-alert.err strong { color: var(--red); }
+    .lock-alert.ok  strong { color: var(--accent); }
+
+    /* ПОЛЕ */
+    .lock-field { position: relative; margin-bottom: 10px; }
+    .lock-label { font-size: .56rem; letter-spacing: .2em; text-transform: uppercase; color: var(--muted-2); display: block; margin-bottom: 6px; }
+    .lock-input {
+      width: 100%; background: var(--surface-2); border: 1px solid var(--border);
+      color: var(--text); font-family: var(--font-sans); font-size: .88rem; font-weight: 400;
+      padding: 11px 44px 11px 13px; outline: none; transition: border-color var(--tf);
+    }
+    .lock-input:focus   { border-color: var(--accent-mid); }
+    .lock-input.err     { border-color: rgba(208,96,112,.5); animation: shake .35s ease; }
+    .lock-input::placeholder { color: var(--muted-2); }
+    .lock-input.no-icon { padding-right: 13px; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-6px)} 40%,80%{transform:translateX(6px)} }
+
+    /* ГЛАЗ */
+    .lock-eye {
+      position: absolute; right: 0; bottom: 0; width: 42px; height: 42px;
+      background: none; border: none; cursor: pointer; color: var(--muted-2);
+      display: flex; align-items: center; justify-content: center; transition: color var(--tf);
+    }
+    .lock-eye:hover { color: var(--muted); }
+
+    /* ОШИБКА ПОД ПОЛЕМ */
+    .lock-field-err { font-size: .63rem; color: var(--red); margin-top: 4px; display: none; }
+    .lock-field-err.show { display: block; }
+
+    /* ИНДИКАТОР ПАРОЛЯ */
+    .pass-strength { display: flex; gap: 3px; margin-top: 6px; }
+    .ps-bar { flex: 1; height: 3px; border-radius: 2px; background: var(--muted-3); transition: background .3s; }
+    .ps-label { font-size: .58rem; color: var(--muted-2); margin-top: 4px; display: none; }
+
+    /* СТРОКА ЗАПОМНИТЬ */
+    .lock-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 10px; flex-wrap: wrap; }
+    .lock-remember { display: flex; align-items: center; gap: 7px; font-size: .7rem; color: var(--muted); cursor: pointer; user-select: none; }
+    .lock-remember input { accent-color: var(--accent); cursor: pointer; }
+    .lock-forgot { font-size: .66rem; color: var(--muted-2); background: none; border: none; cursor: pointer; padding: 0; transition: color var(--tf); border-bottom: 1px solid transparent; }
+    .lock-forgot:hover { color: var(--accent); border-color: var(--accent-mid); }
+
+    /* ИНФО БЛОК */
+    .courier-info {
+      background: var(--surface-2); border: 1px solid var(--border);
+      padding: 12px 14px; margin-bottom: 14px;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .courier-info svg { flex-shrink: 0; color: var(--accent); margin-top: 1px; }
+    .courier-info-text { font-size: .72rem; color: var(--muted); line-height: 1.6; }
+    .courier-info-text strong { color: var(--text); font-size: .74rem; display: block; margin-bottom: 2px; }
+
+    /* СОГЛАСИЕ */
+    .lock-terms { font-size: .68rem; color: var(--muted-2); margin-bottom: 14px; line-height: 1.5; }
+    .lock-terms a { color: var(--muted); border-bottom: 1px solid var(--border); text-decoration: none; transition: color var(--tf); }
+    .lock-terms a:hover { color: var(--accent); }
+
+    /* КНОПКА */
+    .lock-submit {
+      width: 100%; padding: 12px; background: var(--accent); color: #060a08;
+      font-family: var(--font-display); font-weight: 800;
+      font-size: .68rem; letter-spacing: .16em; text-transform: uppercase;
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      transition: opacity var(--tf);
+    }
+    .lock-submit:hover:not(:disabled) { opacity: .88; }
+    .lock-submit:disabled { opacity: .5; cursor: not-allowed; }
+    .lock-submit.loading .lock-submit-txt { opacity: .5; }
+    .lock-spinner { width: 14px; height: 14px; border-radius: 50%; border: 2px solid rgba(6,10,8,.2); border-top-color: #060a08; animation: spin .7s linear infinite; display: none; flex-shrink: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .lock-submit.loading .lock-spinner { display: block; }
+
+    /* РАЗДЕЛИТЕЛЬ */
+    .lock-or { display: flex; align-items: center; gap: 10px; margin: 14px 0; color: var(--muted-2); font-size: .58rem; letter-spacing: .18em; text-transform: uppercase; }
+    .lock-or::before, .lock-or::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* GOOGLE */
+    .lock-google {
+      width: 100%; padding: 10px; background: var(--surface-2); border: 1px solid var(--border);
+      color: var(--muted); font-family: var(--font-sans); font-size: .78rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 9px;
+      transition: border-color var(--tf), color var(--tf), background var(--tf);
+    }
+    .lock-google:hover { border-color: var(--border-h); color: var(--text); background: var(--surface-3); }
+    .lock-google:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* ПЕРЕКЛЮЧЕНИЕ */
+    .lock-switch { text-align: center; margin-top: 14px; font-size: .72rem; color: var(--muted-2); }
+    .lock-switch button { background: none; border: none; cursor: pointer; color: var(--accent); font-size: .72rem; font-family: var(--font-sans); padding: 0; border-bottom: 1px solid transparent; transition: border-color var(--tf); }
+    .lock-switch button:hover { border-color: var(--accent-mid); }
+
+    /* ССЫЛКА НА КЛИЕНТ */
+    .client-link { text-align: center; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); font-size: .66rem; color: var(--muted-2); }
+    .client-link a { color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); transition: color var(--tf); }
+    .client-link a:hover { color: var(--accent); }
+
+    /* СТАТУС */
+    .lock-status { margin-top: 14px; display: flex; align-items: center; gap: 7px; font-size: .6rem; color: var(--muted-2); letter-spacing: .06em; }
+    .lock-status-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; background: var(--yellow); }
+    .lock-status-dot.ok  { background: var(--accent); animation: pg 2.4s ease-in-out infinite; }
+    .lock-status-dot.err { background: var(--red); }
+
+    @media (max-width: 480px) {
+      .lock-head { padding: 22px 20px 18px; }
+      .lock-body { padding: 18px 20px 22px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="fb-bar" id="fb-bar"></div>
+
+<div class="lock-panel" role="main">
+
+  <!-- ШАПКА -->
+  <div class="lock-head">
+    <div class="lock-corp">Galelium · Портал курьеров</div>
+    <div class="courier-badge"><div class="courier-badge-dot"></div>Курьер</div>
+    <div class="lock-title">Galelium<br><em>Courier</em></div>
+    <div class="lock-subtitle">Войдите или зарегистрируйтесь как курьер</div>
+    <div class="mode-tabs">
+      <button class="mode-tab active" id="tab-login" type="button">Вход</button>
+      <button class="mode-tab"        id="tab-reg"   type="button">Регистрация</button>
+    </div>
+  </div>
+
+  <!-- ТЕЛО -->
+  <div class="lock-body">
+
+    <!-- Алерт -->
+    <div class="lock-alert err" id="lock-alert" role="alert">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:1px">
+        <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M7 4.5v3M7 9v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      <div><strong id="alert-title">Ошибка</strong><span id="alert-msg"></span></div>
+    </div>
+
+    <!-- ФОРМА ВХОДА -->
+    <div id="form-login">
+      <div class="lock-field">
+        <label class="lock-label" for="login-email">Email</label>
+        <input type="email" id="login-email" class="lock-input no-icon" placeholder="courier@email.com" autocomplete="email" autofocus inputmode="email"/>
+        <div class="lock-field-err" id="err-login-email">Введите корректный email</div>
+      </div>
+      <div class="lock-field">
+        <label class="lock-label" for="login-pass">Пароль</label>
+        <input type="password" id="login-pass" class="lock-input" placeholder="••••••••" autocomplete="current-password"/>
+        <button class="lock-eye" id="eye-login" type="button" aria-label="Показать пароль">
+          <svg id="eye-login-show" width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 8c1.5-3.5 4-5.5 6.5-5.5s5 2 6.5 5.5c-1.5 3.5-4 5.5-6.5 5.5S3 11.5 1.5 8z" stroke="currentColor" stroke-width="1.3"/></svg>
+          <svg id="eye-login-hide" width="15" height="15" viewBox="0 0 16 16" fill="none" style="display:none"><path d="M2 2l12 12M6.5 6.6A2.5 2.5 0 0 0 9.4 9.5M4 4.3A6.4 6.4 0 0 0 1.5 8c1.5 3.5 4 5.5 6.5 5.5 1.3 0 2.5-.4 3.5-1.1M7 2.6c.3-.1.7-.1 1-.1 2.5 0 5 2 6.5 5.5a8.4 8.4 0 0 1-1.8 2.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </button>
+        <div class="lock-field-err" id="err-login-pass">Введите пароль</div>
+      </div>
+      <div class="lock-row">
+        <label class="lock-remember"><input type="checkbox" id="inp-remember"/> Запомнить меня</label>
+        <button class="lock-forgot" id="btn-forgot" type="button">Забыли пароль?</button>
+      </div>
+      <button class="lock-submit" id="btn-login" type="button">
+        <span class="lock-submit-txt">Войти →</span>
+        <span class="lock-spinner" aria-hidden="true"></span>
+      </button>
+      <div class="lock-switch">Нет аккаунта? <button id="sw-to-reg" type="button">Зарегистрироваться</button></div>
+    </div>
+
+    <!-- ФОРМА РЕГИСТРАЦИИ -->
+    <div id="form-reg" style="display:none">
+      <div class="courier-info">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        <div class="courier-info-text"><strong>Регистрация курьера</strong>После регистрации ваш аккаунт будет активирован администратором. Среднее время активации — 1 рабочий день.</div>
+      </div>
+      <div class="lock-field">
+        <label class="lock-label" for="reg-name">Имя и фамилия <span style="color:var(--accent)">*</span></label>
+        <input type="text" id="reg-name" class="lock-input no-icon" placeholder="Иван Петров" autocomplete="name"/>
+        <div class="lock-field-err" id="err-reg-name">Введите имя</div>
+      </div>
+      <div class="lock-field">
+        <label class="lock-label" for="reg-email">Email <span style="color:var(--accent)">*</span></label>
+        <input type="email" id="reg-email" class="lock-input no-icon" placeholder="courier@email.com" autocomplete="email" inputmode="email"/>
+        <div class="lock-field-err" id="err-reg-email">Введите корректный email</div>
+      </div>
+      <div class="lock-field">
+        <label class="lock-label" for="reg-phone">Телефон <span style="color:var(--accent)">*</span></label>
+        <input type="tel" id="reg-phone" class="lock-input no-icon" placeholder="+7 (000) 000-00-00" autocomplete="tel" inputmode="tel"/>
+        <div class="lock-field-err" id="err-reg-phone">Введите номер телефона</div>
+      </div>
+      <div class="lock-field">
+        <label class="lock-label" for="reg-vehicle">Тип транспорта <span style="color:var(--accent)">*</span></label>
+        <select id="reg-vehicle" class="lock-input no-icon" style="cursor:pointer">
+          <option value="">— Выберите транспорт —</option>
+          <option value="foot">🚶 Пешком</option>
+          <option value="bicycle">🚴 Велосипед</option>
+          <option value="scooter">🛵 Самокат</option>
+          <option value="car">🚗 Автомобиль</option>
+        </select>
+        <div class="lock-field-err" id="err-reg-vehicle">Выберите тип транспорта</div>
+      </div>
+      <div class="lock-field">
+        <label class="lock-label" for="reg-pass">Пароль <span style="color:var(--accent)">*</span></label>
+        <input type="password" id="reg-pass" class="lock-input" placeholder="Минимум 8 символов" autocomplete="new-password"/>
+        <button class="lock-eye" id="eye-reg" type="button" aria-label="Показать пароль">
+          <svg id="eye-reg-show" width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 8c1.5-3.5 4-5.5 6.5-5.5s5 2 6.5 5.5c-1.5 3.5-4 5.5-6.5 5.5S3 11.5 1.5 8z" stroke="currentColor" stroke-width="1.3"/></svg>
+          <svg id="eye-reg-hide" width="15" height="15" viewBox="0 0 16 16" fill="none" style="display:none"><path d="M2 2l12 12M6.5 6.6A2.5 2.5 0 0 0 9.4 9.5M4 4.3A6.4 6.4 0 0 0 1.5 8c1.5 3.5 4 5.5 6.5 5.5 1.3 0 2.5-.4 3.5-1.1M7 2.6c.3-.1.7-.1 1-.1 2.5 0 5 2 6.5 5.5a8.4 8.4 0 0 1-1.8 2.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </button>
+        <div class="lock-field-err" id="err-reg-pass">Пароль не менее 8 символов</div>
+        <div class="pass-strength" id="pass-strength" style="display:none">
+          <div class="ps-bar" id="ps1"></div><div class="ps-bar" id="ps2"></div>
+          <div class="ps-bar" id="ps3"></div><div class="ps-bar" id="ps4"></div>
+        </div>
+        <div class="ps-label" id="ps-label"></div>
+      </div>
+      <div class="lock-terms">
+        Регистрируясь, вы соглашаетесь с <a href="https://delivery.galelium.com/privacy.html" target="_blank">условиями работы курьера</a>.
+      </div>
+      <button class="lock-submit" id="btn-reg" type="button">
+        <span class="lock-submit-txt">Зарегистрироваться →</span>
+        <span class="lock-spinner" aria-hidden="true"></span>
+      </button>
+      <div class="lock-switch">Уже есть аккаунт? <button id="sw-to-login" type="button">Войти</button></div>
+    </div>
+
+    <!-- Разделитель -->
+    <div class="lock-or">или</div>
+
+    <!-- Google -->
+    <button class="lock-google" id="btn-google" type="button">
+      <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true">
+        <path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.6 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 20-9 20-20 0-1.3-.1-2.7-.4-4z"/>
+        <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 19 13 24 13c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.6 29.3 4 24 4 16.3 4 9.7 8.4 6.3 14.7z"/>
+        <path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5l-6.2-5.2C29.4 35.5 26.8 36 24 36c-5.2 0-9.6-3-11.4-7.4l-6.6 5.1C9.8 39.7 16.4 44 24 44z"/>
+        <path fill="#1976D2" d="M43.6 20H24v8h11.3c-1 3-3.5 5.5-6.5 7l6.2 5.2C39.3 37 44 31 44 24c0-1.3-.1-2.7-.4-4z"/>
+      </svg>
+      <span id="google-btn-text">Войти через Google</span>
+    </button>
+
+    <!-- Ссылка на клиент -->
+    <div class="client-link">
+      Вы клиент? <a href="https://delivery.galelium.com/login.html">Перейти в клиентский вход →</a>
+    </div>
+
+    <!-- Статус Firebase -->
+    <div class="lock-status">
+      <span class="lock-status-dot" id="status-dot"></span>
+      <span id="status-text">Подключение к Firebase…</span>
+    </div>
+
+  </div><!-- /lock-body -->
+</div><!-- /lock-panel -->
+
+<!-- JS логика вынесена в отдельный модуль -->
+<script type="module">
+  import { auth, db } from './firebase.js';
+  import {
+    onAuthStateChanged,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signInWithPopup, GoogleAuthProvider,
+    sendPasswordResetEmail, updateProfile,
+    setPersistence, browserLocalPersistence, browserSessionPersistence,
+  } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js';
+  import { doc, getDoc, setDoc, serverTimestamp }
+    from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js';
+
+  const HOME = 'home.html';
+
+  // DOM-элементы
+  const fbBar      = document.getElementById('fb-bar');
+  const alertEl    = document.getElementById('lock-alert');
+  const alertTitle = document.getElementById('alert-title');
+  const alertMsg   = document.getElementById('alert-msg');
+  const statusDot  = document.getElementById('status-dot');
+  const statusText = document.getElementById('status-text');
+  const loginEmail = document.getElementById('login-email');
+  const loginPass  = document.getElementById('login-pass');
+  const remEl      = document.getElementById('inp-remember');
+  const btnLogin   = document.getElementById('btn-login');
+  const btnForgot  = document.getElementById('btn-forgot');
+  const regName    = document.getElementById('reg-name');
+  const regEmail   = document.getElementById('reg-email');
+  const regPhone   = document.getElementById('reg-phone');
+  const regVehicle = document.getElementById('reg-vehicle');
+  const regPass    = document.getElementById('reg-pass');
+  const btnReg     = document.getElementById('btn-reg');
+  const btnGoogle  = document.getElementById('btn-google');
+  const googleTxt  = document.getElementById('google-btn-text');
+
+  // ── Создать / обновить профиль курьера ──────────────────────
+  async function ensureCourierProfile(user, extra = {}) {
+    const userRef    = doc(db, 'users',    user.uid);
+    const courierRef = doc(db, 'couriers', user.uid);
+    const snap       = await getDoc(userRef);
+    if (!snap.exists()) {
+      const base = {
+        uid: user.uid, email: user.email || '',
+        displayName: extra.displayName || user.displayName || '',
+        phone: extra.phone || '', role: 'courier', avatarUrl: '',
+        provider: extra.provider || 'email',
+        createdAt: serverTimestamp(), updatedAt: serverTimestamp(), lastLoginAt: serverTimestamp(),
+      };
+      await setDoc(userRef, base);
+      await setDoc(courierRef, {
+        uid: user.uid, displayName: base.displayName, phone: base.phone, email: base.email,
+        vehicle: extra.vehicle || 'foot', isActive: false, isOnline: false,
+        currentOrderId: null, rating: 0, totalDeliveries: 0, earnings: 0,
+        createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
+      });
+    } else {
+      const data = snap.data();
+      if (data.role !== 'courier') throw { code: 'not-courier' };
+      await setDoc(userRef, { lastLoginAt: serverTimestamp(), updatedAt: serverTimestamp() }, { merge: true });
+    }
+  }
+
+  // ── Auth state → редирект ────────────────────────────────────
+  fbBar.classList.add('loading');
+  onAuthStateChanged(auth, async user => {
+    fbBar.classList.remove('loading');
+    fbBar.classList.add('done');
+    if (user) {
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        if (snap.exists() && snap.data().role === 'courier') {
+          statusDot.className    = 'lock-status-dot ok';
+          statusText.textContent = 'Авторизован · ' + (user.email || '') + ' — переход…';
+          setTimeout(() => { window.location.href = HOME; }, 600);
+          return;
+        }
+      } catch {}
+    }
+    statusDot.className    = 'lock-status-dot ok';
+    statusText.textContent = 'Firebase подключён · courier.galelium.com';
+  });
+
+  // ── Переключение форм ────────────────────────────────────────
+  let currentMode = 'login';
+  const tabLogin  = document.getElementById('tab-login');
+  const tabReg    = document.getElementById('tab-reg');
+  const formLogin = document.getElementById('form-login');
+  const formReg   = document.getElementById('form-reg');
+
+  function switchMode(mode) {
+    currentMode = mode;
+    const isLogin = mode === 'login';
+    tabLogin.classList.toggle('active',  isLogin);
+    tabReg.classList.toggle('active',   !isLogin);
+    formLogin.style.display = isLogin ? '' : 'none';
+    formReg.style.display   = isLogin ? 'none' : '';
+    googleTxt.textContent   = isLogin ? 'Войти через Google' : 'Зарегистрироваться через Google';
+    hideAlert(); clearAllErrors();
+  }
+  tabLogin.addEventListener('click', () => switchMode('login'));
+  tabReg.addEventListener('click',   () => switchMode('reg'));
+  document.getElementById('sw-to-reg').addEventListener('click',   () => switchMode('reg'));
+  document.getElementById('sw-to-login').addEventListener('click', () => switchMode('login'));
+
+  // ── Глаз пароля ──────────────────────────────────────────────
+  function toggleEye(inp, show, hide) {
+    const vis = inp.type === 'password';
+    inp.type = vis ? 'text' : 'password';
+    show.style.display = vis ? 'none' : '';
+    hide.style.display = vis ? '' : 'none';
+    inp.focus();
+  }
+  document.getElementById('eye-login').addEventListener('click', () =>
+    toggleEye(loginPass, document.getElementById('eye-login-show'), document.getElementById('eye-login-hide')));
+  document.getElementById('eye-reg').addEventListener('click', () =>
+    toggleEye(regPass, document.getElementById('eye-reg-show'), document.getElementById('eye-reg-hide')));
+
+  // ── Индикатор силы пароля ────────────────────────────────────
+  const psWrap  = document.getElementById('pass-strength');
+  const psLabel = document.getElementById('ps-label');
+  regPass.addEventListener('input', () => {
+    const v = regPass.value;
+    if (!v) { psWrap.style.display = 'none'; psLabel.style.display = 'none'; return; }
+    psWrap.style.display = 'flex'; psLabel.style.display = 'block';
+    let score = 0;
+    if (v.length >= 8)  score++;
+    if (v.length >= 12) score++;
+    if (/[A-Z]/.test(v) || /[а-яА-Я]/.test(v)) score++;
+    if (/\d/.test(v) && /[^a-zA-Zа-яА-Я0-9]/.test(v)) score++;
+    const colors = ['', '#d06070', '#d4a843', '#3ecf8e', '#3ecf8e'];
+    const labels = ['', 'Слабый', 'Средний', 'Хороший', 'Надёжный'];
+    ['ps1','ps2','ps3','ps4'].forEach((id, i) => {
+      const b = document.getElementById(id);
+      if (b) b.style.background = i < score ? colors[score] : 'var(--muted-3)';
+    });
+    psLabel.textContent = labels[score];
+    psLabel.style.color = colors[score];
+  });
+
+  // ── Утилиты ──────────────────────────────────────────────────
+  function setLoading(on) {
+    [btnLogin, btnReg, btnGoogle].forEach(b => b.disabled = on);
+    const ab = currentMode === 'login' ? btnLogin : btnReg;
+    ab.classList.toggle('loading', on);
+  }
+  function showAlert(title, msg, type = 'err') {
+    alertEl.className = 'lock-alert show ' + type;
+    alertTitle.textContent = title; alertMsg.textContent = msg;
+  }
+  function showSuccess(t, m) { showAlert(t, m, 'ok'); }
+  function hideAlert() { alertEl.classList.remove('show'); }
+  function fieldErr(el, errId, msg) {
+    el.classList.add('err');
+    const e = document.getElementById(errId);
+    if (e) { e.textContent = msg; e.classList.add('show'); }
+    setTimeout(() => el.classList.remove('err'), 400);
+  }
+  function clearAllErrors() {
+    document.querySelectorAll('.lock-input').forEach(el => el.classList.remove('err'));
+    document.querySelectorAll('.lock-field-err').forEach(el => el.classList.remove('show'));
+    hideAlert();
+  }
+  function fbErr(code) {
+    const m = {
+      'auth/user-not-found':         ['Пользователь не найден',  'Аккаунта с таким email не существует.'],
+      'auth/wrong-password':         ['Неверный пароль',          'Введите правильный пароль или сбросьте его.'],
+      'auth/invalid-credential':     ['Неверные данные',          'Email или пароль введены неправильно.'],
+      'auth/invalid-email':          ['Некорректный email',        'Введите правильный адрес.'],
+      'auth/email-already-in-use':   ['Email уже используется',   'Этот email уже зарегистрирован.'],
+      'auth/weak-password':          ['Слабый пароль',             'Не менее 6 символов.'],
+      'auth/too-many-requests':      ['Слишком много попыток',     'Аккаунт временно заблокирован.'],
+      'auth/network-request-failed': ['Ошибка сети',               'Проверьте подключение к интернету.'],
+      'auth/popup-closed-by-user':   ['Окно закрыто',              'Попробуйте снова.'],
+      'auth/cancelled-popup-request':['Отменено',                  ''],
+      'not-courier':                 ['Нет доступа',               'Этот аккаунт зарегистрирован как клиент. Используйте клиентский вход.'],
+    };
+    return m[code] || ['Ошибка', 'Что-то пошло не так. Попробуйте ещё раз.'];
+  }
+
+  // ── Валидация ────────────────────────────────────────────────
+  function validateLogin() {
+    clearAllErrors(); let ok = true;
+    const email = loginEmail.value.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { fieldErr(loginEmail, 'err-login-email', email ? 'Некорректный формат' : 'Введите email'); ok = false; }
+    if (!loginPass.value) { fieldErr(loginPass, 'err-login-pass', 'Введите пароль'); ok = false; }
+    return ok;
+  }
+  function validateReg() {
+    clearAllErrors(); let ok = true;
+    const name = regName.value.trim(), email = regEmail.value.trim(), phone = regPhone.value.trim(), vehicle = regVehicle.value, pass = regPass.value;
+    if (!name || name.length < 2) { fieldErr(regName, 'err-reg-name', 'Введите имя (минимум 2 символа)'); ok = false; }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { fieldErr(regEmail, 'err-reg-email', email ? 'Некорректный формат' : 'Введите email'); ok = false; }
+    if (!phone || phone.length < 6) { fieldErr(regPhone, 'err-reg-phone', 'Введите номер телефона'); ok = false; }
+    if (!vehicle) { fieldErr(regVehicle, 'err-reg-vehicle', 'Выберите тип транспорта'); ok = false; }
+    if (!pass || pass.length < 8) { fieldErr(regPass, 'err-reg-pass', 'Пароль должен быть не менее 8 символов'); ok = false; }
+    return ok;
+  }
+
+  // ── Вход ──────────────────────────────────────────────────
+  async function doLogin() {
+    if (!validateLogin()) return;
+    setLoading(true);
+    try {
+      const persistence = remEl.checked ? browserLocalPersistence : browserSessionPersistence;
+      await setPersistence(auth, persistence);
+      const cred = await signInWithEmailAndPassword(auth, loginEmail.value.trim(), loginPass.value);
+      const snap = await getDoc(doc(db, 'users', cred.user.uid));
+      if (snap.exists() && snap.data().role !== 'courier') {
+        await auth.signOut();
+        showAlert('Нет доступа', 'Этот аккаунт зарегистрирован как клиент. Используйте клиентский вход.');
+        setLoading(false); return;
+      }
+      await ensureCourierProfile(cred.user, { provider: 'email' });
+    } catch (err) {
+      const [t, m] = fbErr(err.code);
+      showAlert(t, m); loginPass.value = ''; loginPass.focus(); setLoading(false);
+    }
+  }
+  btnLogin.addEventListener('click', doLogin);
+  loginEmail.addEventListener('keydown', e => { if (e.key === 'Enter') loginPass.focus(); });
+  loginPass.addEventListener('keydown',  e => { if (e.key === 'Enter') doLogin(); });
+  [loginEmail, loginPass].forEach(el => el.addEventListener('input', () => { hideAlert(); el.classList.remove('err'); }));
+
+  // ── Регистрация ──────────────────────────────────────────────
+  async function doRegister() {
+    if (!validateReg()) return;
+    setLoading(true);
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, regEmail.value.trim(), regPass.value);
+      await updateProfile(cred.user, { displayName: regName.value.trim() });
+      await ensureCourierProfile(cred.user, {
+        displayName: regName.value.trim(),
+        phone:       regPhone.value.trim(),
+        vehicle:     regVehicle.value,
+        provider:    'email',
+      });
+    } catch (err) {
+      const [t, m] = fbErr(err.code);
+      showAlert(t, m); setLoading(false);
+    }
+  }
+  btnReg.addEventListener('click', doRegister);
+  regPass.addEventListener('keydown', e => { if (e.key === 'Enter') doRegister(); });
+  [regName, regEmail, regPhone].forEach(el => el.addEventListener('input', () => { hideAlert(); el.classList.remove('err'); }));
+
+  // ── Google ────────────────────────────────────────────────
+  btnGoogle.addEventListener('click', async () => {
+    clearAllErrors(); setLoading(true);
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      const cred = await signInWithPopup(auth, provider);
+      const snap = await getDoc(doc(db, 'users', cred.user.uid));
+      if (snap.exists() && snap.data().role === 'client') {
+        await auth.signOut();
+        showAlert('Нет доступа', 'Этот Google-аккаунт уже зарегистрирован как клиент.');
+        setLoading(false); return;
+      }
+      await ensureCourierProfile(cred.user, { displayName: cred.user.displayName || '', vehicle: 'foot', provider: 'google' });
+    } catch (err) {
+      if (err.code !== 'auth/cancelled-popup-request' && err.code !== 'auth/popup-closed-by-user') {
+        const [t, m] = fbErr(err.code); showAlert(t, m);
+      }
+      setLoading(false);
+    }
+  });
+
+  // ── Сброс пароля ──────────────────────────────────────────
+  btnForgot.addEventListener('click', async () => {
+    const email = loginEmail.value.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      fieldErr(loginEmail, 'err-login-email', 'Введите email выше для сброса пароля');
+      loginEmail.focus(); return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      showSuccess('Письмо отправлено', 'Проверьте почту ' + email + ' — там ссылка для сброса пароля.');
+    } catch (err) { const [t, m] = fbErr(err.code); showAlert(t, m); }
+  });
+</script>
+
+</body>
+</html>
