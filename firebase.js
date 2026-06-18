@@ -1,7 +1,5 @@
 // ============================================================
-//  firebase.js — Firebase конфиг и инициализация
-//  Courier Panel · courier.delivery.galelium.com
-//  Подключение: import { auth, db, storage } from './firebase.js'
+//  firebase.js — Galelium Courier · courier.delivery.galelium.com
 // ============================================================
 
 import { initializeApp }  from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js';
@@ -9,7 +7,6 @@ import { getAuth }        from 'https://www.gstatic.com/firebasejs/11.8.1/fireba
 import { getFirestore }   from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js';
 import { getStorage }     from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-storage.js';
 
-// ─── Конфигурация Firebase ───────────────────────────────────
 const firebaseConfig = {
   apiKey:            'AIzaSyCjIAMFuwLKwmjChCuiz-MHLv5WZOczAAE',
   authDomain:        'delivery-galelium.firebaseapp.com',
@@ -19,44 +16,38 @@ const firebaseConfig = {
   appId:             '1:982466555080:web:c77ccbff0e71e540ddc9fd',
 };
 
-// ─── Инициализация ───────────────────────────────────────────
 const app = initializeApp(firebaseConfig);
 
 export const auth    = getAuth(app);
 export const db      = getFirestore(app);
 export const storage = getStorage(app);
 
-// ─── Константы коллекций ─────────────────────────────────────
 export const COL = {
   USERS:    'users',
   ORDERS:   'orders',
   COURIERS: 'couriers',
 };
 
-// ─── Роли ────────────────────────────────────────────────────
-export const ROLES = {
-  CLIENT:  'client',
-  COURIER: 'courier',
-  ADMIN:   'admin',
-};
-
-// ─── Статусы заказов ─────────────────────────────────────────
+// Статусы заказа (расширенные для 3-шагового флоу)
 export const ORDER_STATUS = {
-  PENDING:    'pending',
-  CONFIRMED:  'confirmed',
-  PREPARING:  'preparing',
-  DELIVERING: 'delivering',
-  DELIVERED:  'delivered',
-  CANCELLED:  'cancelled',
+  PENDING:         'pending',
+  CONFIRMED:       'confirmed',
+  PREPARING:       'preparing',
+  // Новые статусы для 3-шагового флоу курьера:
+  COURIER_HEADING: 'courier_heading',   // Шаг 1: Курьер едет в магазин
+  COURIER_ARRIVED: 'courier_arrived',   // Курьер прибыл в магазин
+  COLLECTING:      'collecting',        // Шаг 2: Сборка товаров
+  DELIVERING:      'delivering',        // Шаг 3: Везёт клиенту
+  CLIENT_ARRIVED:  'client_arrived',    // Прибыл к клиенту
+  DELIVERED:       'delivered',
+  CANCELLED:       'cancelled',
 };
 
-// ─── Заработок за доставку (сомони) ─────────────────────────
-export const EPD = 80;
+export const EPD = 80; // Заработок за доставку (сомони)
 
-// ─── Типы транспорта ─────────────────────────────────────────
 export const VEHICLE_TYPES = {
   bicycle: '🚴 Велосипед',
-  scooter: '🛵 Самокат',
-  car:     '🚗 Автомобиль',
-  foot:    '🚶 Пешком',
+  scooter: '🛵 Скутер',
+  car:     '🚗 Автомобил',
+  foot:    '🚶 Пиёда',
 };
