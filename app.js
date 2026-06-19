@@ -410,121 +410,99 @@ window.acceptOrder = async function (oid) {
 //  3-ҚАДАМАИ ФЛОУ РАСОНИДАН  —  Нав, пурра, касбӣ
 // ═══════════════════════════════════════════════════════════
 
-// Степ-бар наверху (горизонтальный, с номерами)
-function renderStepBar(currentStep) {
-  const steps = [
-    { n: 1, label: 'Ба дӯкон',    icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>` },
-    { n: 2, label: 'Ҷамъоварӣ',   icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>` },
-    { n: 3, label: 'Расонидан',    icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="1"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>` },
-  ];
-  return `<div class="fsb">
-    ${steps.map((s, i) => {
-      const state = s.n < currentStep ? 'done' : s.n === currentStep ? 'cur' : '';
-      return `<div class="fsb-step ${state}">
-        <div class="fsb-dot">
-          ${s.n < currentStep
-            ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>`
-            : s.icon}
-        </div>
-        <div class="fsb-lbl">${s.label}</div>
-        ${i < steps.length - 1 ? '<div class="fsb-line"></div>' : ''}
-      </div>`;
-    }).join('')}
+// ── Степ-бар ─────────────────────────────────────────────
+const STEP_ICONS = [
+  `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
+  `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>`,
+  `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+];
+const CHECK_ICO = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+function renderStepBar(cur) {
+  return `<div class="fsb">${[1,2,3].map((n,i) => `
+    <div class="fsb-step ${n<cur?'done':n===cur?'cur':''}">
+      <div class="fsb-dot">${n<cur ? CHECK_ICO : STEP_ICONS[i]}</div>
+      ${i<2?'<div class="fsb-line"></div>':''}
+    </div>`).join('')}
   </div>`;
 }
 
-// Мини-шапка заказа (компактная, всегда видна)
+// ── Бейдж заказа ─────────────────────────────────────────
 function renderOrderBadge(o) {
-  const pay = o.paymentMethod === 'cash' ? 'Нақдӣ' : o.paymentMethod === 'card' ? 'Корт' : 'Онлайн';
+  const pay = o.paymentMethod==='cash'?'Нақдӣ':o.paymentMethod==='card'?'Корт':'Онлайн';
   return `<div class="ob">
     <div class="ob-left">
-      <div class="ob-num">#${o.id.slice(-6).toUpperCase()}</div>
-      <div class="ob-client">${o.clientName || 'Муштарӣ'}</div>
+      <span class="ob-num">#${o.id.slice(-6).toUpperCase()}</span>
+      <span class="ob-client">${o.clientName||'Муштарӣ'}</span>
     </div>
     <div class="ob-chips">
       <span class="ob-chip pay">${pay}</span>
-      <span class="ob-chip total">${o.total || 0} см</span>
+      <span class="ob-chip total">${o.total||0} см</span>
       <span class="ob-chip earn">+${EPD} см</span>
     </div>
   </div>`;
 }
 
-// ─── ШАГ 1: Ба дӯкон ──────────────────────────────────────
+// ── ШАГ 1: Ба дӯкон ──────────────────────────────────────
 function renderStep1(o) {
-  const arrived = o.status === 'courier_arrived';
-  const itemCount = (o.items || []).reduce((s, i) => s + i.quantity, 0);
-  const totalItems = (o.items || []).length;
+  const arrived   = o.status === 'courier_arrived';
+  const itemCount = (o.items||[]).reduce((s,i)=>s+i.quantity,0);
 
-  // Превью товаров — иконки
-  const itemPreviews = (o.items || []).slice(0, 4).map(item => {
-    const img = item.imageUrl
-      ? `<img src="${item.imageUrl}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;border-radius:9px">`
-      : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;opacity:.6">🛍️</div>`;
-    return `<div class="s1-thumb">${img}</div>`;
-  }).join('');
+  const itemRows = (o.items||[]).map(item=>`
+    <div class="items-card-row">
+      <div class="items-card-img">
+        ${item.imageUrl?`<img src="${item.imageUrl}" alt="${item.name}">`:'🛍️'}
+      </div>
+      <div class="items-card-name">${item.name}</div>
+      <div class="items-card-qty">×${item.quantity}</div>
+      <div class="items-card-total">${item.price*item.quantity} см</div>
+    </div>`).join('');
 
-  return `
-  <div class="flow-panel">
+  return `<div class="flow-panel">
     ${renderStepBar(1)}
     ${renderOrderBadge(o)}
 
-    <!-- Hero блок -->
-    <div class="s1-hero ${arrived ? 'arrived' : ''}">
-      <div class="s1-hero-icon">${arrived ? '✅' : '🏪'}</div>
-      <div class="s1-hero-title">${arrived ? 'Расидед ба дӯкон!' : 'Ба дӯкон равед'}</div>
-      <div class="s1-hero-sub">${arrived ? 'Акнун молҳоро ҷамъ кунед' : 'Galelium · Дӯкони марказӣ'}</div>
-    </div>
-
-    <!-- Карточка магазина -->
-    <div class="info-card">
-      <div class="info-card-icon" style="background:var(--accd);color:var(--acc2)">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <div class="step-status ${arrived?'done-state':'active-state'}">
+      <div class="step-status-icon">
+        ${arrived
+          ? CHECK_ICO
+          : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`}
       </div>
-      <div class="info-card-body">
-        <div class="info-card-lbl">Дӯкон</div>
-        <div class="info-card-val">Galelium · Дӯкони марказӣ</div>
-        <div class="info-card-sub">Суроғи дӯкон дар харита</div>
-      </div>
-      <div class="info-card-arrow">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      <div class="step-status-body">
+        <div class="step-status-title">${arrived?'Расидед ба дӯкон':'Ба дӯкон равед'}</div>
+        <div class="step-status-sub">${arrived?'Молҳоро ҷамъ кунед':'Galelium · Дӯкони марказӣ'}</div>
       </div>
     </div>
 
-    <!-- Превью заказа -->
-    <div class="s1-order-preview">
-      <div class="s1-op-header">
-        <div class="s1-op-title">Таркиби фармоиш</div>
-        <div class="s1-op-count">${itemCount} мол · ${totalItems} навъ</div>
-      </div>
-      <div class="s1-thumbs">${itemPreviews}${(o.items || []).length > 4 ? `<div class="s1-thumb-more">+${(o.items||[]).length - 4}</div>` : ''}</div>
-      <div class="s1-items-list">
-        ${(o.items || []).map(item => `
-          <div class="s1-item">
-            <div class="s1-item-img">
-              ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.name}">` : '<span style="font-size:1.1rem">🛍️</span>'}
-            </div>
-            <div class="s1-item-info">
-              <div class="s1-item-name">${item.name}</div>
-              <div class="s1-item-price">${item.price} см · ${item.quantity} дона</div>
-            </div>
-            <div class="s1-item-qty">×${item.quantity}</div>
-          </div>
-        `).join('')}
+    <div class="info-row">
+      <div class="info-row-item">
+        <div class="info-row-ico" style="background:var(--accd);color:var(--acc2)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <div class="info-row-body">
+          <div class="info-row-lbl">Дӯкон</div>
+          <div class="info-row-val">Galelium · Дӯкони марказӣ</div>
+        </div>
       </div>
     </div>
 
-    <!-- Кнопки -->
+    <div class="items-card">
+      <div class="items-card-hd">
+        <span class="items-card-hd-t">Таркиби фармоиш</span>
+        <span class="items-card-hd-c">${itemCount} мол</span>
+      </div>
+      ${itemRows}
+    </div>
+
     <div class="flow-actions">
       ${arrived
         ? `<button class="btn-flow-next" onclick="advance('${o.id}','collecting')">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-            Ба ҷамъоварӣ гузаред
-          </button>`
+            ${CHECK_ICO} Ба ҷамъоварӣ гузаред
+           </button>`
         : `<button class="btn-flow-primary" onclick="advance('${o.id}','courier_arrived')">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
             Расидам ба дӯкон
-          </button>`
-      }
+           </button>`}
     </div>
   </div>`;
 }
@@ -566,14 +544,9 @@ function renderStep2(o) {
             <div class="ci-block-meta">
               <span class="ci-block-price">${item.price} см</span>
               ${item.quantity > 1 ? `<span class="ci-block-badge">${q + 1} / ${item.quantity}</span>` : ''}
-              ${hasBarcode ? `<span class="ci-block-barcode-chip">
-                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <rect x="2" y="4" width="3" height="16" rx="1"/><rect x="7" y="4" width="1.5" height="16" rx=".5"/>
-                  <rect x="10" y="4" width="3" height="16" rx="1"/><rect x="15" y="4" width="1.5" height="16" rx=".5"/>
-                  <rect x="18" y="4" width="3" height="16" rx="1"/>
-                </svg>
-                Штрих-код
-              </span>` : `<span class="ci-block-nobc-chip">Без штрих-кода</span>`}
+              ${hasBarcode
+                ? `<span class="ci-bc-chip"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="4" width="3" height="16" rx="1"/><rect x="7" y="4" width="1.5" height="16" rx=".5"/><rect x="10" y="4" width="3" height="16" rx="1"/><rect x="15" y="4" width="1.5" height="16" rx=".5"/><rect x="18" y="4" width="3" height="16" rx="1"/></svg> скан</span>`
+                : `<span class="ci-nobc-chip">без коди</span>`}
             </div>
           </div>
           <div class="ci-block-check ${chk ? 'on' : ''}">
@@ -590,37 +563,25 @@ function renderStep2(o) {
     }
   });
 
-  return `
-  <div class="flow-panel">
+  return `<div class="flow-panel">
     ${renderStepBar(2)}
     ${renderOrderBadge(o)}
 
-    <div class="collect-hero">
-      <div class="collect-hero-nums">
-        <span class="collect-done">${done}</span>
-        <span class="collect-sep">/</span>
-        <span class="collect-total">${all}</span>
+    <div class="collect-bar-wrap">
+      <div class="collect-bar-top">
+        <span class="collect-bar-lbl">Ҷамъоварии мол</span>
+        <span class="collect-bar-cnt">${done} / ${all}</span>
       </div>
-      <div class="collect-hero-lbl">мол гирифта шуд</div>
-      <div class="collect-ring-wrap">
-        <svg class="collect-ring" viewBox="0 0 64 64">
-          <circle cx="32" cy="32" r="28" fill="none" stroke="var(--s3)" stroke-width="5"/>
-          <circle cx="32" cy="32" r="28" fill="none" stroke="var(--acc)" stroke-width="5"
-            stroke-dasharray="${2 * Math.PI * 28}" stroke-dashoffset="${2 * Math.PI * 28 * (1 - pct / 100)}"
-            stroke-linecap="round" transform="rotate(-90 32 32)"
-            style="transition:stroke-dashoffset .5s var(--ease)"/>
-        </svg>
-        <div class="collect-ring-pct">${pct}%</div>
-      </div>
+      <div class="collect-track"><div class="collect-fill" style="width:${pct}%"></div></div>
     </div>
 
     <div class="ci-hint">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <rect x="2" y="4" width="3" height="16" rx="1"/><rect x="7" y="4" width="1.5" height="16" rx=".5"/>
         <rect x="10" y="4" width="3" height="16" rx="1"/><rect x="15" y="4" width="1.5" height="16" rx=".5"/>
         <rect x="18" y="4" width="3" height="16" rx="1"/>
       </svg>
-      Молро пахш кунед, то штрих-коди онро скан кунед
+      Молро пахш кунед — штрих-кодро скан кунед
     </div>
 
     <div class="ci-list">${itemBlocks}</div>
@@ -628,19 +589,121 @@ function renderStep2(o) {
     <div class="flow-actions">
       ${allDone
         ? `<button class="btn-flow-next" onclick="confirmCollect('${o.id}')">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-            Ҳама гирифтам — тасдиқ
-          </button>`
+            ${CHECK_ICO} Ҳама гирифтам — тасдиқ
+           </button>`
         : `<div class="collect-remain">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-            Ҳоло <strong>${all - done}</strong> мол монд — штрих-кодро скан кунед
-          </div>`
-      }
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+            </svg>
+            Ҳоло <strong>${all-done}</strong> мол монд
+           </div>`}
     </div>
   </div>`;
 }
 
-// ─── СКАНЕР ШТРИХ-КОДА ───────────────────────────────────
+// ─── ШАГ 3: Расонидан ─────────────────────────────────────
+function renderStep3(o) {
+  const atClient = o.status === 'client_arrived';
+  const pay = o.paymentMethod==='cash'?'💵 Нақдӣ ба курьер':o.paymentMethod==='card'?'💳 Корт':'🌐 Онлайн';
+  const itemCount = (o.items||[]).reduce((s,i)=>s+i.quantity,0);
+
+  return `<div class="flow-panel">
+    ${renderStepBar(3)}
+    ${renderOrderBadge(o)}
+
+    <div class="step-status ${atClient?'done-state':'active-state'}" style="${atClient?'':'border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.06)'}">
+      <div class="step-status-icon" style="${atClient?'':'background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.3);color:#60a5fa'}">
+        ${atClient
+          ? CHECK_ICO
+          : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`}
+      </div>
+      <div class="step-status-body">
+        <div class="step-status-title" style="${atClient?'':'color:#93c5fd'}">${atClient?'Расидед ба муштарӣ':'Дар роҳ ба муштарӣ'}</div>
+        <div class="step-status-sub">${atClient?'Фармоишро супоред':'Ба суроғ зер раед'}</div>
+      </div>
+    </div>
+
+    <div class="info-row">
+      <div class="info-row-item">
+        <div class="info-row-ico" style="background:rgba(59,130,246,.12);color:#60a5fa">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div class="info-row-body">
+          <div class="info-row-lbl">Суроғи муштарӣ</div>
+          <div class="info-row-val">${o.address||'—'}</div>
+        </div>
+      </div>
+      ${o.comment?`<div class="info-row-item">
+        <div class="info-row-ico" style="background:var(--amberd);color:var(--amber)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        </div>
+        <div class="info-row-body">
+          <div class="info-row-lbl">Шарҳи муштарӣ</div>
+          <div class="info-row-val">${o.comment}</div>
+        </div>
+      </div>`:''}
+      <div class="info-row-item">
+        <div class="info-row-ico" style="background:var(--amberd);color:var(--amber)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="1"/><path d="M2 10h20"/></svg>
+        </div>
+        <div class="info-row-body">
+          <div class="info-row-lbl">Пардохт</div>
+          <div class="info-row-val">${pay}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="s3-items">
+      <div class="s3-items-hd">
+        <span class="s3-items-hd-t">Таркиб</span>
+        <span class="s3-items-hd-c">${itemCount} мол</span>
+      </div>
+      ${(o.items||[]).map(item=>`
+        <div class="s3-item">
+          <div class="s3-item-img">
+            ${item.imageUrl?`<img src="${item.imageUrl}" alt="${item.name}">`:'🛍️'}
+          </div>
+          <div class="s3-item-name">${item.name}</div>
+          <div class="s3-item-right">
+            <span class="s3-item-qty">×${item.quantity}</span>
+            <span class="s3-item-price">${item.price*item.quantity} см</span>
+          </div>
+        </div>`).join('')}
+      <div class="s3-earn-row">
+        <span>Даромади шумо</span>
+        <span class="s3-earn-val">+${EPD} см</span>
+      </div>
+    </div>
+
+    <div class="flow-actions">
+      ${atClient
+        ? `<button class="btn-flow-final" onclick="deliverOrder('${o.id}')">
+            ${CHECK_ICO} Фармоиш супурда шуд
+           </button>`
+        : `<button class="btn-flow-primary" onclick="advance('${o.id}','client_arrived')"
+            style="background:linear-gradient(135deg,#3b82f6,#60a5fa);box-shadow:0 3px 14px rgba(59,130,246,.3)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Расидам ба муштарӣ
+           </button>`}
+    </div>
+  </div>`;
+}
+
+// ─── Рендер активного заказа ─────────────────────────────
+function renderActive() {
+  const el = document.getElementById('active-content');
+  if (!el) return;
+  if (!activeOrder) {
+    el.innerHTML = `<div class="empty"><div class="empty-ico">🛵</div><div class="empty-t">Фармоиши фаъол нест</div><div class="empty-s">Аз рӯйхат фармоиш қабул кунед</div></div>`;
+    return;
+  }
+  const o = activeOrder;
+  let html = '';
+  if (['courier_heading','courier_arrived'].includes(o.status)) html = renderStep1(o);
+  else if (o.status === 'collecting')                           html = renderStep2(o);
+  else if (['delivering','client_arrived'].includes(o.status)) html = renderStep3(o);
+  el.innerHTML = html || `<div class="empty"><div class="empty-ico">⏳</div><div class="empty-t">Интизор…</div></div>`;
+}
 
 // Открыть оверлей сканера для конкретного товара
 window.openScanner = async function (key, oid, itemIdx) {
@@ -994,6 +1057,8 @@ function renderActive() {
 }
 
 // toggleItem удалён — заменён на openScanner + validateBarcode
+
+// ─── СКАНЕР ШТРИХ-КОДА ───────────────────────────────────
 
 // ─── Подтвердить сборку → переход к доставке ─────────────────
 window.confirmCollect = async function (oid) {
