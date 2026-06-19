@@ -727,6 +727,143 @@ a{color:inherit;text-decoration:none}
   .toast-wrap{bottom:calc(var(--nb) + var(--safe-b) + 12px);right:14px}
 }
 @media(max-width:400px){.stats-row{grid-template-columns:1fr 1fr}}
+/* ══════════════════════════════════════════════════════════
+   СКАНЕР ШТРИХ-КОДА — оверлей
+══════════════════════════════════════════════════════════ */
+.scanner-overlay{
+  position:fixed;inset:0;z-index:9000;
+  background:rgba(5,8,7,.97);backdrop-filter:blur(6px);
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .3s var(--ease);
+}
+.scanner-overlay.open{opacity:1;pointer-events:all}
+
+.sc-panel{
+  width:min(480px,100vw);max-height:92svh;
+  background:var(--s1);border:1.5px solid var(--b1);
+  border-radius:24px 24px 0 0;overflow:hidden;
+  display:flex;flex-direction:column;
+  animation:scUp .35s var(--spring) both;
+  box-shadow:0 -8px 48px rgba(0,0,0,.5);
+}
+@keyframes scUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+
+.sc-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 20px 14px;border-bottom:1px solid var(--b0);flex-shrink:0;
+}
+.sc-title{font-family:var(--fd);font-weight:900;font-size:1rem;color:#fff}
+.sc-close{
+  width:32px;height:32px;border-radius:8px;
+  background:var(--s2);border:1px solid var(--b0);
+  cursor:pointer;color:var(--tx3);
+  display:flex;align-items:center;justify-content:center;
+  transition:all var(--tf);
+}
+.sc-close:hover{background:var(--redd);color:var(--red);border-color:rgba(229,69,90,.3)}
+
+.sc-item-info{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  padding:10px 20px;background:var(--s2);border-bottom:1px solid var(--b0);
+  font-size:.8rem;font-weight:600;color:var(--tx);flex-shrink:0;
+}
+.sc-item-info svg{color:var(--acc2);flex-shrink:0}
+.sc-nobc-warn{
+  font-size:.64rem;font-weight:500;color:var(--amber);
+  background:var(--amberd);border:1px solid rgba(217,119,6,.25);
+  padding:2px 8px;border-radius:6px;
+}
+
+/* Область камеры */
+.sc-cam-wrap{
+  position:relative;width:100%;aspect-ratio:4/3;
+  background:#000;overflow:hidden;flex-shrink:0;max-height:260px;
+}
+#sc-video{width:100%;height:100%;object-fit:cover;display:block}
+
+/* Лазерная линия */
+.sc-laser{
+  position:absolute;left:10%;right:10%;height:2px;
+  background:linear-gradient(90deg,transparent,var(--acc2),transparent);
+  box-shadow:0 0 8px var(--acc);
+  animation:laserMove 2s ease-in-out infinite;
+  z-index:2;
+}
+@keyframes laserMove{0%{top:20%}50%{top:75%}100%{top:20%}}
+
+/* Угловые рамки */
+.sc-corners{position:absolute;inset:16px;z-index:3;pointer-events:none}
+.sc-corner{position:absolute;width:22px;height:22px;border-color:var(--acc2);border-style:solid;}
+.sc-corner.tl{top:0;left:0;border-width:3px 0 0 3px;border-radius:4px 0 0 0}
+.sc-corner.tr{top:0;right:0;border-width:3px 3px 0 0;border-radius:0 4px 0 0}
+.sc-corner.bl{bottom:0;left:0;border-width:0 0 3px 3px;border-radius:0 0 0 4px}
+.sc-corner.br{bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 4px 0}
+
+.sc-cam-hint{
+  position:absolute;bottom:10px;left:0;right:0;text-align:center;
+  font-size:.68rem;color:rgba(255,255,255,.75);z-index:4;
+  background:rgba(0,0,0,.45);padding:5px;
+}
+
+/* Результат сканирования */
+.sc-result{
+  padding:0;max-height:0;overflow:hidden;
+  font-size:.8rem;font-weight:600;text-align:center;
+  transition:all .3s var(--ease);flex-shrink:0;
+}
+.sc-result.show{padding:12px 20px;max-height:60px}
+.sc-result.ok {background:var(--accd);color:var(--acc2);border-top:1px solid var(--accg)}
+.sc-result.err{background:var(--redd);color:var(--red);border-top:1px solid rgba(229,69,90,.3)}
+.sc-result.warn{background:var(--amberd);color:var(--amber);border-top:1px solid rgba(217,119,6,.25)}
+
+/* Разделитель */
+.sc-divider{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 20px;flex-shrink:0;
+}
+.sc-divider::before,.sc-divider::after{content:'';flex:1;height:1px;background:var(--b0)}
+.sc-divider span{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--tx3)}
+
+/* Ручной ввод */
+.sc-manual{padding:0 20px 14px;flex-shrink:0}
+.sc-manual-lbl{font-size:.54rem;letter-spacing:.18em;text-transform:uppercase;color:var(--tx3);margin-bottom:8px}
+.sc-manual-row{display:flex;gap:8px}
+.sc-manual-inp{
+  flex:1;background:var(--s2);border:1.5px solid var(--b0);border-radius:10px;
+  color:var(--tx);font-family:var(--fs);font-size:.9rem;font-weight:500;
+  padding:10px 14px;outline:none;letter-spacing:.06em;
+  transition:border-color var(--tf),box-shadow var(--tf);
+}
+.sc-manual-inp:focus{border-color:var(--accg);box-shadow:0 0 0 3px var(--accd)}
+.sc-manual-inp::placeholder{color:var(--tx3);font-weight:400}
+.sc-manual-btn{
+  width:44px;height:44px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  border:none;border-radius:10px;cursor:pointer;color:#0b0f0c;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 3px 10px var(--acc-shadow);
+  transition:opacity var(--tf),transform var(--tf);
+}
+.sc-manual-btn:hover{opacity:.9;transform:scale(1.05)}
+
+/* Чипы штрихкода в карточке товара */
+.ci-block-barcode-chip{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:2px 7px;border-radius:5px;font-size:.54rem;font-weight:600;
+  background:var(--accd);border:1px solid var(--accg);color:var(--acc2);
+}
+.ci-block-nobc-chip{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:2px 7px;border-radius:5px;font-size:.54rem;font-weight:600;
+  background:var(--amberd);border:1px solid rgba(217,119,6,.2);color:var(--amber);
+}
+.ci-hint{
+  display:flex;align-items:center;gap:8px;padding:9px 13px;
+  background:var(--accd);border:1px solid var(--accg);border-radius:10px;
+  font-size:.68rem;color:var(--acc2);
+}
+.ci-hint svg{flex-shrink:0}
 </style>
 </head>
 <body>
@@ -982,6 +1119,9 @@ a{color:inherit;text-decoration:none}
     </button>
   </div>
 </nav>
+
+<!-- ОВЕРЛЕЙ СКАНЕРА ШТРИХ-КОДА -->
+<div class="scanner-overlay" id="scanner-overlay"></div>
 
 <script type="module" src="./app.js"></script>
 </body>

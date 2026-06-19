@@ -529,7 +529,17 @@ function renderStep1(o) {
   </div>`;
 }
 
-// ─── ШАГ 2: Ҷамъоварӣ ────────────────────────────────────
+// ─── ШАГ 2: Ҷамъоварӣ + Сканери штрих-код ───────────────
+// Состояние сканера
+let scannerActive    = false;    // открыт ли оверлей сканера
+let scannerItemKey   = null;     // ключ текущего элемента (idx-q)
+let scannerItemName  = '';       // название товара для UI
+let scannerExpected  = null;     // ожидаемый штрихкод из Firestore
+let scannerOid       = null;     // id заказа
+let barcodeStream    = null;     // MediaStream камеры
+let barcodeDetector  = null;     // BarcodeDetector API
+let barcodeRAF       = null;     // requestAnimationFrame handle
+
 function renderStep2(o) {
   const items   = o.items || [];
   const all     = items.reduce((s, i) => s + i.quantity, 0);
@@ -537,7 +547,6 @@ function renderStep2(o) {
   const pct     = all > 0 ? Math.round(done / all * 100) : 0;
   const allDone = done >= all;
 
-  // Строим список по уникальным позициям, каждая штука — отдельный блок
   let itemBlocks = '';
   items.forEach((item, idx) => {
     for (let q = 0; q < item.quantity; q++) {
@@ -546,22 +555,35 @@ function renderStep2(o) {
       const imgHtml = item.imageUrl
         ? `<img src="${item.imageUrl}" alt="${item.name}">`
         : `<div class="ci-no-img">🛍️</div>`;
+      const hasBarcode = !!item.barcode;
       itemBlocks += `
-        <div class="ci-block ${chk ? 'checked' : ''}" onclick="toggleItem('${key}','${o.id}')">
+        <div class="ci-block ${chk ? 'checked' : ''}" onclick="${chk ? '' : `openScanner('${key}','${o.id}',${idx})`}">
           <div class="ci-block-img ${chk ? 'done' : ''}">${imgHtml}
-            ${chk ? `<div class="ci-block-overlay"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>` : ''}
+            ${chk ? `<div class="ci-block-overlay"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>` : ''}
           </div>
           <div class="ci-block-body">
             <div class="ci-block-name">${item.name}</div>
             <div class="ci-block-meta">
               <span class="ci-block-price">${item.price} см</span>
               ${item.quantity > 1 ? `<span class="ci-block-badge">${q + 1} / ${item.quantity}</span>` : ''}
+              ${hasBarcode ? `<span class="ci-block-barcode-chip">
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <rect x="2" y="4" width="3" height="16" rx="1"/><rect x="7" y="4" width="1.5" height="16" rx=".5"/>
+                  <rect x="10" y="4" width="3" height="16" rx="1"/><rect x="15" y="4" width="1.5" height="16" rx=".5"/>
+                  <rect x="18" y="4" width="3" height="16" rx="1"/>
+                </svg>
+                Штрих-код
+              </span>` : `<span class="ci-block-nobc-chip">Без штрих-кода</span>`}
             </div>
           </div>
           <div class="ci-block-check ${chk ? 'on' : ''}">
             ${chk
               ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>`
-              : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>`
+              : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="4" width="3" height="16" rx="1"/><rect x="7" y="4" width="1.5" height="16" rx=".5"/>
+                  <rect x="10" y="4" width="3" height="16" rx="1"/><rect x="15" y="4" width="1.5" height="16" rx=".5"/>
+                  <rect x="18" y="4" width="3" height="16" rx="1"/>
+                </svg>`
             }
           </div>
         </div>`;
@@ -573,7 +595,6 @@ function renderStep2(o) {
     ${renderStepBar(2)}
     ${renderOrderBadge(o)}
 
-    <!-- Прогресс -->
     <div class="collect-hero">
       <div class="collect-hero-nums">
         <span class="collect-done">${done}</span>
@@ -593,10 +614,17 @@ function renderStep2(o) {
       </div>
     </div>
 
-    <!-- Список товаров -->
+    <div class="ci-hint">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="4" width="3" height="16" rx="1"/><rect x="7" y="4" width="1.5" height="16" rx=".5"/>
+        <rect x="10" y="4" width="3" height="16" rx="1"/><rect x="15" y="4" width="1.5" height="16" rx=".5"/>
+        <rect x="18" y="4" width="3" height="16" rx="1"/>
+      </svg>
+      Молро пахш кунед, то штрих-коди онро скан кунед
+    </div>
+
     <div class="ci-list">${itemBlocks}</div>
 
-    <!-- Кнопка -->
     <div class="flow-actions">
       ${allDone
         ? `<button class="btn-flow-next" onclick="confirmCollect('${o.id}')">
@@ -605,11 +633,263 @@ function renderStep2(o) {
           </button>`
         : `<div class="collect-remain">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-            Ҳоло <strong>${all - done}</strong> мол монд
+            Ҳоло <strong>${all - done}</strong> мол монд — штрих-кодро скан кунед
           </div>`
       }
     </div>
   </div>`;
+}
+
+// ─── СКАНЕР ШТРИХ-КОДА ───────────────────────────────────
+
+// Открыть оверлей сканера для конкретного товара
+window.openScanner = async function (key, oid, itemIdx) {
+  if (scannerActive) return;
+  const o = activeOrder;
+  if (!o) return;
+  const item = (o.items || [])[itemIdx];
+  if (!item) return;
+
+  scannerItemKey  = key;
+  scannerOid      = oid;
+  scannerItemName = item.name;
+
+  // Если у товара нет barcode в данных заказа — берём из Firestore products
+  if (item.barcode) {
+    scannerExpected = item.barcode;
+  } else if (item.productId) {
+    try {
+      const snap = await getDoc(doc(db, COL.PRODUCTS || 'products', item.productId));
+      scannerExpected = snap.exists() ? (snap.data().barcode || null) : null;
+    } catch { scannerExpected = null; }
+  } else {
+    scannerExpected = null;
+  }
+
+  showScannerOverlay();
+};
+
+function showScannerOverlay() {
+  const ov = document.getElementById('scanner-overlay');
+  if (!ov) return;
+
+  const hasBC = !!scannerExpected;
+
+  ov.innerHTML = `
+    <div class="sc-panel">
+      <div class="sc-header">
+        <div class="sc-title">Скан штрих-код</div>
+        <button class="sc-close" onclick="closeScanner()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="sc-item-info">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        ${scannerItemName}
+        ${!hasBC ? '<span class="sc-nobc-warn">⚠️ Штрих-код нест — вуруди дастӣ</span>' : ''}
+      </div>
+
+      ${hasBC ? `
+      <!-- Видео-камера -->
+      <div class="sc-cam-wrap" id="sc-cam-wrap">
+        <video id="sc-video" autoplay playsinline muted></video>
+        <div class="sc-laser"></div>
+        <div class="sc-corners">
+          <div class="sc-corner tl"></div><div class="sc-corner tr"></div>
+          <div class="sc-corner bl"></div><div class="sc-corner br"></div>
+        </div>
+        <div class="sc-cam-hint" id="sc-cam-hint">Камераро ба штрих-код нишон диҳед</div>
+      </div>
+      <div class="sc-result" id="sc-result"></div>
+      <div class="sc-divider"><span>ё</span></div>
+      ` : ''}
+
+      <!-- Ручной ввод -->
+      <div class="sc-manual">
+        <div class="sc-manual-lbl">Дастӣ ворид кунед</div>
+        <div class="sc-manual-row">
+          <input class="sc-manual-inp" id="sc-manual-inp" type="text"
+            inputmode="numeric" pattern="[0-9]*"
+            placeholder="${hasBC ? 'Рақами штрих-код' : 'Ҳар рақам ё код'}"
+            onkeydown="if(event.key==='Enter')submitManual()"
+          />
+          <button class="sc-manual-btn" onclick="submitManual()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      ${!hasBC ? `
+      <button class="btn-flow-next" style="margin-top:4px" onclick="confirmItemNoBarcode()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        Дастӣ тасдиқ — штрих-код нест
+      </button>
+      ` : ''}
+    </div>`;
+
+  ov.classList.add('open');
+  scannerActive = true;
+
+  if (hasBC) startCamera();
+  setTimeout(() => document.getElementById('sc-manual-inp')?.focus(), 300);
+}
+
+// Запуск камеры с BarcodeDetector API
+async function startCamera() {
+  if (!('BarcodeDetector' in window)) {
+    showScanResult('warn', '⚠️ Камераи браузер BarcodeDetector дастгирӣ намекунад. Дастӣ ворид кунед.');
+    return;
+  }
+  try {
+    barcodeStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+    });
+    const video = document.getElementById('sc-video');
+    if (!video) return;
+    video.srcObject = barcodeStream;
+    await video.play();
+
+    barcodeDetector = new BarcodeDetector({
+      formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'itf', 'qr_code', 'data_matrix']
+    });
+    detectLoop(video);
+  } catch (e) {
+    showScanResult('warn', '⚠️ Камера дастрас нест: ' + e.message);
+  }
+}
+
+let lastDetected = null;
+let lastDetectedTime = 0;
+
+function detectLoop(video) {
+  if (!scannerActive || !barcodeDetector) return;
+  barcodeRAF = requestAnimationFrame(async () => {
+    try {
+      const barcodes = await barcodeDetector.detect(video);
+      if (barcodes.length > 0) {
+        const now = Date.now();
+        const code = barcodes[0].rawValue;
+        // Дебаунс — один и тот же код не обрабатываем чаще раза в 2с
+        if (code !== lastDetected || now - lastDetectedTime > 2000) {
+          lastDetected     = code;
+          lastDetectedTime = now;
+          handleScannedCode(code);
+          return; // Пауза, дадим UI обновиться
+        }
+      }
+    } catch {}
+    detectLoop(video);
+  });
+}
+
+function handleScannedCode(code) {
+  const hint = document.getElementById('sc-cam-hint');
+  if (hint) hint.textContent = `Скан: ${code}`;
+  validateBarcode(code);
+}
+
+// Ручной ввод
+window.submitManual = function () {
+  const inp = document.getElementById('sc-manual-inp');
+  const val = inp?.value.trim();
+  if (!val) { inp?.focus(); return; }
+  validateBarcode(val);
+};
+
+// Товар без штрихкода — подтвердить вручную
+window.confirmItemNoBarcode = function () {
+  markItemDone();
+};
+
+// Валидация кода
+function validateBarcode(code) {
+  if (!scannerExpected) {
+    // Нет штрихкода в базе — любой ввод подтверждает
+    showScanResult('ok', `✅ Тасдиқ шуд!`, true);
+    return;
+  }
+  const clean   = code.trim().replace(/\s/g, '');
+  const expected = String(scannerExpected).trim().replace(/\s/g, '');
+  if (clean === expected) {
+    showScanResult('ok', `✅ Дуруст! ${scannerItemName}`, true);
+  } else {
+    showScanResult('err', `❌ Хато! Интизор: ${expected} · Гирифт: ${clean}`);
+    playErrorBeep();
+    // Через 2с продолжаем сканировать
+    setTimeout(() => {
+      const res = document.getElementById('sc-result');
+      if (res) res.innerHTML = '';
+      const video = document.getElementById('sc-video');
+      if (video && scannerActive) detectLoop(video);
+    }, 2000);
+  }
+}
+
+function showScanResult(type, msg, autoClose = false) {
+  // Стоп камеры пока показываем результат
+  if (barcodeRAF) { cancelAnimationFrame(barcodeRAF); barcodeRAF = null; }
+  const res = document.getElementById('sc-result');
+  if (res) {
+    res.className = `sc-result show ${type}`;
+    res.textContent = msg;
+  }
+  if (autoClose) {
+    playSuccessBeep();
+    setTimeout(() => {
+      markItemDone();
+    }, 700);
+  }
+}
+
+// Успешно отсканировано — отметить товар
+function markItemDone() {
+  const key = scannerItemKey;
+  closeScanner();
+  if (key) {
+    checkedItems.add(key);
+    renderActive();
+    // Виброотклик
+    if (navigator.vibrate) navigator.vibrate([50, 30, 80]);
+  }
+}
+
+// Закрыть сканер
+window.closeScanner = function () {
+  scannerActive = false;
+  if (barcodeRAF)   { cancelAnimationFrame(barcodeRAF); barcodeRAF = null; }
+  if (barcodeStream) { barcodeStream.getTracks().forEach(t => t.stop()); barcodeStream = null; }
+  barcodeDetector = null;
+  lastDetected    = null;
+  const ov = document.getElementById('scanner-overlay');
+  if (ov) ov.classList.remove('open');
+};
+
+// Звуки обратной связи
+function playSuccessBeep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value = 1200; o.type = 'sine';
+    g.gain.setValueAtTime(.15, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + .25);
+    o.start(); o.stop(ctx.currentTime + .25);
+  } catch {}
+}
+
+function playErrorBeep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [0, 150].forEach(d => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = 300; o.type = 'sawtooth';
+      g.gain.setValueAtTime(.12, ctx.currentTime + d / 1000);
+      g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + d / 1000 + .18);
+      o.start(ctx.currentTime + d / 1000);
+      o.stop(ctx.currentTime + d / 1000 + .18);
+    });
+  } catch {}
 }
 
 // ─── ШАГ 3: Расонидан ────────────────────────────────────
@@ -713,12 +993,7 @@ function renderActive() {
   el.innerHTML = stepHtml || `<div class="empty"><div class="empty-ico">⏳</div><div class="empty-t">Интизор…</div></div>`;
 }
 
-// ─── Отметить товар ──────────────────────────────────────────
-window.toggleItem = function (key, oid) {
-  if (checkedItems.has(key)) checkedItems.delete(key);
-  else checkedItems.add(key);
-  renderActive();
-};
+// toggleItem удалён — заменён на openScanner + validateBarcode
 
 // ─── Подтвердить сборку → переход к доставке ─────────────────
 window.confirmCollect = async function (oid) {
