@@ -1020,6 +1020,8 @@ window.confirmCollect = async function (oid) {
 window.deliverOrder = async function (oid) {
   try {
     await updateDoc(doc(db, COL.ORDERS, oid), { status: 'delivered', updatedAt: serverTimestamp() });
+    // Сбрасываем кэш истории чтобы при переходе она перезагрузилась
+    historyOrders = [];
     await setDoc(doc(db, COL.COURIERS, CU.uid), {
       currentOrderId:  null,
       isActive:        false,
@@ -1074,12 +1076,22 @@ async function loadHistory() {
   if (!el) return;
   el.innerHTML = '<div class="pload"><div class="spin"></div> Боргузорӣ…</div>';
   try {
-    const q   = query(collection(db, COL.ORDERS), where('courierId', '==', CU.uid), where('status', '==', 'delivered'), orderBy('updatedAt', 'desc'), limit(50));
-    const sn  = await getDocs(q);
+    // Только where без orderBy — не требует composite index в Firestore
+    const q  = query(collection(db, COL.ORDERS), where('courierId', '==', CU.uid), where('status', '==', 'delivered'));
+    const sn = await getDocs(q);
     historyOrders = sn.docs.map(d => ({ id: d.id, ...d.data() }));
+    // Сортируем на стороне клиента по дате убывания
+    historyOrders.sort((a, b) => {
+      const ta = a.updatedAt?.toMillis?.() || a.createdAt?.toMillis?.() || 0;
+      const tb = b.updatedAt?.toMillis?.() || b.createdAt?.toMillis?.() || 0;
+      return tb - ta;
+    });
+    // Берём последние 50
+    historyOrders = historyOrders.slice(0, 50);
     renderHistory();
-  } catch {
-    el.innerHTML = `<div class="empty"><div class="empty-ico">📭</div><div class="empty-t">Расониданиҳо нест</div></div>`;
+  } catch (e) {
+    console.error('loadHistory error:', e);
+    el.innerHTML = `<div class="empty"><div class="empty-ico">📭</div><div class="empty-t">Расониданиҳо нест</div><div class="empty-s">Хатои боргузорӣ: ${e.message}</div></div>`;
   }
 }
 
@@ -1094,7 +1106,8 @@ function renderHistory() {
     return;
   }
   el.innerHTML = historyOrders.map(o => {
-    const d = o.updatedAt?.toDate ? o.updatedAt.toDate().toLocaleDateString('tg-TJ', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—';
+    const _dt = o.updatedAt?.toDate?.() || o.createdAt?.toDate?.();
+    const d = _dt ? _dt.toLocaleDateString('ru-RU', { day: '2-digit', month: 'short' }) + ', ' + _dt.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) : '—';
     const cnt = (o.items || []).reduce((s, i) => s + i.quantity, 0);
     return `<div class="hc">
       <div class="hc-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
