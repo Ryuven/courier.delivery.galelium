@@ -413,20 +413,27 @@ window.acceptOrder = async function (oid) {
 // Степ-бар наверху (горизонтальный, с номерами)
 function renderStepBar(currentStep) {
   const steps = [
-    { n: 1, label: 'Ба дӯкон',    icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>` },
-    { n: 2, label: 'Ҷамъоварӣ',   icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>` },
-    { n: 3, label: 'Расонидан',    icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="1"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>` },
+    { n: 1, label: 'Ба дӯкон',  sub: 'Қадами 1',
+      icon: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>` },
+    { n: 2, label: 'Ҷамъоварӣ', sub: 'Қадами 2',
+      icon: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>` },
+    { n: 3, label: 'Расонидан', sub: 'Қадами 3',
+      icon: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="1"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>` },
   ];
   return `<div class="fsb">
     ${steps.map((s, i) => {
       const state = s.n < currentStep ? 'done' : s.n === currentStep ? 'cur' : '';
+      const isDone = s.n < currentStep;
       return `<div class="fsb-step ${state}">
         <div class="fsb-dot">
-          ${s.n < currentStep
-            ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>`
+          ${isDone
+            ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>`
             : s.icon}
         </div>
-        <div class="fsb-lbl">${s.label}</div>
+        <div class="fsb-step-inner">
+          <div class="fsb-lbl">${s.label}</div>
+          <div class="fsb-lbl-sub">${isDone ? 'Тайёр ✓' : s.sub}</div>
+        </div>
         ${i < steps.length - 1 ? '<div class="fsb-line"></div>' : ''}
       </div>`;
     }).join('')}
@@ -471,8 +478,10 @@ function renderStep1(o) {
     <!-- Hero блок -->
     <div class="s1-hero ${arrived ? 'arrived' : ''}">
       <div class="s1-hero-icon">${arrived ? '✅' : '🏪'}</div>
-      <div class="s1-hero-title">${arrived ? 'Расидед ба дӯкон!' : 'Ба дӯкон равед'}</div>
-      <div class="s1-hero-sub">${arrived ? 'Акнун молҳоро ҷамъ кунед' : 'Galelium · Дӯкони марказӣ'}</div>
+      <div class="s1-hero-body">
+        <div class="s1-hero-title">${arrived ? 'Расидед ба дӯкон!' : 'Ба дӯкон равед'}</div>
+        <div class="s1-hero-sub">${arrived ? 'Молҳоро ҷамъ кардан мумкин аст' : 'Galelium · Дӯкони марказӣ'}</div>
+      </div>
     </div>
 
     <!-- Карточка магазина -->
@@ -596,12 +605,14 @@ function renderStep2(o) {
     ${renderOrderBadge(o)}
 
     <div class="collect-hero">
+      <div class="collect-hero-left">
       <div class="collect-hero-nums">
         <span class="collect-done">${done}</span>
         <span class="collect-sep">/</span>
         <span class="collect-total">${all}</span>
       </div>
       <div class="collect-hero-lbl">мол гирифта шуд</div>
+      </div>
       <div class="collect-ring-wrap">
         <svg class="collect-ring" viewBox="0 0 64 64">
           <circle cx="32" cy="32" r="28" fill="none" stroke="var(--s3)" stroke-width="5"/>
@@ -620,7 +631,7 @@ function renderStep2(o) {
         <rect x="10" y="4" width="3" height="16" rx="1"/><rect x="15" y="4" width="1.5" height="16" rx=".5"/>
         <rect x="18" y="4" width="3" height="16" rx="1"/>
       </svg>
-      Молро пахш кунед, то штрих-коди онро скан кунед
+      Ҳар молро пахш кунед — штрих-кодро скан мекунед
     </div>
 
     <div class="ci-list">${itemBlocks}</div>
@@ -906,8 +917,10 @@ function renderStep3(o) {
     <!-- Hero -->
     <div class="s1-hero ${atClient ? 'arrived' : ''}" style="${atClient ? '' : 'background:linear-gradient(135deg,rgba(59,130,246,.12),rgba(59,130,246,.04));border-color:rgba(59,130,246,.25)'}">
       <div class="s1-hero-icon">${atClient ? '🎉' : '🛵'}</div>
-      <div class="s1-hero-title" style="${atClient ? '' : 'color:#93c5fd'}">${atClient ? 'Расидед ба муштарӣ!' : 'Дар роҳ ба муштарӣ'}</div>
-      <div class="s1-hero-sub">${atClient ? 'Фармоишро супоред ва тасдиқ кунед' : 'Ба суроғ зер раед'}</div>
+      <div class="s1-hero-body">
+        <div class="s1-hero-title" style="${atClient ? '' : 'color:#93c5fd'}">${atClient ? 'Расидед ба муштарӣ!' : 'Дар роҳ ба муштарӣ'}</div>
+        <div class="s1-hero-sub">${atClient ? 'Фармоишро супоред ва тасдиқ кунед' : 'Ба суроғ зер равед'}</div>
+      </div>
     </div>
 
     <!-- Адрес клиента -->
