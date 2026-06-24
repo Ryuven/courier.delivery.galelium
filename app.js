@@ -297,7 +297,7 @@ function orderCard(o, withCountdown = false) {
     <div class="oc-top">
       <div class="oc-left">
         <div class="oc-meta">
-          <span class="oc-num">#${o.id.slice(-6).toUpperCase()}</span>
+          <span class="oc-num">#${o.orderNumber || o.id.slice(-6).toUpperCase()}</span>
           <span class="oc-pill">${SL[o.status] || o.status}</span>
         </div>
         <div class="oc-addr">
@@ -445,7 +445,7 @@ function renderOrderBadge(o) {
   const pay = o.paymentMethod === 'cash' ? 'Нақдӣ' : o.paymentMethod === 'card' ? 'Корт' : 'Онлайн';
   return `<div class="ob">
     <div class="ob-left">
-      <div class="ob-num">#${o.id.slice(-6).toUpperCase()}</div>
+      <div class="ob-num">#${o.orderNumber || o.id.slice(-6).toUpperCase()}</div>
       <div class="ob-client">${o.clientName || 'Муштарӣ'}</div>
     </div>
     <div class="ob-chips">
@@ -1064,7 +1064,7 @@ function renderDashActive() {
     <div class="ab-pulse"></div>
     <div class="ab-body">
       <div class="ab-lbl">Ҳоло дар кор</div>
-      <div class="ab-txt">${icon} #${o.id.slice(-6).toUpperCase()} · ${SL[o.status]} · ${o.address || ''}</div>
+      <div class="ab-txt">${icon} #${o.orderNumber || o.id.slice(-6).toUpperCase()} · ${SL[o.status]} · ${o.address || ''}</div>
     </div>
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--acc)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
   </div>`;
@@ -1112,7 +1112,7 @@ function renderHistory() {
     return `<div class="hc">
       <div class="hc-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
       <div class="hc-body">
-        <div class="hc-top"><span class="hc-num">#${o.id.slice(-6).toUpperCase()}</span><span class="hc-earn">+${EPD} см</span></div>
+        <div class="hc-top"><span class="hc-num">#${o.orderNumber || o.id.slice(-6).toUpperCase()}</span><span class="hc-earn">+${EPD} см</span></div>
         <div class="hc-addr">${o.address || '—'}</div>
         <div class="hc-meta">${d} · ${cnt} мол</div>
       </div>
