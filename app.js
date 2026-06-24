@@ -977,9 +977,20 @@ function renderStep3(o) {
     <!-- Кнопки -->
     <div class="flow-actions">
       ${atClient
-        ? `<button class="btn-flow-final" onclick="deliverOrder('${o.id}')">
+        ? `<div style="background:linear-gradient(135deg,rgba(26,158,74,.08),rgba(34,197,94,.04));border:2px solid rgba(26,158,74,.22);border-radius:18px;padding:20px;margin-bottom:12px">
+            <div style="font-size:.55rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--acc);margin-bottom:12px;text-align:center">Рамзи тасдиқ аз муштарӣ</div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input id="confirm-code-inp" type="number" maxlength="4" placeholder="0000"
+                style="flex:1;font-family:var(--fd);font-weight:900;font-size:2rem;text-align:center;letter-spacing:.2em;background:var(--s1);border:2px solid var(--b1);border-radius:14px;color:var(--tx);padding:12px 8px;outline:none;appearance:textfield;-moz-appearance:textfield;width:100%;box-sizing:border-box"
+                oninput="this.value=this.value.slice(0,4)"
+                onfocus="this.style.borderColor='var(--acc)'"
+                onblur="this.style.borderColor='var(--b1)'"/>
+            </div>
+            <div style="font-size:.62rem;color:var(--tx3);margin-top:10px;text-align:center">Муштарӣ рамзи 4-рақамро мегӯяд</div>
+          </div>
+          <button class="btn-flow-final" onclick="deliverOrder('${o.id}')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-            Фармоиш супурда шуд! 🎉
+            Тасдиқ ва анҷом додан 🎉
           </button>`
         : `<button class="btn-flow-primary" onclick="advance('${o.id}','client_arrived')" style="background:linear-gradient(135deg,#3b82f6,#60a5fa);box-shadow:0 4px 16px rgba(59,130,246,.3)">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -1018,6 +1029,19 @@ window.confirmCollect = async function (oid) {
 
 // ─── Завершить доставку ───────────────────────────────────────
 window.deliverOrder = async function (oid) {
+  // Проверяем код подтверждения
+  const inp = document.getElementById('confirm-code-inp');
+  const enteredCode = inp ? inp.value.trim() : '';
+  if (!enteredCode || enteredCode.length !== 4) {
+    toast('Рамзи 4-рақамро ворид кунед', 'err');
+    if (inp) { inp.style.borderColor = '#ef4444'; setTimeout(() => inp.style.borderColor = 'var(--b1)', 1500); }
+    return;
+  }
+  if (activeOrder && activeOrder.confirmCode && enteredCode !== activeOrder.confirmCode) {
+    toast('Рамз нодуруст аст! Аз муштарӣ пурсед 🔐', 'err');
+    if (inp) { inp.style.borderColor = '#ef4444'; inp.value = ''; setTimeout(() => inp.style.borderColor = 'var(--b1)', 1500); }
+    return;
+  }
   try {
     await updateDoc(doc(db, COL.ORDERS, oid), { status: 'delivered', updatedAt: serverTimestamp() });
     // Сбрасываем кэш истории чтобы при переходе она перезагрузилась
