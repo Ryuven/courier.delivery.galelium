@@ -101,8 +101,34 @@ onAuthStateChanged(auth, async u => {
   renderSB();
   renderProfile();
   calcStats();
+  applyVerifLock();
   startListeners();
 });
+
+// ─── Проверка верификации ────────────────────────────────────
+function isVerified() {
+  return (CD?.verificationStatus || UD?.verificationStatus || 'unverified') === 'verified';
+}
+
+function applyVerifLock() {
+  const overlay  = document.getElementById('verif-lock-overlay');
+  const togCard  = document.getElementById('sb-online-card');
+  const onlineTog = document.getElementById('online-tog');
+
+  if (!isVerified()) {
+    // Показываем оверлей поверх всего кроме профиля
+    if (overlay) overlay.style.display = 'flex';
+
+    // Блокируем переключатель онлайн
+    if (togCard)  togCard.style.opacity   = '.4';
+    if (togCard)  togCard.style.pointerEvents = 'none';
+    if (onlineTog) onlineTog.disabled = true;
+  } else {
+    if (overlay) overlay.style.display = 'none';
+    if (togCard)  { togCard.style.opacity = ''; togCard.style.pointerEvents = ''; }
+    if (onlineTog) onlineTog.disabled = false;
+  }
+}
 
 // ─── Баромадан ───────────────────────────────────────────────
 window.doLogout = async function () {
@@ -179,6 +205,11 @@ function playBeep() {
 
 // ─── Навигация ────────────────────────────────────────────────
 window.goPage = function (page) {
+  // Неверифицированным — только профиль
+  if (!isVerified() && page !== 'profile') {
+    toast('Аввал ҳувияти худро тасдиқ кунед 🔒', 'info');
+    page = 'profile';
+  }
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.ni,.mn-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + page)?.classList.add('active');
@@ -190,8 +221,9 @@ window.goPage = function (page) {
     history:      'Таърих',
     profile:      'Профил',
   };
-  const tb = document.getElementById('tb-title');
-  if (tb) tb.textContent = titles[page] || 'Galelium Courier';
+  // tb-title теперь содержит логотип — текст не меняем
+  // const tb = document.getElementById('tb-title');
+  // if (tb) tb.textContent = titles[page] || 'Galelium Courier';
   if (page === 'history')   loadHistory();
   if (page === 'active')    renderActive();
   if (page === 'dashboard') { renderDashNew(); renderDashActive(); }
@@ -234,6 +266,7 @@ async function calcStats() {
 
 // ─── Realtime слушатели ──────────────────────────────────────
 function startListeners() {
+  if (!isVerified()) return; // не слушаем заказы для неверифицированных
   listenNew();
   listenActive();
 }
@@ -382,6 +415,7 @@ function renderNotif() {
 
 // ─── Қабули фармоиш ──────────────────────────────────────────
 window.acceptOrder = async function (oid) {
+  if (!isVerified()) { toast('Ҳувият тасдиқ нашудааст 🔒', 'err'); return; }
   if (activeOrder) { toast('Шумо аллакай фармоиш доред', 'err'); return; }
   const btn = document.getElementById('btn-' + oid);
   if (btn) { btn.disabled = true; btn.innerHTML = '<div class="spin" style="width:13px;height:13px;border-color:rgba(0,0,0,.2);border-top-color:#000"></div>'; }
@@ -1177,6 +1211,7 @@ function renderProfile() {
       CD = { ...CD, verificationStatus: 'pending' };
       UD = { ...UD, verificationStatus: 'pending' };
       renderProfile();
+      applyVerifLock();
       toast('Дархост фиристода шуд ✓', 'ok');
     } catch { toast('Хато ҳангоми сабт', 'err'); }
   };
@@ -1255,6 +1290,9 @@ function renderProfile() {
         </button>
       </div>
     </div>`;
+
+  // Каждый раз обновляем блокировку
+  applyVerifLock();
 }
 
 window.saveProfile = async function () {
