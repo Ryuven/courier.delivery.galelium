@@ -12,95 +12,221 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Inter:wght@300;400;500;600;700&display=swap"/>
 <style>
 /* ═══════════════════════════════════════════════════════════
-   ВЕРИФИКАЦИЯ
+   ВЕРИФИКАЦИЯ — минималистичный дизайн
 ═══════════════════════════════════════════════════════════ */
-.verif-banner{
-  background:var(--amberd);border:1px solid rgba(217,119,6,.3);
-  border-radius:12px;padding:16px 18px;margin-bottom:16px;
-  display:flex;align-items:flex-start;gap:12px;
-}
-.verif-banner.verified{background:var(--accd);border-color:var(--accg)}
-.verif-banner.pending{background:rgba(59,130,246,.08);border-color:rgba(59,130,246,.25)}
-.verif-banner-ico{font-size:1.3rem;flex-shrink:0;line-height:1}
-.verif-banner-body{flex:1;min-width:0}
-.verif-banner-title{font-size:.8rem;font-weight:700;color:var(--tx);margin-bottom:3px}
-.verif-banner.verified .verif-banner-title{color:var(--acc2)}
-.verif-banner.pending .verif-banner-title{color:var(--blue)}
-.verif-banner-sub{font-size:.68rem;color:var(--tx2);line-height:1.5}
 
+/* ── Карточка статуса верификации в профиле ── */
+.verif-card{
+  margin-top:14px;
+  background:var(--s2);
+  border:1px solid var(--b0);
+  border-radius:14px;
+  overflow:hidden;
+}
+.verif-card-top{
+  padding:16px 18px 14px;
+  display:flex;align-items:center;gap:14px;
+}
+.verif-card-icon{
+  width:40px;height:40px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;
+  background:var(--amberd);
+  border:1px solid rgba(217,119,6,.2);
+}
+.verif-card-icon.pending{ background:rgba(59,130,246,.08); border-color:rgba(59,130,246,.18); }
+.verif-card-icon.verified{ background:var(--accd); border-color:var(--b1); }
+.verif-card-info{ flex:1;min-width:0 }
+.verif-card-title{
+  font-size:.78rem;font-weight:700;color:var(--tx);line-height:1.2;
+}
+.verif-card-sub{
+  font-size:.64rem;color:var(--tx3);margin-top:3px;line-height:1.5;
+}
+.verif-card-sub.pending{ color:var(--blue) }
+.verif-card-sub.verified{ color:var(--acc2) }
+.verif-card-divider{
+  height:1px;background:var(--b0);margin:0 18px;
+}
+.verif-card-actions{
+  padding:12px 18px;
+  display:flex;gap:8px;flex-wrap:wrap;
+}
+.verif-btn-primary{
+  flex:1;min-width:120px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:10px 14px;border:none;cursor:pointer;border-radius:9px;
+  background:linear-gradient(135deg,#0088cc 0%,#1ea8e0 100%);
+  color:#fff;font-size:.71rem;font-weight:600;font-family:var(--fs);
+  letter-spacing:.02em;
+  transition:opacity .15s,transform .15s;
+  box-shadow:0 2px 10px rgba(0,136,204,.2);
+}
+.verif-btn-primary:hover{opacity:.88;transform:translateY(-1px)}
+.verif-btn-primary:active{transform:translateY(0)}
+.verif-btn-secondary{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:10px 14px;border:1px solid var(--b1);cursor:pointer;border-radius:9px;
+  background:transparent;color:var(--tx2);font-size:.71rem;font-weight:500;font-family:var(--fs);
+  transition:border-color .15s,color .15s,background .15s;
+  white-space:nowrap;
+}
+.verif-btn-secondary:hover{border-color:var(--b2);color:var(--tx);background:var(--s3)}
+
+/* Пульс для pending */
+@keyframes verifPulse{
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:.5;transform:scale(.85)}
+}
+.verif-pulse-dot{
+  width:7px;height:7px;border-radius:50%;flex-shrink:0;
+  background:var(--blue);
+  animation:verifPulse 2s ease-in-out infinite;
+  display:inline-block;
+}
+
+/* Бейдж статуса (в шапке карточки профиля) */
+.p-verif-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;
+  padding:3px 9px 3px 7px;border-radius:99px;margin-top:7px;font-weight:700;
+}
+.p-verif-badge.unverified{ background:var(--amberd);color:var(--amber); }
+.p-verif-badge.pending{ background:rgba(59,130,246,.1);color:var(--blue); }
+.p-verif-badge.verified{ background:var(--accd);color:var(--acc2); }
+.p-verif-badge-dot{ width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0; }
+
+/* ── Модальное окно ── */
 .verif-modal-overlay{
   position:fixed;inset:0;z-index:999;
-  background:rgba(0,0,0,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  background:rgba(7,11,9,.8);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   display:none;align-items:flex-end;justify-content:center;
 }
-.verif-modal-overlay.open{display:flex}
-@media(min-width:600px){.verif-modal-overlay{align-items:center}}
-
-.verif-modal{
-  background:var(--s1);border:1px solid var(--b1);border-radius:20px 20px 0 0;
-  width:100%;max-width:520px;max-height:90svh;overflow-y:auto;
-  padding:24px 22px 32px;
-  animation:slideUp .28s var(--spring) both;
+.verif-modal-overlay.open{ display:flex }
+@media(min-width:600px){
+  .verif-modal-overlay{ align-items:center }
+  .verif-modal{ border-radius:18px }
 }
-@media(min-width:600px){.verif-modal{border-radius:16px}}
-@keyframes slideUp{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
+.verif-modal{
+  background:var(--s1);
+  border:1px solid var(--b1);
+  border-bottom:none;
+  border-radius:22px 22px 0 0;
+  width:100%;max-width:500px;
+  max-height:88svh;overflow-y:auto;
+  padding:0 0 calc(28px + var(--safe-b));
+  animation:vmSlideUp .3s var(--spring) both;
+}
+@media(min-width:600px){ .verif-modal{ border-bottom:1px solid var(--b1) } }
+@keyframes vmSlideUp{
+  from{transform:translateY(56px);opacity:0}
+  to{transform:translateY(0);opacity:1}
+}
 
-.verif-modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-.verif-modal-title{font-family:var(--fd);font-weight:900;font-size:1rem;color:#fff}
-.verif-modal-close{background:none;border:none;cursor:pointer;color:var(--tx3);padding:4px;border-radius:6px;transition:color var(--tf)}
-.verif-modal-close:hover{color:var(--tx)}
+/* drag handle */
+.verif-modal-handle{
+  width:36px;height:4px;border-radius:99px;
+  background:var(--s4);margin:12px auto 0;
+}
+@media(min-width:600px){ .verif-modal-handle{ display:none } }
 
-.verif-steps{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.verif-modal-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px 0;margin-bottom:4px;
+}
+.verif-modal-title{
+  font-family:var(--fd);font-weight:900;font-size:.95rem;color:var(--tx);
+}
+.verif-modal-close{
+  background:var(--s3);border:1px solid var(--b0);cursor:pointer;
+  color:var(--tx3);width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;flex-shrink:0;
+}
+.verif-modal-close:hover{ background:var(--s4);color:var(--tx);border-color:var(--b1) }
+
+.verif-modal-desc{
+  font-size:.7rem;color:var(--tx3);line-height:1.65;
+  padding:8px 20px 16px;
+  border-bottom:1px solid var(--b0);
+}
+
+/* Шаги */
+.verif-steps{
+  padding:16px 20px 0;
+  display:flex;flex-direction:column;gap:0;
+}
 .verif-step{
-  background:var(--s2);border:1px solid var(--b0);border-radius:10px;
-  padding:14px 15px;display:flex;gap:13px;align-items:flex-start;
+  display:flex;gap:14px;align-items:flex-start;
+  padding-bottom:16px;position:relative;
+}
+/* вертикальная линия между шагами */
+.verif-step:not(:last-child)::after{
+  content:'';position:absolute;
+  left:11px;top:26px;bottom:0;
+  width:1px;background:var(--b0);
 }
 .verif-step-num{
-  width:26px;height:26px;border-radius:50%;flex-shrink:0;
-  background:var(--accd);border:1.5px solid var(--accg);
+  width:24px;height:24px;border-radius:50%;flex-shrink:0;
+  background:var(--s3);border:1.5px solid var(--b1);
   display:flex;align-items:center;justify-content:center;
-  font-size:.62rem;font-weight:800;color:var(--acc2);
+  font-size:.58rem;font-weight:800;color:var(--acc2);
+  position:relative;z-index:1;
 }
-.verif-step-title{font-size:.76rem;font-weight:700;color:var(--tx);margin-bottom:2px}
-.verif-step-desc{font-size:.67rem;color:var(--tx2);line-height:1.5}
+.verif-step-body{ padding-top:2px }
+.verif-step-title{
+  font-size:.74rem;font-weight:700;color:var(--tx);margin-bottom:2px;
+}
+.verif-step-desc{
+  font-size:.65rem;color:var(--tx3);line-height:1.55;
+}
 
-.verif-photos{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+/* Фото-примеры */
+.verif-photos{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  padding:0 20px 16px;
+  border-bottom:1px solid var(--b0);
+}
+.verif-photos-label{
+  grid-column:1/-1;
+  font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--tx3);padding-bottom:6px;
+}
 .verif-photo{
   background:var(--s2);border:1px solid var(--b0);border-radius:10px;
   overflow:hidden;aspect-ratio:4/3;position:relative;
 }
-.verif-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.verif-photo img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  transition:opacity .2s;
+}
 .verif-photo-lbl{
   position:absolute;bottom:0;left:0;right:0;
-  background:rgba(11,15,12,.82);backdrop-filter:blur(4px);
-  padding:5px 8px;font-size:.58rem;color:var(--tx2);text-align:center;
+  background:linear-gradient(0deg,rgba(11,15,12,.92) 0%,transparent 100%);
+  padding:16px 8px 7px;
+  font-size:.58rem;color:var(--tx2);text-align:center;
 }
 
+/* Кнопка Telegram */
+.verif-modal-footer{ padding:16px 20px 0; }
 .verif-tg-btn{
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  width:100%;padding:13px;border:none;cursor:pointer;border-radius:10px;
-  background:linear-gradient(135deg,#0088cc,#229ed9);
-  color:#fff;font-size:.78rem;font-weight:700;
-  transition:opacity var(--tf),transform var(--tf);
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  width:100%;padding:12px 16px;border:none;cursor:pointer;border-radius:11px;
+  background:linear-gradient(135deg,#0077b5 0%,#1da1d9 100%);
+  color:#fff;font-size:.75rem;font-weight:700;font-family:var(--fs);
+  letter-spacing:.02em;
+  transition:opacity .15s,transform .15s;
+  box-shadow:0 3px 14px rgba(0,119,181,.28);
 }
-.verif-tg-btn:hover{opacity:.9;transform:translateY(-1px)}
-.verif-tg-btn:active{transform:translateY(0)}
-.verif-tg-btn svg{flex-shrink:0}
+.verif-tg-btn:hover{ opacity:.88;transform:translateY(-1px) }
+.verif-tg-btn:active{ transform:translateY(0) }
+.verif-tg-btn svg{ flex-shrink:0 }
 
 .verif-note{
-  font-size:.62rem;color:var(--tx3);text-align:center;margin-top:10px;line-height:1.6;
+  font-size:.61rem;color:var(--tx3);text-align:center;
+  margin-top:10px;line-height:1.7;padding:0 4px;
 }
-
-/* Статус-бейдж в профиле */
-.p-verif-badge{
-  display:inline-flex;align-items:center;gap:5px;
-  font-size:.54rem;letter-spacing:.12em;text-transform:uppercase;
-  padding:3px 9px;border-radius:99px;margin-top:6px;font-weight:700;
-}
-.p-verif-badge.unverified{background:var(--amberd);color:var(--amber)}
-.p-verif-badge.pending{background:rgba(59,130,246,.1);color:var(--blue)}
-.p-verif-badge.verified{background:var(--accd);color:var(--acc2)}
-.p-verif-badge-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
 
 /* ═══════════════════════════════════════════════════════════
    ТОКЕНЫ — тёмный режим, акцент зелёный как у клиентской
@@ -1217,67 +1343,75 @@ a{color:inherit;text-decoration:none}
 <!-- ══════════ МОДАЛ ВЕРИФИКАЦИИ ══════════ -->
 <div class="verif-modal-overlay" id="verif-modal-overlay" onclick="if(event.target===this)closeVerifModal()">
   <div class="verif-modal" role="dialog" aria-modal="true" aria-labelledby="verif-modal-ttl">
+
+    <div class="verif-modal-handle"></div>
+
     <div class="verif-modal-head">
-      <div class="verif-modal-title" id="verif-modal-ttl">🪪 Тасдиқи ҳувият</div>
+      <div class="verif-modal-title" id="verif-modal-ttl">Тасдиқи ҳувият</div>
       <button class="verif-modal-close" onclick="closeVerifModal()" aria-label="Пӯшидан">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="1" y1="1" x2="11" y2="11"/><line x1="11" y1="1" x2="1" y2="11"/></svg>
       </button>
     </div>
 
-    <p style="font-size:.73rem;color:var(--tx2);line-height:1.6;margin-bottom:18px">
-      Барои қабули фармоишҳо, ҳувияти худро тасдиқ кунед. Барои ин, тавассути Телеграм ба мо аксҳои зайл равон кунед:
-    </p>
+    <div class="verif-modal-desc">
+      Барои қабули фармоишҳо, ҳувияти худро тасдиқ кунед.
+      Тавассути Телеграм аксҳои зайлро равон кунед — мо дар давоми 1 рӯзи кор баррасӣ мекунем.
+    </div>
 
     <div class="verif-steps">
       <div class="verif-step">
         <div class="verif-step-num">1</div>
-        <div>
-          <div class="verif-step-title">Рӯи паспорт (қисми ном)</div>
-          <div class="verif-step-desc">Акси пешрӯи паспорти миллии Тоҷикистон — ному насаб ва акс бояд равшан бошад</div>
+        <div class="verif-step-body">
+          <div class="verif-step-title">Рӯи паспорт</div>
+          <div class="verif-step-desc">Пешрӯи паспорти миллӣ — ному насаб ва акс бояд равшан бошад</div>
         </div>
       </div>
       <div class="verif-step">
         <div class="verif-step-num">2</div>
-        <div>
+        <div class="verif-step-body">
           <div class="verif-step-title">Пушти паспорт</div>
-          <div class="verif-step-desc">Акси пушти паспорт — маълумоти иловагӣ бояд хонда шавад</div>
+          <div class="verif-step-desc">Пушти паспорт — ҳамаи маълумот бояд хонда шавад</div>
         </div>
       </div>
       <div class="verif-step">
         <div class="verif-step-num">3</div>
-        <div>
+        <div class="verif-step-body">
           <div class="verif-step-title">Селфи бо паспорт</div>
-          <div class="verif-step-desc">Акси шумо дар баробари паспорт — ном бояд хонда шавад. Чеҳраи шумо бояд равшан бошад</div>
+          <div class="verif-step-desc">Чеҳраи шумо дар паҳлӯи паспорт — ном ва рӯй бояд равшан бошад</div>
         </div>
       </div>
     </div>
 
-    <div style="font-size:.64rem;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Намунаи аксҳо</div>
     <div class="verif-photos">
+      <div class="verif-photos-label">Намунаи аксҳо</div>
       <div class="verif-photo">
-        <img src="/storage/passport-1.png" alt="Пешрӯи паспорт" onerror="this.style.display='none';this.parentElement.style.background='var(--s3)'"/>
-        <div class="verif-photo-lbl">📋 Рӯи паспорт</div>
+        <img src="/storage/passport-1.png" alt="Рӯи паспорт"
+             onerror="this.parentElement.style.background='var(--s3)';this.remove()"/>
+        <div class="verif-photo-lbl">Рӯи паспорт</div>
       </div>
       <div class="verif-photo">
-        <img src="/storage/passport-2.png" alt="Пушти паспорт" onerror="this.style.display='none';this.parentElement.style.background='var(--s3)'"/>
-        <div class="verif-photo-lbl">📋 Пушти паспорт</div>
+        <img src="/storage/passport-2.png" alt="Пушти паспорт"
+             onerror="this.parentElement.style.background='var(--s3)';this.remove()"/>
+        <div class="verif-photo-lbl">Пушти паспорт</div>
       </div>
     </div>
 
-    <button class="verif-tg-btn" id="verif-tg-btn" onclick="sendVerifTelegram()">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Ба Телеграм фиристодан
-    </button>
-
-    <div class="verif-note">
-      Пас аз фиристодан, дархости шумо дар давоми <strong>1 рӯзи кор</strong> баррасӣ мешавад.<br>
-      Дар Телеграм ҷавоб медиҳем: <strong>@lucas_vegas</strong>
+    <div class="verif-modal-footer">
+      <button class="verif-tg-btn" onclick="sendVerifTelegram()">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <path d="M21.5 2.5L2.5 10l7 2.5M21.5 2.5L14 21.5l-4.5-9M21.5 2.5L9.5 12.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Ба Телеграм фиристодан
+      </button>
+      <div class="verif-note">
+        Ҷавоб дар Телеграм: <strong style="color:var(--tx2)">@lucas_vegas</strong>
+      </div>
     </div>
+
   </div>
 </div>
 
 <script>
-// ── Верификация ────────────────────────────────────────────
 window.openVerifModal = function() {
   document.getElementById('verif-modal-overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -1287,12 +1421,10 @@ window.closeVerifModal = function() {
   document.body.style.overflow = '';
 };
 window.sendVerifTelegram = function() {
-  // Собираем данные из глобальных переменных CU и UD (из app.js)
   const uid   = window.__verifUID   || '—';
   const name  = window.__verifName  || '—';
   const email = window.__verifEmail || '—';
   const phone = window.__verifPhone || '—';
-
   const text =
     `🪪 Дархости тасдиқи ҳувият\n\n` +
     `👤 Ном: ${name}\n` +
@@ -1300,22 +1432,12 @@ window.sendVerifTelegram = function() {
     `📧 Email: ${email}\n` +
     `📞 Телефон: ${phone}\n\n` +
     `📸 Аксҳои паспорт:\n` +
-    `1. Рӯи паспорт (қисми ном)\n` +
-    `2. Пушти паспорт\n` +
-    `3. Селфи бо паспорт\n\n` +
+    `1. Рӯи паспорт\n2. Пушти паспорт\n3. Селфи бо паспорт\n\n` +
     `courier.delivery.galelium.com`;
-
-  const url = 'https://t.me/lucas_vegas?text=' + encodeURIComponent(text);
-  window.open(url, '_blank');
-
-  // Меняем статус на pending в Firestore через app.js
-  if (typeof window.__setVerifPending === 'function') {
-    window.__setVerifPending();
-  }
+  window.open('https://t.me/lucas_vegas?text=' + encodeURIComponent(text), '_blank');
+  if (typeof window.__setVerifPending === 'function') window.__setVerifPending();
 };
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeVerifModal();
-});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVerifModal(); });
 </script>
 
 <script type="module" src="./app.js"></script>

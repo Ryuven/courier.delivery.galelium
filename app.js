@@ -1160,16 +1160,16 @@ function renderProfile() {
   const pse = document.getElementById('ps-earn');    if (pse) pse.textContent = (CD?.earnings || 0) + ' см';
   const psr = document.getElementById('ps-rating');  if (psr) psr.textContent = CD?.rating ? CD.rating.toFixed(1) : '—';
 
-  // — Передаём данные в глобал для модала верификации
+  // — Данные для модала
   window.__verifUID   = CU.uid;
   window.__verifName  = name;
   window.__verifEmail = CU.email || '';
   window.__verifPhone = UD?.phone || '';
 
-  // — Статус верификации (из couriers или users)
+  // — Статус
   const vs = CD?.verificationStatus || UD?.verificationStatus || 'unverified';
 
-  // — Функция обновления pending при нажатии "Отправить в Telegram"
+  // — Pending updater
   window.__setVerifPending = async function() {
     try {
       await setDoc(doc(db, COL.USERS,    CU.uid), { verificationStatus: 'pending', updatedAt: serverTimestamp() }, { merge: true });
@@ -1181,55 +1181,80 @@ function renderProfile() {
     } catch { toast('Хато ҳангоми сабт', 'err'); }
   };
 
-  // — Бейдж статуса
+  // — Бейдж в шапке карточки профиля
   const badgeWrap = document.getElementById('p-verif-badge-wrap');
   if (badgeWrap) {
     const badgeCfg = {
-      unverified: { cls: 'unverified', icon: '⚠️', txt: 'Тасдиқ нашудааст' },
-      pending:    { cls: 'pending',    icon: '⏳', txt: 'Дар баррасӣ' },
-      verified:   { cls: 'verified',   icon: '✅', txt: 'Тасдиқ шудааст' },
+      unverified: { cls: 'unverified', dot: true,  txt: 'Тасдиқ нашудааст' },
+      pending:    { cls: 'pending',    dot: true,   txt: 'Дар баррасӣ' },
+      verified:   { cls: 'verified',   dot: true,   txt: 'Тасдиқ шудааст' },
     };
     const b = badgeCfg[vs] || badgeCfg.unverified;
-    badgeWrap.innerHTML = `<div class="p-verif-badge ${b.cls}"><div class="p-verif-badge-dot"></div>${b.icon} ${b.txt}</div>`;
+    badgeWrap.innerHTML = `<div class="p-verif-badge ${b.cls}"><div class="p-verif-badge-dot"></div>${b.txt}</div>`;
   }
 
-  // — Баннер верификации
+  // — Карточка верификации (кнопка видна при unverified И pending)
   const bannerWrap = document.getElementById('verif-banner-wrap');
-  if (bannerWrap) {
-    if (vs === 'unverified') {
-      bannerWrap.innerHTML = `
-        <div class="verif-banner" style="margin-top:12px">
-          <div class="verif-banner-ico">⚠️</div>
-          <div class="verif-banner-body">
-            <div class="verif-banner-title">Аккаунт тасдиқ нашудааст</div>
-            <div class="verif-banner-sub">Барои қабули фармоишҳо, ҳувияти худро тасдиқ кунед</div>
-            <button class="btn-primary" style="margin-top:10px;padding:9px 16px;font-size:.7rem" onclick="openVerifModal()">
-              🪪 Тасдиқ кардан
-            </button>
+  if (!bannerWrap) return;
+
+  if (vs === 'verified') {
+    bannerWrap.innerHTML = `
+      <div class="verif-card">
+        <div class="verif-card-top">
+          <div class="verif-card-icon verified">✅</div>
+          <div class="verif-card-info">
+            <div class="verif-card-title">Ҳувият тасдиқ шудааст</div>
+            <div class="verif-card-sub verified">Шумо метавонед фармоишҳо қабул кунед</div>
           </div>
-        </div>`;
-    } else if (vs === 'pending') {
-      bannerWrap.innerHTML = `
-        <div class="verif-banner pending" style="margin-top:12px">
-          <div class="verif-banner-ico">⏳</div>
-          <div class="verif-banner-body">
-            <div class="verif-banner-title">Дар баррасӣ</div>
-            <div class="verif-banner-sub">Дархости шумо қабул шуд. Дар давоми 1 рӯзи кор ҷавоб медиҳем</div>
-          </div>
-        </div>`;
-    } else if (vs === 'verified') {
-      bannerWrap.innerHTML = `
-        <div class="verif-banner verified" style="margin-top:12px">
-          <div class="verif-banner-ico">✅</div>
-          <div class="verif-banner-body">
-            <div class="verif-banner-title">Тасдиқ шудааст</div>
-            <div class="verif-banner-sub">Ҳувияти шумо тасдиқ шуд. Шумо метавонед фармоиш қабул кунед</div>
-          </div>
-        </div>`;
-    } else {
-      bannerWrap.innerHTML = '';
-    }
+        </div>
+      </div>`;
+    return;
   }
+
+  if (vs === 'pending') {
+    bannerWrap.innerHTML = `
+      <div class="verif-card">
+        <div class="verif-card-top">
+          <div class="verif-card-icon pending">
+            <span class="verif-pulse-dot"></span>
+          </div>
+          <div class="verif-card-info">
+            <div class="verif-card-title">Дар баррасӣ</div>
+            <div class="verif-card-sub pending">Дархост қабул шуд · ҷавоб то 1 рӯзи кор</div>
+          </div>
+        </div>
+        <div class="verif-card-divider"></div>
+        <div class="verif-card-actions">
+          <button class="verif-btn-primary" onclick="openVerifModal()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21.5 2.5L2.5 10l7 2.5M21.5 2.5L14 21.5l-4.5-9M21.5 2.5L9.5 12.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Такрор фиристодан
+          </button>
+          <button class="verif-btn-secondary" onclick="openVerifModal()">
+            Дастур
+          </button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  // unverified (default)
+  bannerWrap.innerHTML = `
+    <div class="verif-card">
+      <div class="verif-card-top">
+        <div class="verif-card-icon">🪪</div>
+        <div class="verif-card-info">
+          <div class="verif-card-title">Тасдиқи ҳувият</div>
+          <div class="verif-card-sub">Барои қабули фармоишҳо зарур аст</div>
+        </div>
+      </div>
+      <div class="verif-card-divider"></div>
+      <div class="verif-card-actions">
+        <button class="verif-btn-primary" onclick="openVerifModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21.5 2.5L2.5 10l7 2.5M21.5 2.5L14 21.5l-4.5-9M21.5 2.5L9.5 12.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Тасдиқ кардан
+        </button>
+      </div>
+    </div>`;
 }
 
 window.saveProfile = async function () {
