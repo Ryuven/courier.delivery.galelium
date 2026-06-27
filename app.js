@@ -1159,6 +1159,77 @@ function renderProfile() {
   const pst = document.getElementById('ps-total');   if (pst) pst.textContent = CD?.totalDeliveries || 0;
   const pse = document.getElementById('ps-earn');    if (pse) pse.textContent = (CD?.earnings || 0) + ' см';
   const psr = document.getElementById('ps-rating');  if (psr) psr.textContent = CD?.rating ? CD.rating.toFixed(1) : '—';
+
+  // — Передаём данные в глобал для модала верификации
+  window.__verifUID   = CU.uid;
+  window.__verifName  = name;
+  window.__verifEmail = CU.email || '';
+  window.__verifPhone = UD?.phone || '';
+
+  // — Статус верификации (из couriers или users)
+  const vs = CD?.verificationStatus || UD?.verificationStatus || 'unverified';
+
+  // — Функция обновления pending при нажатии "Отправить в Telegram"
+  window.__setVerifPending = async function() {
+    try {
+      await setDoc(doc(db, COL.USERS,    CU.uid), { verificationStatus: 'pending', updatedAt: serverTimestamp() }, { merge: true });
+      await setDoc(doc(db, COL.COURIERS, CU.uid), { verificationStatus: 'pending', updatedAt: serverTimestamp() }, { merge: true });
+      CD = { ...CD, verificationStatus: 'pending' };
+      UD = { ...UD, verificationStatus: 'pending' };
+      renderProfile();
+      toast('Дархост фиристода шуд ✓', 'ok');
+    } catch { toast('Хато ҳангоми сабт', 'err'); }
+  };
+
+  // — Бейдж статуса
+  const badgeWrap = document.getElementById('p-verif-badge-wrap');
+  if (badgeWrap) {
+    const badgeCfg = {
+      unverified: { cls: 'unverified', icon: '⚠️', txt: 'Тасдиқ нашудааст' },
+      pending:    { cls: 'pending',    icon: '⏳', txt: 'Дар баррасӣ' },
+      verified:   { cls: 'verified',   icon: '✅', txt: 'Тасдиқ шудааст' },
+    };
+    const b = badgeCfg[vs] || badgeCfg.unverified;
+    badgeWrap.innerHTML = `<div class="p-verif-badge ${b.cls}"><div class="p-verif-badge-dot"></div>${b.icon} ${b.txt}</div>`;
+  }
+
+  // — Баннер верификации
+  const bannerWrap = document.getElementById('verif-banner-wrap');
+  if (bannerWrap) {
+    if (vs === 'unverified') {
+      bannerWrap.innerHTML = `
+        <div class="verif-banner" style="margin-top:12px">
+          <div class="verif-banner-ico">⚠️</div>
+          <div class="verif-banner-body">
+            <div class="verif-banner-title">Аккаунт тасдиқ нашудааст</div>
+            <div class="verif-banner-sub">Барои қабули фармоишҳо, ҳувияти худро тасдиқ кунед</div>
+            <button class="btn-primary" style="margin-top:10px;padding:9px 16px;font-size:.7rem" onclick="openVerifModal()">
+              🪪 Тасдиқ кардан
+            </button>
+          </div>
+        </div>`;
+    } else if (vs === 'pending') {
+      bannerWrap.innerHTML = `
+        <div class="verif-banner pending" style="margin-top:12px">
+          <div class="verif-banner-ico">⏳</div>
+          <div class="verif-banner-body">
+            <div class="verif-banner-title">Дар баррасӣ</div>
+            <div class="verif-banner-sub">Дархости шумо қабул шуд. Дар давоми 1 рӯзи кор ҷавоб медиҳем</div>
+          </div>
+        </div>`;
+    } else if (vs === 'verified') {
+      bannerWrap.innerHTML = `
+        <div class="verif-banner verified" style="margin-top:12px">
+          <div class="verif-banner-ico">✅</div>
+          <div class="verif-banner-body">
+            <div class="verif-banner-title">Тасдиқ шудааст</div>
+            <div class="verif-banner-sub">Ҳувияти шумо тасдиқ шуд. Шумо метавонед фармоиш қабул кунед</div>
+          </div>
+        </div>`;
+    } else {
+      bannerWrap.innerHTML = '';
+    }
+  }
 }
 
 window.saveProfile = async function () {

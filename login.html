@@ -437,11 +437,13 @@
         provider: extra.provider || 'email',
         createdAt: serverTimestamp(), updatedAt: serverTimestamp(), lastLoginAt: serverTimestamp(),
       };
+      base.verificationStatus = 'unverified';
       await setDoc(userRef, base);
       await setDoc(courierRef, {
         uid: user.uid, displayName: base.displayName, phone: base.phone, email: base.email,
         vehicle: extra.vehicle || 'foot', isActive: false, isOnline: false,
         currentOrderId: null, rating: 0, totalDeliveries: 0, earnings: 0,
+        verificationStatus: 'unverified',
         createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
       });
     } else {
