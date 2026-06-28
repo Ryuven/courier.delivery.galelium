@@ -674,40 +674,143 @@ a{color:inherit;text-decoration:none}
 .sb-logout{background:none;border:none;cursor:pointer;color:var(--tx3);padding:6px;border-radius:6px;flex-shrink:0;transition:all var(--tf)}
 .sb-logout:hover{color:var(--red);background:var(--redd)}
 
-/* ── TOPBAR ──────────────────────────────────────────────── */
+/* ── TOPBAR — скрыт, карта занимает весь экран ───────────── */
 .main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-width:0}
-.topbar{
-  height:var(--th);flex-shrink:0;
-  background:rgba(11,15,12,.94);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--b0);
-  display:flex;align-items:center;padding:0 20px;gap:12px;z-index:50;
+.topbar{ display:none!important }
+.tb-chip,.tb-time,.tb-sound,.mob-btn,.tb-title{ display:none!important }
+
+/* ── SWIPE BUTTON ────────────────────────────────────────── */
+.swipe-btn-wrap{
+  position:relative;width:100%;height:54px;
+  background:var(--s3);border-radius:16px;overflow:hidden;
+  border:1.5px solid var(--accg);flex-shrink:0;
+  user-select:none;-webkit-user-select:none;
 }
-.tb-title{font-family:var(--fd);font-weight:900;font-size:.94rem;color:#fff;flex:1;letter-spacing:-.01em;display:flex;align-items:center}
-.tb-title em{color:var(--acc2);font-style:normal}
-.tb-logo-img{height:26px;width:auto;object-fit:contain;display:block;}
-.tb-chip{
-  display:flex;align-items:center;gap:6px;
-  padding:5px 12px;border-radius:99px;
-  border:1px solid var(--b0);background:var(--s2);
-  font-size:.58rem;font-weight:600;color:var(--tx3);
-  letter-spacing:.08em;text-transform:uppercase;
-  transition:all .3s;
+.swipe-btn-track{
+  position:absolute;inset:0;
+  display:flex;align-items:center;
+  padding-left:4px;
+  pointer-events:none;
 }
-.tb-chip.online{border-color:var(--accg);color:var(--acc2);background:var(--accd)}
-.chip-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
-.tb-chip.online .chip-dot{animation:cdot 2s ease-in-out infinite}
-@keyframes cdot{0%,100%{box-shadow:0 0 0 0 rgba(61,207,142,.5)}50%{box-shadow:0 0 0 4px rgba(61,207,142,0)}}
-.tb-time{font-size:.7rem;color:var(--tx3);letter-spacing:.06em;font-variant-numeric:tabular-nums}
-.tb-sound{
-  background:none;border:1px solid var(--b0);border-radius:6px;
-  cursor:pointer;color:var(--tx3);width:30px;height:30px;
+.swipe-btn-thumb{
+  width:46px;height:46px;border-radius:13px;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
   display:flex;align-items:center;justify-content:center;
-  transition:all var(--tf);flex-shrink:0;
+  color:#0b0f0c;
+  box-shadow:0 3px 14px var(--acc-shadow);
+  position:absolute;left:4px;top:4px;
+  transition:none;cursor:grab;
+  z-index:2;
 }
-.tb-sound:hover{border-color:var(--b1);color:var(--tx2)}
-.tb-sound.on{border-color:var(--accg);color:var(--acc2);background:var(--accd)}
-.mob-btn{display:none;background:none;border:none;cursor:pointer;color:var(--tx3);width:36px;height:36px;border-radius:10px;align-items:center;justify-content:center;transition:all var(--tf)}
-.mob-btn:hover{background:var(--s2);color:var(--tx)}
+.swipe-btn-thumb:active{cursor:grabbing}
+.swipe-btn-label{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fd);font-weight:900;font-size:.82rem;
+  color:var(--acc2);letter-spacing:.06em;
+  pointer-events:none;z-index:1;
+  gap:7px;
+}
+.swipe-btn-label svg{ opacity:.7 }
+.swipe-btn-fill{
+  position:absolute;left:0;top:0;bottom:0;width:0;
+  background:linear-gradient(90deg,var(--accd),var(--acc));
+  opacity:.18;pointer-events:none;transition:none;border-radius:14px;
+}
+.swipe-btn-wrap.done .swipe-btn-thumb{
+  left:calc(100% - 50px);transition:left .25s var(--spring);
+}
+.swipe-btn-wrap.done .swipe-btn-fill{ width:100%;transition:width .25s; }
+.swipe-btn-wrap.done .swipe-btn-label{ color:#0b0f0c; }
+
+/* ── PROFILE MENU TAB (замена sidebar) ─────────────────── */
+.profile-menu-overlay{
+  position:fixed;inset:0;z-index:300;
+  background:rgba(7,11,9,.85);backdrop-filter:blur(14px);
+  display:none;align-items:flex-end;justify-content:center;
+}
+.profile-menu-overlay.open{ display:flex }
+.profile-menu-sheet{
+  width:100%;max-width:480px;
+  background:var(--s1);border:1px solid var(--b1);border-bottom:none;
+  border-radius:22px 22px 0 0;
+  padding:0 0 calc(var(--nb) + var(--safe-b) + 8px);
+  animation:vmSlideUp .3s var(--spring) both;
+  max-height:90svh;overflow-y:auto;
+}
+.pms-handle{
+  width:36px;height:4px;border-radius:99px;
+  background:var(--s4);margin:12px auto 0;
+}
+.pms-header{
+  padding:16px 20px 12px;
+  border-bottom:1px solid var(--b0);
+  display:flex;align-items:center;gap:14px;
+}
+.pms-header-av{
+  width:46px;height:46px;border-radius:50%;
+  background:var(--accd);border:2px solid var(--accg);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.9rem;font-weight:700;color:var(--acc2);
+  flex-shrink:0;overflow:hidden;
+}
+.pms-header-av img{width:100%;height:100%;object-fit:cover}
+.pms-header-info{ flex:1;min-width:0 }
+.pms-header-name{font-family:var(--fd);font-weight:900;font-size:.95rem;color:#fff;margin-bottom:1px}
+.pms-header-role{font-size:.6rem;color:var(--tx3);letter-spacing:.04em}
+.pms-close{
+  width:30px;height:30px;border-radius:50%;
+  background:var(--s3);border:1px solid var(--b0);
+  cursor:pointer;color:var(--tx3);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all .15s;
+}
+.pms-close:hover{background:var(--redd);color:var(--red)}
+.pms-online-row{
+  margin:14px 16px 0;padding:12px 14px;
+  background:var(--s2);border:1px solid var(--b0);border-radius:12px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  transition:border-color var(--tf),background var(--tf);
+}
+.pms-online-row.is-online{border-color:var(--accg);background:var(--accd)}
+.pms-online-lbl{font-size:.45rem;letter-spacing:.18em;text-transform:uppercase;color:var(--tx3);margin-bottom:2px}
+.pms-online-val{font-size:.8rem;font-weight:600;color:var(--tx3)}
+.pms-online-val.on{color:var(--acc2)}
+.pms-earn{
+  margin:10px 16px 0;padding:10px 14px;
+  background:var(--s2);border:1px solid var(--b0);border-radius:10px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.pms-earn-lbl{font-size:.44rem;letter-spacing:.2em;text-transform:uppercase;color:var(--tx3);margin-bottom:2px}
+.pms-earn-val{font-family:var(--fd);font-weight:900;font-size:.9rem;color:var(--acc2)}
+.pms-nav{padding:10px 10px 0}
+.pms-nav-grp{font-size:.52rem;letter-spacing:.22em;text-transform:uppercase;color:var(--tx3);padding:12px 8px 4px}
+.pms-item{
+  display:flex;align-items:center;gap:10px;padding:11px 12px;
+  cursor:pointer;color:var(--tx3);font-size:.8rem;font-weight:500;
+  border-radius:10px;position:relative;
+  transition:color var(--tf),background var(--tf);
+  border:none;background:none;width:100%;text-align:left;font-family:var(--fs);
+}
+.pms-item:hover{color:var(--tx2);background:var(--s2)}
+.pms-item svg{flex-shrink:0;opacity:.5;transition:opacity var(--tf)}
+.pms-item:hover svg{opacity:1}
+.pms-item-badge{
+  margin-left:auto;min-width:18px;height:18px;padding:0 5px;
+  background:var(--amber);color:#fff;font-size:.5rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;border-radius:99px;
+}
+.pms-item-badge.green{background:var(--acc)}
+.pms-divider{height:1px;background:var(--b0);margin:8px 16px}
+.pms-logout-btn{
+  margin:12px 16px 0;width:calc(100% - 32px);
+  padding:12px;border:1px solid rgba(229,69,90,.25);
+  border-radius:11px;background:var(--redd);
+  color:var(--red);font-size:.74rem;font-family:var(--fs);font-weight:600;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:all .15s;
+}
+.pms-logout-btn:hover{background:rgba(229,69,90,.18);border-color:rgba(229,69,90,.4)}
 
 /* ── PAGES ───────────────────────────────────────────────── */
 .pages{flex:1;overflow:hidden;position:relative}
@@ -721,6 +824,7 @@ a{color:inherit;text-decoration:none}
   display:none;
   flex-direction:column;
   z-index:2;
+  top:0!important;
 }
 #page-dashboard.active{ display:flex!important }
 @keyframes pgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -1213,8 +1317,6 @@ a.ni{ text-decoration:none }
   .sb{position:fixed;left:0;top:0;bottom:0;z-index:200;transform:translateX(-110%)}
   .sb.open{transform:translateX(0);box-shadow:20px 0 60px rgba(0,0,0,.5)}
   .sb-overlay.open{display:block}
-  .mob-btn{display:flex}
-  .tb-time{display:none}
   .pages{padding-bottom:0}
   .page{padding:14px 14px calc(var(--nb) + var(--safe-b) + 14px)}
   #page-dashboard{padding:0!important}
@@ -1476,21 +1578,8 @@ a.ni{ text-decoration:none }
   </div>
 </aside>
 
-<!-- ══ MAIN ═════════════════════════════════════════════════ -->
+  <!-- ══ MAIN ═════════════════════════════════════════════════ -->
 <div class="main">
-  <div class="topbar">
-    <button class="mob-btn" onclick="toggleSidebar()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h12"/></svg>
-    </button>
-    <div class="tb-title" id="tb-title">
-      <img src="/dastdaroz.png" alt="Dastdaroz" class="tb-logo-img" id="tb-logo-img">
-    </div>
-    <button class="tb-sound on" id="sound-btn" onclick="toggleSound()" title="Садо">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg>
-    </button>
-    <div class="tb-chip offline" id="tb-chip"><div class="chip-dot"></div><span id="tb-chip-txt">Офлайн</span></div>
-    <div class="tb-time" id="tb-time">--:--:--</div>
-  </div>
 
   <div class="pages" id="pages">
 
@@ -1518,13 +1607,19 @@ a.ni{ text-decoration:none }
           <div class="ab-txt" id="dash-active-pill-txt" style="font-size:.76rem;font-weight:700;color:var(--tx);max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div>
         </div>
 
-        <!-- Доход + аватар -->
-        <div class="dash-earn-card">
-          <div>
+        <!-- Кнопка профиля / настроек -->
+        <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+          <!-- Доход -->
+          <div style="background:rgba(17,23,18,.92);backdrop-filter:blur(14px);border:1px solid rgba(62,207,142,.2);border-radius:12px;padding:7px 11px;text-align:right;box-shadow:0 4px 20px rgba(0,0,0,.4);">
             <div class="dash-earn-val" id="dash-earn-val">0 см</div>
-            <div class="dash-earn-sub" id="dash-earn-sub">0 расониш имрӯз</div>
+            <div class="dash-earn-sub" id="dash-earn-sub">0 расониш</div>
           </div>
-          <div class="dash-av" id="dash-av">?</div>
+          <!-- Аватар + кнопка открытия меню -->
+          <div class="dash-av" id="dash-av" onclick="openProfileMenu()" style="cursor:pointer;position:relative;width:42px;height:42px;border-radius:14px;border:2px solid var(--accg);">?
+            <div style="position:absolute;bottom:-4px;right:-4px;width:16px;height:16px;background:var(--s2);border:1.5px solid var(--accg);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--acc2)" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1695,12 +1790,97 @@ a.ni{ text-decoration:none }
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       <span class="mn-lbl">Таърих</span>
     </button>
-    <button class="mn-item" data-page="profile" onclick="goPage('profile')">
+    <button class="mn-item" data-page="profile" onclick="openProfileMenu()">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span class="mn-lbl">Профил</span>
     </button>
   </div>
 </nav>
+
+<!-- ══════════ МЕНЮ ПРОФИЛЯ (вместо sidebar) ══════════ -->
+<div class="profile-menu-overlay" id="profile-menu-overlay" onclick="if(event.target===this)closeProfileMenu()">
+  <div class="profile-menu-sheet">
+    <div class="pms-handle"></div>
+    <div class="pms-header">
+      <div class="pms-header-av" id="pms-av">?</div>
+      <div class="pms-header-info">
+        <div class="pms-header-name" id="pms-name">—</div>
+        <div class="pms-header-role">Курьер · Galelium</div>
+      </div>
+      <button class="pms-close" onclick="closeProfileMenu()">
+        <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="1" y1="1" x2="11" y2="11"/><line x1="11" y1="1" x2="1" y2="11"/></svg>
+      </button>
+    </div>
+
+    <!-- Онлайн -->
+    <div class="pms-online-row" id="pms-online-card">
+      <div>
+        <div class="pms-online-lbl">Ҳолати навбат</div>
+        <div class="pms-online-val" id="pms-online-val">Офлайн</div>
+      </div>
+      <label class="tog">
+        <input type="checkbox" id="pms-online-tog" onchange="toggleOnline(this.checked)"/>
+        <div class="tog-track"></div>
+        <div class="tog-thumb"></div>
+      </label>
+    </div>
+
+    <!-- Заработок -->
+    <div class="pms-earn">
+      <div>
+        <div class="pms-earn-lbl">Имрӯз гирифтам</div>
+        <div class="pms-earn-val" id="pms-earn-val">0 см</div>
+      </div>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--acc2)" stroke-width="1.8" opacity=".5">
+        <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+      </svg>
+    </div>
+
+    <div class="pms-nav">
+      <div class="pms-nav-grp">Кор</div>
+      <button class="pms-item" onclick="closeProfileMenu();goPage('dashboard')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Дашборд
+      </button>
+      <button class="pms-item" onclick="closeProfileMenu();goPage('new-orders')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        Фармоишҳои нав
+        <span class="pms-item-badge" id="pms-new-badge" style="display:none">0</span>
+      </button>
+      <button class="pms-item" onclick="closeProfileMenu();goPage('active')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="1"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>
+        Фармоиши фаъол
+        <span class="pms-item-badge green" id="pms-active-badge" style="display:none"></span>
+      </button>
+      <div class="pms-nav-grp">Таърих</div>
+      <button class="pms-item" onclick="closeProfileMenu();goPage('history')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Таърихи расониш
+      </button>
+      <div class="pms-nav-grp">Аккаунт</div>
+      <button class="pms-item" onclick="closeProfileMenu();goPage('profile')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Профил
+      </button>
+      <div class="pms-nav-grp">Ёрдам</div>
+      <a class="pms-item" href="https://delivery.galelium.com/help.html" target="_blank" rel="noopener" onclick="closeProfileMenu()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-linecap="round" stroke-width="2.5"/></svg>
+        FAQ / Ёрдам
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:auto;opacity:.35"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+      <div class="pms-divider"></div>
+      <button class="pms-item" onclick="toggleSound();closeProfileMenu()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg>
+        Садои огоҳинома
+      </button>
+    </div>
+
+    <button class="pms-logout-btn" onclick="doLogout()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      Аз аккаунт баромадан
+    </button>
+  </div>
+</div>
 
 <!-- ОВЕРЛЕЙ СКАНЕРА ШТРИХ-КОДА -->
 <div class="scanner-overlay" id="scanner-overlay"></div>

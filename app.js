@@ -215,7 +215,8 @@ function drawRoute(from, to, color) {
   if (!_routeLine) {
     _routeLine = window.L.polyline(pts, { color:color, weight:3.5, opacity:.82, dashArray:'8 10' }).addTo(_map);
   } else { _routeLine.setLatLngs(pts); _routeLine.setStyle({ color:color }); }
-  try { _map.fitBounds(_routeLine.getBounds(), { padding:[60,60], maxZoom:16 }); } catch(e) {}
+  // НЕ фиксируем карту — пользователь может двигать её свободно
+  // try { _map.fitBounds(_routeLine.getBounds(), { padding:[60,60], maxZoom:16 }); } catch(e) {}
 }
 
 function updateRoutePill(dest, dist) {
@@ -453,13 +454,41 @@ window.doLogout = async function () {
 function renderSB() {
   const name = UD?.displayName || CU.email || 'Курьер';
   const init = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
+  const avatarHtml = UD?.avatarUrl ? `<img src="${UD.avatarUrl}" alt="">` : init;
+
   const uname = document.getElementById('sb-uname');
   if (uname) uname.textContent = name;
   const av = document.getElementById('sb-av');
-  if (av) av.innerHTML = UD?.avatarUrl ? `<img src="${UD.avatarUrl}" alt="">` : init;
+  if (av) av.innerHTML = avatarHtml;
+
+  // Профиль меню
+  const pmsName = document.getElementById('pms-name');
+  if (pmsName) pmsName.textContent = name;
+  const pmsAv = document.getElementById('pms-av');
+  if (pmsAv) pmsAv.innerHTML = avatarHtml;
+
+  // Дашборд аватар
+  const dashAv = document.getElementById('dash-av');
+  if (dashAv) {
+    dashAv.innerHTML = avatarHtml;
+    // keep the settings gear overlay
+    dashAv.innerHTML = avatarHtml + `<div style="position:absolute;bottom:-4px;right:-4px;width:16px;height:16px;background:var(--s2);border:1.5px solid var(--accg);border-radius:50%;display:flex;align-items:center;justify-content:center;pointer-events:none"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--acc2)" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>`;
+  }
+
   updateOnlineUI(CD?.isOnline || false);
   updateEarnUI();
 }
+
+// ─── Меню профиля ────────────────────────────────────────────
+window.openProfileMenu = function() {
+  document.getElementById('profile-menu-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+window.closeProfileMenu = function() {
+  document.getElementById('profile-menu-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+};
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeProfileMenu?.(); } });
 
 // ─── Онлайн / Офлайн ─────────────────────────────────────────
 window.toggleOnline = async function (v) {
@@ -477,12 +506,22 @@ function updateOnlineUI(on) {
   const card    = document.getElementById('sb-online-card'); if (card)    card.className = 'sb-online' + (on ? ' is-online' : '');
   const chip    = document.getElementById('tb-chip');        if (chip)    chip.className = 'tb-chip' + (on ? ' online' : ' offline');
   const chipTxt = document.getElementById('tb-chip-txt');    if (chipTxt) chipTxt.textContent = on ? 'Онлайн' : 'Офлайн';
+  // Профиль меню
+  const pmsTog  = document.getElementById('pms-online-tog'); if (pmsTog)  pmsTog.checked = on;
+  const pmsVal  = document.getElementById('pms-online-val'); if (pmsVal)  { pmsVal.textContent = on ? 'Онлайн' : 'Офлайн'; pmsVal.className = 'pms-online-val' + (on ? ' on' : ''); }
+  const pmsCard = document.getElementById('pms-online-card');if (pmsCard) pmsCard.className = 'pms-online-row' + (on ? ' is-online' : '');
   updateDashOnlineBtn(on);
+  // Если стали офлайн — очищаем заказы из UI
+  if (!on) {
+    renderNewOrdersIfOnline();
+    renderDashNewIfOnline();
+  }
 }
 
 function updateEarnUI() {
-  const se = document.getElementById('sb-earn-val'); if (se) se.textContent = todayEarnings + ' см';
-  const de = document.getElementById('d-earn');      if (de) de.textContent = todayEarnings + ' см';
+  const se = document.getElementById('sb-earn-val');   if (se)  se.textContent = todayEarnings + ' см';
+  const pe = document.getElementById('pms-earn-val');  if (pe)  pe.textContent = todayEarnings + ' см';
+  const de = document.getElementById('d-earn');        if (de)  de.textContent = todayEarnings + ' см';
   updateDashUI();
 }
 
@@ -533,7 +572,8 @@ window.goPage = function (page) {
   // if (tb) tb.textContent = titles[page] || 'Galelium Courier';
   if (page === 'history')   loadHistory();
   if (page === 'active')    renderActive();
-  if (page === 'dashboard') { renderDashNew(); renderDashActive(); mapOnShowDashboard(); }
+  if (page === 'new-orders') renderNewOrdersIfOnline();
+  if (page === 'dashboard') { renderDashNewIfOnline(); renderDashActive(); mapOnShowDashboard(); }
   closeSB();
   const pages = document.getElementById('pages');
   if (pages) pages.scrollTop = 0;
@@ -586,11 +626,39 @@ function listenNew() {
     const prev = newOrders.length;
     newOrders  = sn.docs.map(d => ({ id: d.id, ...d.data() }));
     updateNewBadge();
-    renderNewOrders();
-    renderDashNew();
-    if (!first && newOrders.length > prev) { playBeep(); toast('🔔 Фармоиши нав!', 'info'); renderNotif(); }
+    renderNewOrdersIfOnline();
+    renderDashNewIfOnline();
+    if (!first && newOrders.length > prev && CD?.isOnline) {
+      playBeep(); toast('🔔 Фармоиши нав!', 'info'); renderNotif();
+    }
     first = false;
   });
+}
+
+// Рендерит новые заказы ТОЛЬКО если курьер онлайн
+function renderNewOrdersIfOnline() {
+  const el = document.getElementById('new-orders-list');
+  if (!el) return;
+  if (!CD?.isOnline) {
+    el.innerHTML = `<div class="empty"><div class="empty-ico">🔴</div><div class="empty-t">Шумо офлайн ед</div><div class="empty-s">Барои дидани фармоишҳо онлайн шавед</div></div>`;
+    return;
+  }
+  renderNewOrders();
+}
+
+function renderDashNewIfOnline() {
+  if (!CD?.isOnline) {
+    const el = document.getElementById('dash-new-orders');
+    if (el) el.innerHTML = `<div class="empty" style="padding:28px 20px"><div class="empty-ico">🔴</div><div class="empty-t">Офлайн</div><div class="empty-s">Фармоишҳо пас аз онлайн шудан намоён мешаванд</div></div>`;
+    const notif = document.getElementById('notif-wrap');
+    if (notif) notif.innerHTML = '';
+    const title = document.getElementById('dash-new-title');
+    if (title) title.style.display = 'none';
+    const badge = document.getElementById('dash-badge-num');
+    if (badge) badge.textContent = '0';
+    return;
+  }
+  renderDashNew();
 }
 
 function listenActive() {
@@ -619,7 +687,7 @@ function listenActive() {
 // ─── Бейджи ──────────────────────────────────────────────────
 function updateNewBadge() {
   const cnt = newOrders.length;
-  ['new-badge', 'mob-new-badge'].forEach(id => {
+  ['new-badge', 'mob-new-badge', 'pms-new-badge'].forEach(id => {
     const b = document.getElementById(id);
     if (b) { b.style.display = cnt > 0 ? '' : 'none'; b.textContent = cnt; }
   });
@@ -628,7 +696,7 @@ function updateNewBadge() {
 }
 
 function updateActiveBadge() {
-  ['active-badge', 'mob-active-badge'].forEach(id => {
+  ['active-badge', 'mob-active-badge', 'pms-active-badge'].forEach(id => {
     const b = document.getElementById(id);
     if (b) b.style.display = activeOrder ? '' : 'none';
   });
@@ -668,10 +736,21 @@ function orderCard(o, withCountdown = false) {
         <span class="oc-chip"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>${total} см</span>
         ${o.comment ? `<span class="oc-chip">💬 ${o.comment}</span>` : ''}
       </div>
-      <button class="btn-take" onclick="acceptOrder('${o.id}')" id="btn-${o.id}" ${activeOrder ? 'disabled title="Фармоиши фаъол дорад"' : ''}>
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        Қабул
-      </button>
+    </div>
+    <div style="padding:0 0 4px">
+      ${activeOrder
+        ? `<div style="width:100%;padding:14px 16px;background:var(--s3);border-radius:14px;text-align:center;font-size:.74rem;color:var(--tx3);border:1.5px solid var(--b0)">Фармоиши фаъол дорад</div>`
+        : `<div class="swipe-btn-wrap" id="swipe-${o.id}" data-oid="${o.id}">
+            <div class="swipe-btn-fill" id="swipe-fill-${o.id}"></div>
+            <div class="swipe-btn-thumb" id="swipe-thumb-${o.id}">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </div>
+            <div class="swipe-btn-label">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Свайп барои қабул
+            </div>
+          </div>`
+      }
     </div>
   </div>`;
 }
@@ -702,6 +781,7 @@ function renderNewOrders() {
   }
   el.innerHTML = sorted.map((o, i) => orderCard(o, i === 0)).join('');
   if (sorted[0]) startCD(sorted[0].id);
+  initSwipeButtons();
 }
 
 function renderDashNew() {
@@ -722,6 +802,7 @@ function renderDashNew() {
     renderNotif(); return;
   }
   el.innerHTML = sorted.slice(0, 2).map(o => orderCard(o)).join('');
+  initSwipeButtons();
   renderNotif();
 }
 
@@ -734,6 +815,68 @@ function renderNotif() {
     <div class="live-info"><div class="live-lbl">Фармоишҳои нав</div><div class="live-txt">${newOrders.length} фармоиш интизори курьер аст</div></div>
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--acc)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
   </div>`;
+}
+
+// ─── Свайп-кнопки для принятия заказов ─────────────────────
+function initSwipeButtons() {
+  document.querySelectorAll('.swipe-btn-wrap:not([data-swipe-init])').forEach(wrap => {
+    wrap.setAttribute('data-swipe-init', '1');
+    const oid   = wrap.getAttribute('data-oid');
+    const thumb = wrap.querySelector('.swipe-btn-thumb');
+    const fill  = wrap.querySelector('.swipe-btn-fill');
+    if (!thumb || !oid) return;
+
+    let startX = 0, dragging = false;
+
+    function getMax() {
+      return wrap.clientWidth - thumb.clientWidth - 8;
+    }
+
+    function onStart(e) {
+      if (wrap.classList.contains('done')) return;
+      startX   = (e.touches ? e.touches[0].clientX : e.clientX);
+      dragging = true;
+      thumb.style.transition = 'none';
+      if (fill) fill.style.transition = 'none';
+    }
+
+    function onMove(e) {
+      if (!dragging) return;
+      if (e.cancelable) e.preventDefault();
+      const x   = (e.touches ? e.touches[0].clientX : e.clientX);
+      const dx  = Math.max(0, Math.min(x - startX, getMax()));
+      thumb.style.left = (4 + dx) + 'px';
+      if (fill) fill.style.width = (dx / getMax() * 100) + '%';
+    }
+
+    function onEnd(e) {
+      if (!dragging) return;
+      dragging = false;
+      const x   = (e.changedTouches ? e.changedTouches[0].clientX : e.clientX);
+      const dx  = x - startX;
+      const max = getMax();
+
+      if (dx >= max * 0.82) {
+        // Свайп завершён — принять заказ
+        wrap.classList.add('done');
+        thumb.style.transition = '';
+        if (fill) fill.style.transition = '';
+        setTimeout(() => acceptOrder(oid), 260);
+      } else {
+        // Вернуть в начало
+        thumb.style.transition = 'left .3s var(--spring)';
+        thumb.style.left = '4px';
+        if (fill) { fill.style.transition = 'width .3s'; fill.style.width = '0'; }
+      }
+    }
+
+    thumb.addEventListener('touchstart', onStart, { passive:true });
+    thumb.addEventListener('touchmove',  onMove,  { passive:false });
+    thumb.addEventListener('touchend',   onEnd);
+    thumb.addEventListener('mousedown',  onStart);
+    window.addEventListener('mousemove', e => dragging && onMove(e));
+    window.addEventListener('mouseup',   e => dragging && onEnd(e));
+  });
 }
 
 // ─── Қабули фармоиш ──────────────────────────────────────────
