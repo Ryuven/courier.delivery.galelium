@@ -16,18 +16,6 @@
    ДАШБОРД — ПОЛНОЭКРАННАЯ КАРТА (стиль Яндекс Про)
 ═══════════════════════════════════════════════════════════ */
 
-/* Дашборд-страница — скрыта по умолчанию как все .page */
-#page-dashboard{
-  display:none;
-  position:absolute;
-  inset:0;
-  padding:0!important;
-  overflow:hidden;
-  flex-direction:column;
-  z-index:1;
-}
-#page-dashboard.active{ display:flex!important }
-
 /* Карта — абсолютно на весь контейнер */
 #courier-map{
   position:absolute;
@@ -699,9 +687,19 @@ a{color:inherit;text-decoration:none}
 .mob-btn:hover{background:var(--s2);color:var(--tx)}
 
 /* ── PAGES ───────────────────────────────────────────────── */
-.pages{flex:1;overflow-y:auto;position:relative}
-.page{display:none;padding:22px 22px 36px;animation:pgIn .25s var(--ease) both}
+.pages{flex:1;overflow:hidden;position:relative}
+.page{display:none;padding:22px 22px 36px;animation:pgIn .25s var(--ease) both;
+  position:absolute;inset:0;overflow-y:auto;}
 .page.active{display:block}
+/* Дашборд — флекс-колонка, без паддинга, без скролла (скролл внутри листа) */
+#page-dashboard{
+  padding:0!important;
+  overflow:hidden;
+  display:none;
+  flex-direction:column;
+  z-index:2;
+}
+#page-dashboard.active{ display:flex!important }
 @keyframes pgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
 /* Заголовок секции */
@@ -1196,6 +1194,7 @@ a.ni{ text-decoration:none }
   .tb-time{display:none}
   .pages{padding-bottom:0}
   .page{padding:14px 14px calc(var(--nb) + var(--safe-b) + 14px)}
+  #page-dashboard{padding:0!important}
   .mob-nav{
     display:flex;position:fixed;bottom:0;left:0;right:0;z-index:200;
     background:rgba(11,15,12,.97);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
