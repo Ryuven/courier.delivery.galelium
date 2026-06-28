@@ -34,190 +34,247 @@ let todayEarnings   = 0;
 let checkedItems    = new Set(); // Отмеченные товары при сборке
 
 // ═══════════════════════════════════════════════════════════
-//  КАРТА — GPS + Leaflet
+//  КАРТА — GPS + Leaflet (полноэкранный дашборд)
 // ═══════════════════════════════════════════════════════════
-let _map          = null;  // Leaflet instance
-let _markerMe     = null;  // маркер курьера
-let _markerStore  = null;  // маркер магазина
-let _markerClient = null;  // маркер клиента
-let _routeLine    = null;  // линия маршрута
-let _geoWatchId   = null;  // ID watchPosition
-let _lastPos      = null;  // { lat, lng, accuracy, speed }
+let _map          = null;
+let _markerMe     = null;
+let _markerStore  = null;
+let _markerClient = null;
+let _routeLine    = null;
+let _geoWatchId   = null;
+let _lastPos      = null;
 let _gpsReady     = false;
 
-// ─── Создать иконку маркера ───────────────────────────────
-function mkIcon(html, size = 36) {
-  return window.L.divIcon({
-    html, className: '', iconSize: [size, size], iconAnchor: [size / 2, size / 2],
-  });
+function mkIcon(html, size = 38) {
+  return window.L.divIcon({ html, className:'', iconSize:[size,size], iconAnchor:[size/2,size/2] });
 }
 
-// ─── Инициализация карты ──────────────────────────────────
 function initMap() {
   if (_map || !window.L) return;
   const el = document.getElementById('courier-map');
   if (!el) return;
-
   _map = window.L.map('courier-map', {
-    center:       [38.56, 68.77], // Душанбе по умолчанию
-    zoom:         14,
-    zoomControl:  true,
-    attributionControl: false,
+    center:[38.56,68.77], zoom:14,
+    zoomControl:true, attributionControl:false,
+    zoomAnimation:true,
   });
-
-  window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '© OSM',
-  }).addTo(_map);
-
-  // Принудительный ресайз после показа вкладки
-  setTimeout(() => _map.invalidateSize(), 200);
+  window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 }).addTo(_map);
+  // Перемещаем zoom-кнопки влево вниз
+  _map.zoomControl.setPosition('bottomright');
+  setTimeout(() => _map.invalidateSize(), 300);
 }
 
-// ─── Старт GPS ────────────────────────────────────────────
 function startGPS() {
-  if (!navigator.geolocation) { showMapNoGPS(); return; }
+  if (!navigator.geolocation) { gpsUnavailable(); return; }
   if (_geoWatchId !== null) return;
-
   _geoWatchId = navigator.geolocation.watchPosition(
     pos => onGPS(pos),
-    err => {
-      if (err.code === 1) showMapNoGPS(); // denied
-    },
-    { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
+    err => { if (err.code === 1) gpsUnavailable(); },
+    { enableHighAccuracy:true, maximumAge:5000, timeout:15000 }
   );
 }
 
-function showMapNoGPS() {
-  const ng = document.getElementById('map-no-gps');
-  if (ng) ng.style.display = 'block';
-  const dot = document.getElementById('map-gps-dot');
-  if (dot) { dot.classList.remove('active'); }
+function gpsUnavailable() {
+  const dot = document.getElementById('gps-pill-dot');
+  const txt = document.getElementById('gps-pill-txt');
+  if (dot) dot.style.background = 'var(--red)';
+  if (txt) txt.textContent = 'GPS нест';
 }
 
-// ─── Обновление позиции ───────────────────────────────────
 function onGPS(pos) {
   const lat = pos.coords.latitude;
   const lng = pos.coords.longitude;
   const acc = Math.round(pos.coords.accuracy);
   const spd = pos.coords.speed != null ? (pos.coords.speed * 3.6).toFixed(1) : null;
-
-  _lastPos = { lat, lng, accuracy: acc, speed: spd };
+  _lastPos  = { lat, lng, accuracy:acc, speed:spd };
   _gpsReady = true;
 
-  // — UI мета
-  const dot  = document.getElementById('map-gps-dot');
-  const meta = document.getElementById('map-meta');
-  const accV = document.getElementById('map-acc-val');
-  const spdV = document.getElementById('map-speed-val');
-  const ng   = document.getElementById('map-no-gps');
-  if (dot)  dot.classList.add('active');
-  if (meta) meta.innerHTML = `<span style="color:var(--acc2)">●</span> GPS активно`;
-  if (accV) accV.textContent = acc + ' м';
-  if (spdV) spdV.textContent = spd != null ? spd + ' км/с' : '0 км/с';
-  if (ng)   ng.style.display = 'none';
+  // GPS пилюля
+  const dot = document.getElementById('gps-pill-dot');
+  const txt = document.getElementById('gps-pill-txt');
+  if (dot) dot.className = 'dot on';
+  if (txt) txt.innerHTML = `<span>${acc}м</span>` + (spd ? ` · <span>${spd}км/с</span>` : '');
 
-  // — Инициализируем карту если ещё нет
   if (!_map) { initMap(); }
   if (!_map) return;
 
-  // — Маркер курьера
   const courierIcon = mkIcon(`<div class="m-courier">🛵</div>`);
   if (!_markerMe) {
-    _markerMe = window.L.marker([lat, lng], { icon: courierIcon }).addTo(_map);
-    _map.setView([lat, lng], 15);
+    _markerMe = window.L.marker([lat,lng], { icon:courierIcon, zIndexOffset:1000 }).addTo(_map);
+    _map.setView([lat,lng], 15);
   } else {
-    _markerMe.setLatLng([lat, lng]);
+    _markerMe.setLatLng([lat,lng]);
     _markerMe.setIcon(courierIcon);
   }
 
-  // — Записываем позицию в Firestore (не чаще раз в 10 сек)
+  // Пишем в Firestore раз в 10 сек
   if (CU && CD?.isOnline) {
     const now = Date.now();
     if (!onGPS._lastWrite || now - onGPS._lastWrite > 10000) {
       onGPS._lastWrite = now;
       setDoc(doc(db, COL.COURIERS, CU.uid), {
-        location: { lat, lng, updatedAt: serverTimestamp() },
-        updatedAt: serverTimestamp(),
-      }, { merge: true }).catch(() => {});
+        location:{ lat, lng, updatedAt:serverTimestamp() }, updatedAt:serverTimestamp(),
+      }, { merge:true }).catch(()=>{});
     }
   }
 
-  // — Если есть активный заказ — обновляем маршрут
   if (activeOrder) updateMapForOrder(activeOrder);
 }
 
-// ─── Маркеры магазина и клиента для активного заказа ─────
 function updateMapForOrder(order) {
   if (!_map || !_lastPos) return;
-
-  // Магазин
   const storeLat = order.storeLat || order.store?.lat;
   const storeLng = order.storeLng || order.store?.lng;
   if (storeLat && storeLng) {
-    const storeIcon = mkIcon(`<div class="m-store">🏪</div>`, 32);
     if (!_markerStore) {
-      _markerStore = window.L.marker([storeLat, storeLng], { icon: storeIcon })
-        .bindPopup(`<b>Дӯкон</b><br>${order.storeName || ''}`)
+      _markerStore = window.L.marker([storeLat,storeLng], { icon:mkIcon(`<div class="m-store">🏪</div>`,32) })
+        .bindPopup(`<b>Дӯкон</b><br>${order.storeName||''}`)
         .addTo(_map);
-    } else {
-      _markerStore.setLatLng([storeLat, storeLng]);
-    }
+    } else { _markerStore.setLatLng([storeLat,storeLng]); }
   }
-
-  // Клиент
   const clientLat = order.clientLat || order.deliveryLat || order.coords?.lat;
   const clientLng = order.clientLng || order.deliveryLng || order.coords?.lng;
   if (clientLat && clientLng) {
-    const clientIcon = mkIcon(`<div class="m-client">👤</div>`, 32);
     if (!_markerClient) {
-      _markerClient = window.L.marker([clientLat, clientLng], { icon: clientIcon })
-        .bindPopup(`<b>Муштарӣ</b><br>${order.address || ''}`)
+      _markerClient = window.L.marker([clientLat,clientLng], { icon:mkIcon(`<div class="m-client">👤</div>`,32) })
+        .bindPopup(`<b>Муштарӣ</b><br>${order.address||''}`)
         .addTo(_map);
-    } else {
-      _markerClient.setLatLng([clientLat, clientLng]);
-    }
+    } else { _markerClient.setLatLng([clientLat,clientLng]); }
   }
-
-  // Линия маршрута (курьер → цель)
-  const status  = order.status;
-  const isPickup = ['courier_heading', 'courier_arrived', 'collecting'].includes(status);
-  const destLat  = isPickup ? storeLat  : clientLat;
-  const destLng  = isPickup ? storeLng  : clientLng;
-
-  if (destLat && destLng && _lastPos) {
-    const pts = [[_lastPos.lat, _lastPos.lng], [destLat, destLng]];
+  const isPickup = ['courier_heading','courier_arrived','collecting'].includes(order.status);
+  const dLat = isPickup ? storeLat : clientLat;
+  const dLng = isPickup ? storeLng : clientLng;
+  if (dLat && dLng) {
+    const pts = [[_lastPos.lat,_lastPos.lng],[dLat,dLng]];
     if (!_routeLine) {
-      _routeLine = window.L.polyline(pts, {
-        color: '#3ecf8e', weight: 3, opacity: .7, dashArray: '6 8',
-      }).addTo(_map);
-    } else {
-      _routeLine.setLatLngs(pts);
-    }
-    // Фиттируем карту под маршрут
-    _map.fitBounds(_routeLine.getBounds(), { padding: [40, 40] });
+      _routeLine = window.L.polyline(pts, { color:'#3ecf8e', weight:3, opacity:.75, dashArray:'7 9' }).addTo(_map);
+    } else { _routeLine.setLatLngs(pts); }
+    _map.fitBounds(_routeLine.getBounds(), { padding:[52,52] });
   }
 }
 
-// ─── Очистить маркеры заказа ─────────────────────────────
 function clearOrderMarkers() {
   if (_markerStore)  { _markerStore.remove();  _markerStore  = null; }
   if (_markerClient) { _markerClient.remove(); _markerClient = null; }
   if (_routeLine)    { _routeLine.remove();    _routeLine    = null; }
 }
 
-// ─── Центровать на курьере ────────────────────────────────
 window.mapCenterOnCourier = function () {
-  if (!_map || !_lastPos) {
-    toast('GPS не активно', 'err'); return;
-  }
-  _map.setView([_lastPos.lat, _lastPos.lng], 16, { animate: true });
+  if (!_map || !_lastPos) { toast('GPS не активно', 'err'); return; }
+  _map.setView([_lastPos.lat, _lastPos.lng], 16, { animate:true });
 };
 
-// ─── Обновить карту при переключении на дашборд ──────────
 function mapOnShowDashboard() {
   if (!_map) { initMap(); startGPS(); return; }
-  setTimeout(() => { _map.invalidateSize(); if (_lastPos) _map.setView([_lastPos.lat, _lastPos.lng], 15); }, 150);
+  setTimeout(() => {
+    _map.invalidateSize();
+    if (_lastPos) _map.setView([_lastPos.lat, _lastPos.lng], 15, { animate:false });
+  }, 150);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ВЫДВИЖНОЙ ЛИСТ — drag (свайп вверх/вниз)
+// ═══════════════════════════════════════════════════════════
+function initSheetDrag() {
+  const sheet  = document.getElementById('dash-sheet');
+  const handle = document.getElementById('dash-sheet-handle');
+  const scroll = document.getElementById('dash-sheet-scroll');
+  if (!sheet || !handle) return;
+
+  let startY = 0, startExpanded = false, dragging = false;
+
+  function onStart(e) {
+    startY = (e.touches ? e.touches[0].clientY : e.clientY);
+    startExpanded = sheet.classList.contains('expanded');
+    dragging = true;
+    sheet.style.transition = 'none';
+  }
+  function onMove(e) {
+    if (!dragging) return;
+    const y = (e.touches ? e.touches[0].clientY : e.clientY);
+    const delta = y - startY;
+    // не тянем вниз если скролл не в начале
+    if (startExpanded && scroll && scroll.scrollTop > 0 && delta > 0) return;
+    if (e.cancelable) e.preventDefault();
+    const peek = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sheet-peek') || '148');
+    const maxH = sheet.parentElement.clientHeight - 80;
+    // Текущее смещение translateY
+    const baseY = startExpanded ? 0 : (sheet.clientHeight - peek);
+    const newY  = Math.max(0, Math.min(baseY + delta, sheet.clientHeight - peek));
+    sheet.style.transform = `translateY(${newY}px)`;
+  }
+  function onEnd(e) {
+    if (!dragging) return;
+    dragging = false;
+    sheet.style.transition = '';
+    const y = (e.changedTouches ? e.changedTouches[0].clientY : e.clientY);
+    const delta = y - startY;
+    if (startExpanded) {
+      if (delta > 60) sheet.classList.remove('expanded');
+      else sheet.classList.add('expanded');
+    } else {
+      if (delta < -40) sheet.classList.add('expanded');
+      else sheet.classList.remove('expanded');
+    }
+    sheet.style.transform = '';
+  }
+
+  handle.addEventListener('touchstart', onStart, { passive:true });
+  handle.addEventListener('touchmove',  onMove,  { passive:false });
+  handle.addEventListener('touchend',   onEnd);
+  handle.addEventListener('mousedown',  onStart);
+  window.addEventListener('mousemove',  e => dragging && onMove(e));
+  window.addEventListener('mouseup',    e => dragging && onEnd(e));
+
+  // Клик по handle — переключение
+  handle.addEventListener('click', () => { sheet.classList.toggle('expanded'); });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ОНЛАЙН-КНОПКА В ДАШБОРДЕ
+// ═══════════════════════════════════════════════════════════
+window.dashToggleOnline = function() {
+  const isOn = CD?.isOnline || false;
+  window.toggleOnline(!isOn);
+};
+
+// ─── Обновление UI дашборда ──────────────────────────────
+function updateDashUI() {
+  // Аватар
+  const dav  = document.getElementById('dash-av');
+  if (dav) {
+    const name = UD?.displayName || '';
+    const init = name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) || '?';
+    dav.innerHTML = UD?.avatarUrl ? `<img src="${UD.avatarUrl}" alt="">` : init;
+  }
+  // Доход
+  const dev  = document.getElementById('dash-earn-val');
+  const des  = document.getElementById('dash-earn-sub');
+  if (dev) dev.textContent = todayEarnings + ' см';
+  if (des) des.textContent = todayDeliveries + ' расониш имрӯз';
+  // Быстрые цифры в листе
+  const qe = document.getElementById('dqs-earn');   if (qe)  qe.textContent  = todayEarnings + ' см';
+  const qt = document.getElementById('dqs-today');  if (qt)  qt.textContent  = todayDeliveries;
+  const qT = document.getElementById('dqs-total');  if (qT)  qT.textContent  = CD?.totalDeliveries || 0;
+  const qr = document.getElementById('dqs-rating'); if (qr)  qr.textContent  = CD?.rating ? CD.rating.toFixed(1) : '—';
+  // Старые id (на случай если они ещё используются где-то)
+  const de = document.getElementById('d-earn');   if (de)  de.textContent  = todayEarnings + ' см';
+  const dt = document.getElementById('d-today');  if (dt)  dt.textContent  = todayDeliveries;
+  const dT = document.getElementById('d-total');  if (dT)  dT.textContent  = CD?.totalDeliveries || 0;
+  const dr = document.getElementById('d-rating'); if (dr)  dr.textContent  = CD?.rating ? CD.rating.toFixed(1) : '—';
+}
+
+// Онлайн-кнопка в дашборде
+function updateDashOnlineBtn(isOn) {
+  const btn = document.getElementById('dash-online-btn');
+  if (!btn) return;
+  if (isOn) {
+    btn.className = 'dash-online-btn online';
+    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Аз хат баромадан`;
+  } else {
+    btn.className = 'dash-online-btn offline';
+    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Ба хат баромадан`;
+  }
 }
 
 
@@ -291,8 +348,8 @@ onAuthStateChanged(auth, async u => {
   renderProfile();
   calcStats();
   startListeners();
-  // Карта — запускаем после небольшой задержки (DOM готов)
-  setTimeout(() => { initMap(); startGPS(); }, 400);
+  updateDashUI();
+  setTimeout(() => { initMap(); startGPS(); initSheetDrag(); }, 400);
 });
 
 // ─── Проверка верификации ────────────────────────────────────
@@ -337,11 +394,13 @@ function updateOnlineUI(on) {
   const card    = document.getElementById('sb-online-card'); if (card)    card.className = 'sb-online' + (on ? ' is-online' : '');
   const chip    = document.getElementById('tb-chip');        if (chip)    chip.className = 'tb-chip' + (on ? ' online' : ' offline');
   const chipTxt = document.getElementById('tb-chip-txt');    if (chipTxt) chipTxt.textContent = on ? 'Онлайн' : 'Офлайн';
+  updateDashOnlineBtn(on);
 }
 
 function updateEarnUI() {
   const se = document.getElementById('sb-earn-val'); if (se) se.textContent = todayEarnings + ' см';
   const de = document.getElementById('d-earn');      if (de) de.textContent = todayEarnings + ' см';
+  updateDashUI();
 }
 
 // ─── Садо ────────────────────────────────────────────────────
@@ -566,6 +625,15 @@ function renderDashNew() {
   const el = document.getElementById('dash-new-orders');
   if (!el) return;
   const sorted = [...newOrders].sort((a, b) => (a.createdAt?.toDate?.().getTime() || 0) - (b.createdAt?.toDate?.().getTime() || 0));
+
+  // Бейдж сверху
+  const badge = document.getElementById('dash-badge-num');
+  if (badge) badge.textContent = sorted.length;
+
+  // Заголовок секции
+  const title = document.getElementById('dash-new-title');
+  if (title) title.style.display = sorted.length ? '' : 'none';
+
   if (!sorted.length) {
     el.innerHTML = `<div class="empty" style="padding:28px 20px"><div class="empty-ico">📭</div><div class="empty-t">Фармоишҳо нест</div><div class="empty-s">Интизор ем…</div></div>`;
     renderNotif(); return;
@@ -1286,19 +1354,32 @@ window.advance = async function (oid, ns) {
 
 // ─── Дашборд: баннер активного заказа ────────────────────────
 function renderDashActive() {
+  // Пилюля в топбаре карты
+  const pill    = document.getElementById('dash-active-pill');
+  const pillTxt = document.getElementById('dash-active-pill-txt');
+  if (pill && pillTxt) {
+    if (activeOrder) {
+      pill.style.display = '';
+      pillTxt.textContent = activeOrder.address || SL[activeOrder.status] || 'Фаъол';
+    } else {
+      pill.style.display = 'none';
+    }
+  }
+  // Баннер в листе
   const w = document.getElementById('dash-active-wrap');
   if (!w) return;
   if (!activeOrder) { w.innerHTML = ''; return; }
-  const o = activeOrder;
+  const o  = activeOrder;
   const si = statusToStep(o.status);
   const icon = TRACK_STEPS[si]?.icon || '📦';
-  w.innerHTML = `<div class="active-banner" onclick="goPage('active')">
-    <div class="ab-pulse"></div>
-    <div class="ab-body">
-      <div class="ab-lbl">Ҳоло дар кор</div>
-      <div class="ab-txt">${icon} #${o.orderNumber || o.id.slice(-6).toUpperCase()} · ${SL[o.status]} · ${o.address || ''}</div>
+  w.innerHTML = `<div class="dash-active-row" onclick="goPage('active')">
+    <div class="dash-active-dot"></div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:.52rem;letter-spacing:.12em;text-transform:uppercase;color:var(--acc2);margin-bottom:2px;font-weight:700">Фармоиши фаъол</div>
+      <div style="font-size:.82rem;font-weight:700;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${icon} #${o.orderNumber||o.id.slice(-6).toUpperCase()} · ${o.address||''}</div>
+      <div style="font-size:.62rem;color:var(--tx3);margin-top:2px">${SL[o.status]||o.status}</div>
     </div>
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--acc)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--acc2)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
   </div>`;
 }
 
