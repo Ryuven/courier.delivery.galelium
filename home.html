@@ -676,38 +676,141 @@ a{color:inherit;text-decoration:none}
 
 /* ── TOPBAR ──────────────────────────────────────────────── */
 .main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-width:0}
-.topbar{
-  height:var(--th);flex-shrink:0;
-  background:rgba(11,15,12,.94);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--b0);
-  display:flex;align-items:center;padding:0 20px;gap:12px;z-index:50;
+
+/* ── МЕНЮ-ДРОВЕР В ПРОФИЛЕ ───────────────────────────────── */
+.prof-menu-overlay{
+  position:fixed;inset:0;z-index:900;
+  background:rgba(7,11,9,.6);backdrop-filter:blur(8px);
+  display:none;opacity:0;transition:opacity .25s;
 }
-.tb-title{font-family:var(--fd);font-weight:900;font-size:.94rem;color:#fff;flex:1;letter-spacing:-.01em;display:flex;align-items:center}
-.tb-title em{color:var(--acc2);font-style:normal}
-.tb-logo-img{height:26px;width:auto;object-fit:contain;display:block;}
-.tb-chip{
-  display:flex;align-items:center;gap:6px;
-  padding:5px 12px;border-radius:99px;
-  border:1px solid var(--b0);background:var(--s2);
-  font-size:.58rem;font-weight:600;color:var(--tx3);
-  letter-spacing:.08em;text-transform:uppercase;
-  transition:all .3s;
+.prof-menu-overlay.open{display:block;opacity:1}
+.prof-menu-sheet{
+  position:fixed;bottom:0;left:0;right:0;z-index:901;
+  background:var(--s1);border:1px solid var(--b1);
+  border-radius:22px 22px 0 0;
+  padding:0 0 calc(var(--safe-b) + 12px);
+  transform:translateY(100%);transition:transform .32s var(--spring);
+  max-height:80svh;overflow-y:auto;
 }
-.tb-chip.online{border-color:var(--accg);color:var(--acc2);background:var(--accd)}
-.chip-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
-.tb-chip.online .chip-dot{animation:cdot 2s ease-in-out infinite}
-@keyframes cdot{0%,100%{box-shadow:0 0 0 0 rgba(61,207,142,.5)}50%{box-shadow:0 0 0 4px rgba(61,207,142,0)}}
-.tb-time{font-size:.7rem;color:var(--tx3);letter-spacing:.06em;font-variant-numeric:tabular-nums}
-.tb-sound{
-  background:none;border:1px solid var(--b0);border-radius:6px;
-  cursor:pointer;color:var(--tx3);width:30px;height:30px;
+.prof-menu-sheet.open{transform:translateY(0)}
+.prof-menu-handle{width:36px;height:4px;border-radius:99px;background:var(--s4);margin:12px auto 0}
+.prof-menu-head{
+  display:flex;align-items:center;gap:14px;
+  padding:16px 20px;border-bottom:1px solid var(--b0);
+}
+.prof-menu-av{
+  width:46px;height:46px;border-radius:50%;flex-shrink:0;
+  background:var(--accd);border:2px solid var(--accg);
   display:flex;align-items:center;justify-content:center;
-  transition:all var(--tf);flex-shrink:0;
+  font-size:.9rem;font-weight:700;color:var(--acc2);overflow:hidden;
 }
-.tb-sound:hover{border-color:var(--b1);color:var(--tx2)}
-.tb-sound.on{border-color:var(--accg);color:var(--acc2);background:var(--accd)}
-.mob-btn{display:none;background:none;border:none;cursor:pointer;color:var(--tx3);width:36px;height:36px;border-radius:10px;align-items:center;justify-content:center;transition:all var(--tf)}
-.mob-btn:hover{background:var(--s2);color:var(--tx)}
+.prof-menu-av img{width:100%;height:100%;object-fit:cover}
+.prof-menu-name{font-weight:700;font-size:.88rem;color:var(--tx)}
+.prof-menu-role{font-size:.62rem;color:var(--tx3);margin-top:2px}
+
+/* Онлайн-строка в меню */
+.prof-menu-online{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;border-bottom:1px solid var(--b0);
+}
+.prof-menu-online-lbl{font-size:.76rem;color:var(--tx2);font-weight:600}
+.prof-menu-online-val{font-size:.64rem;margin-top:2px}
+.prof-menu-online-val.on{color:var(--acc2)}
+.prof-menu-online-val.off{color:var(--tx3)}
+
+/* Строки меню */
+.prof-menu-items{padding:8px 0}
+.prof-menu-item{
+  display:flex;align-items:center;gap:14px;
+  padding:13px 20px;cursor:pointer;
+  transition:background .12s;
+  border:none;background:none;width:100%;text-align:left;
+  font-family:var(--fs);
+}
+.prof-menu-item:hover{background:var(--s2)}
+.prof-menu-item-ico{
+  width:34px;height:34px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--s3);color:var(--tx2);
+}
+.prof-menu-item-lbl{font-size:.8rem;font-weight:600;color:var(--tx)}
+.prof-menu-item-sub{font-size:.6rem;color:var(--tx3);margin-top:1px}
+.prof-menu-item.danger .prof-menu-item-ico{background:var(--redd);color:var(--red)}
+.prof-menu-item.danger .prof-menu-item-lbl{color:var(--red)}
+.prof-menu-divider{height:1px;background:var(--b0);margin:4px 20px}
+/* Заработок в меню */
+.prof-menu-earn{
+  margin:0 16px 8px;padding:12px 16px;
+  background:var(--accd);border:1px solid var(--accg);border-radius:12px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.prof-menu-earn-lbl{font-size:.6rem;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+.prof-menu-earn-val{font-family:var(--fd);font-weight:900;font-size:1.1rem;color:var(--acc2)}
+
+/* ── СВАЙП-КНОПКА ПРИНЯТИЯ ЗАКАЗА ───────────────────────── */
+.swipe-btn{
+  position:relative;overflow:hidden;
+  background:var(--s3);border:1.5px solid var(--b1);
+  border-radius:16px;height:56px;cursor:pointer;
+  user-select:none;-webkit-user-select:none;
+  touch-action:none;
+}
+.swipe-btn-track{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;
+  font-weight:700;color:var(--tx3);pointer-events:none;
+  gap:8px;
+}
+.swipe-btn-fill{
+  position:absolute;left:0;top:0;bottom:0;
+  background:linear-gradient(90deg,var(--acc),var(--acc2));
+  border-radius:14px;
+  width:56px;transition:width .08s linear;
+  pointer-events:none;
+}
+.swipe-btn-thumb{
+  position:absolute;left:4px;top:4px;bottom:4px;
+  width:48px;
+  background:rgba(255,255,255,.15);
+  border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;
+  box-shadow:0 2px 10px rgba(0,0,0,.3);
+  transition:transform .08s linear;
+  pointer-events:none;
+  z-index:2;
+}
+.swipe-btn.done .swipe-btn-fill{width:100%!important;transition:width .2s ease}
+.swipe-btn.done .swipe-btn-thumb{opacity:0;transition:opacity .15s}
+.swipe-btn.done .swipe-btn-track{color:#0b0f0c;font-size:.72rem}
+
+/* Кнопка меню профиля в профильной странице */
+.prof-settings-btn{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 16px;background:var(--s2);
+  border:1px solid var(--b0);border-radius:12px;
+  cursor:pointer;width:100%;margin-bottom:10px;
+  transition:border-color .15s,background .15s;
+  font-family:var(--fs);
+}
+.prof-settings-btn:hover{border-color:var(--b1);background:var(--s3)}
+.prof-settings-btn-ico{
+  width:32px;height:32px;border-radius:9px;
+  background:var(--s3);border:1px solid var(--b0);
+  display:flex;align-items:center;justify-content:center;color:var(--tx3);flex-shrink:0;
+}
+.prof-settings-btn-lbl{font-size:.78rem;font-weight:600;color:var(--tx);flex:1}
+.prof-settings-btn-arr{color:var(--tx3);flex-shrink:0}
+
+/* ── ОФЛАЙН-БАННЕР (пустой экран заказов) ───────────────── */
+.offline-screen{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:60px 28px;text-align:center;gap:16px;
+}
+.offline-screen-ico{font-size:3rem;opacity:.25;line-height:1}
+.offline-screen-title{font-family:var(--fd);font-weight:900;font-size:1.05rem;color:var(--tx3)}
+.offline-screen-sub{font-size:.72rem;color:var(--tx3);line-height:1.6;max-width:220px}
 
 /* ── PAGES ───────────────────────────────────────────────── */
 .pages{flex:1;overflow:hidden;position:relative}
@@ -1398,100 +1501,8 @@ a.ni{ text-decoration:none }
 
 <div class="app">
 
-<!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
-<aside class="sb" id="sidebar">
-  <div class="sb-logo">
-    <img src="/dastdaroz.png" alt="Dastdaroz" style="height:32px;width:auto;object-fit:contain;display:block;">
-  </div>
-
-  <!-- Онлайн -->
-  <div class="sb-online" id="sb-online-card">
-    <div>
-      <div class="sb-online-lbl">Ҳолати навбат</div>
-      <div class="sb-online-val" id="sb-online-val">Офлайн</div>
-    </div>
-    <label class="tog">
-      <input type="checkbox" id="online-tog" onchange="toggleOnline(this.checked)"/>
-      <div class="tog-track"></div>
-      <div class="tog-thumb"></div>
-    </label>
-  </div>
-
-  <!-- Заработок -->
-  <div class="sb-earn">
-    <div>
-      <div class="sb-earn-lbl">Имрӯз гирифтам</div>
-      <div class="sb-earn-val" id="sb-earn-val">0 см</div>
-    </div>
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--acc2)" stroke-width="1.8" opacity=".5">
-      <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
-    </svg>
-  </div>
-
-  <nav class="sb-nav">
-    <div class="nav-grp">Кор</div>
-    <button class="ni active" data-page="dashboard" onclick="goPage('dashboard')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      Дашборд
-    </button>
-    <button class="ni" data-page="new-orders" onclick="goPage('new-orders')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-      Фармоишҳои нав
-      <span class="ni-badge" id="new-badge" style="display:none">0</span>
-    </button>
-    <button class="ni" data-page="active" onclick="goPage('active')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="1"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>
-      Фармоиши фаъол
-      <span class="ni-badge green" id="active-badge" style="display:none">1</span>
-    </button>
-    <div class="nav-grp">Таърих</div>
-    <button class="ni" data-page="history" onclick="goPage('history')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      Таърихи расониш
-    </button>
-    <div class="nav-grp">Аккаунт</div>
-    <button class="ni" data-page="profile" onclick="goPage('profile')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      Профил
-    </button>
-    <div class="nav-grp">Ёрдам</div>
-    <a class="ni" href="https://delivery.galelium.com/help.html" target="_blank" rel="noopener">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-linecap="round" stroke-width="2.5"/></svg>
-      FAQ / Ёрдам
-      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:auto;opacity:.35"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-    </a>
-  </nav>
-
-  <div class="sb-bottom">
-    <div class="sb-user" onclick="goPage('profile')">
-      <div class="sb-av" id="sb-av">?</div>
-      <div style="flex:1;min-width:0">
-        <div class="sb-uname" id="sb-uname">Боргузорӣ…</div>
-        <div class="sb-urole">Курьер · Galelium</div>
-      </div>
-      <button class="sb-logout" onclick="event.stopPropagation();doLogout()" title="Баромадан">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-      </button>
-    </div>
-  </div>
-</aside>
-
 <!-- ══ MAIN ═════════════════════════════════════════════════ -->
 <div class="main">
-  <div class="topbar">
-    <button class="mob-btn" onclick="toggleSidebar()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h12"/></svg>
-    </button>
-    <div class="tb-title" id="tb-title">
-      <img src="/dastdaroz.png" alt="Dastdaroz" class="tb-logo-img" id="tb-logo-img">
-    </div>
-    <button class="tb-sound on" id="sound-btn" onclick="toggleSound()" title="Садо">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg>
-    </button>
-    <div class="tb-chip offline" id="tb-chip"><div class="chip-dot"></div><span id="tb-chip-txt">Офлайн</span></div>
-    <div class="tb-time" id="tb-time">--:--:--</div>
-  </div>
-
   <div class="pages" id="pages">
 
     <!-- ДАШБОРД — полноэкранная карта -->
@@ -1636,10 +1647,17 @@ a.ni{ text-decoration:none }
               <div class="p-st"><div class="p-st-val" id="ps-rating">—</div><div class="p-st-lbl">Рейтинг</div></div>
             </div>
           </div>
+
+          <!-- Кнопка настроек — открывает меню-дровер -->
+          <button class="prof-settings-btn" style="margin-top:10px" onclick="openProfMenu()">
+            <div class="prof-settings-btn-ico">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            </div>
+            <span class="prof-settings-btn-lbl">Танзимот ва меню</span>
+            <svg class="prof-settings-btn-arr" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+
           <div id="verif-banner-wrap"></div>
-          <div style="margin-top:10px">
-            <button class="btn-outline danger" style="width:100%;padding:11px" onclick="doLogout()">Аз аккаунт баромадан</button>
-          </div>
         </div>
         <div>
           <div class="pform">
@@ -1673,6 +1691,73 @@ a.ni{ text-decoration:none }
   </div><!-- /pages -->
 </div><!-- /main -->
 </div><!-- /app -->
+
+<!-- ══ МЕНЮ-ДРОВЕР ══════════════════════════════════════════ -->
+<div class="prof-menu-overlay" id="prof-menu-overlay" onclick="closeProfMenu()"></div>
+<div class="prof-menu-sheet" id="prof-menu-sheet">
+  <div class="prof-menu-handle"></div>
+  <!-- Шапка с аватаром -->
+  <div class="prof-menu-head">
+    <div class="prof-menu-av" id="pm-av">?</div>
+    <div>
+      <div class="prof-menu-name" id="pm-name">—</div>
+      <div class="prof-menu-role">Курьер · Dastdaroz</div>
+    </div>
+  </div>
+  <!-- Онлайн-переключатель -->
+  <div class="prof-menu-online">
+    <div>
+      <div class="prof-menu-online-lbl">Ҳолати навбат</div>
+      <div class="prof-menu-online-val off" id="pm-online-val">Офлайн</div>
+    </div>
+    <label class="tog">
+      <input type="checkbox" id="online-tog" onchange="toggleOnline(this.checked)"/>
+      <div class="tog-track"></div>
+      <div class="tog-thumb"></div>
+    </label>
+  </div>
+  <!-- Заработок -->
+  <div class="prof-menu-earn" style="margin-top:12px">
+    <div>
+      <div class="prof-menu-earn-lbl">Имрӯз</div>
+      <div class="prof-menu-earn-val" id="pm-earn">0 см</div>
+    </div>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--acc2)" stroke-width="1.8" opacity=".6"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+  </div>
+  <!-- Пункты меню -->
+  <div class="prof-menu-items">
+    <button class="prof-menu-item" onclick="closeProfMenu();goPage('dashboard')">
+      <div class="prof-menu-item-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+      <div><div class="prof-menu-item-lbl">Дашборд</div><div class="prof-menu-item-sub">Харита ва ҳолат</div></div>
+    </button>
+    <button class="prof-menu-item" onclick="closeProfMenu();goPage('new-orders')">
+      <div class="prof-menu-item-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+      <div><div class="prof-menu-item-lbl">Фармоишҳои нав <span id="pm-new-badge" style="display:none;background:var(--amber);color:#fff;font-size:.5rem;padding:1px 6px;border-radius:99px;margin-left:4px"></span></div><div class="prof-menu-item-sub">Фармоишҳои дастрас</div></div>
+    </button>
+    <button class="prof-menu-item" onclick="closeProfMenu();goPage('active')">
+      <div class="prof-menu-item-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="1"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg></div>
+      <div><div class="prof-menu-item-lbl">Фармоиши фаъол</div><div class="prof-menu-item-sub">Ҷараёни расонидан</div></div>
+    </button>
+    <button class="prof-menu-item" onclick="closeProfMenu();goPage('history')">
+      <div class="prof-menu-item-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+      <div><div class="prof-menu-item-lbl">Таърих</div><div class="prof-menu-item-sub">Таърихи расонидан</div></div>
+    </button>
+    <div class="prof-menu-divider"></div>
+    <a class="prof-menu-item" href="https://delivery.galelium.com/help.html" target="_blank" rel="noopener" onclick="closeProfMenu()">
+      <div class="prof-menu-item-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-linecap="round" stroke-width="2.5"/></svg></div>
+      <div><div class="prof-menu-item-lbl">FAQ / Ёрдам</div><div class="prof-menu-item-sub">delivery.galelium.com</div></div>
+    </a>
+    <button class="prof-menu-item" onclick="closeProfMenu();toggleSound()">
+      <div class="prof-menu-item-ico" id="pm-sound-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg></div>
+      <div><div class="prof-menu-item-lbl">Садо</div><div class="prof-menu-item-sub" id="pm-sound-sub">Фаъол</div></div>
+    </button>
+    <div class="prof-menu-divider"></div>
+    <button class="prof-menu-item danger" onclick="closeProfMenu();doLogout()">
+      <div class="prof-menu-item-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg></div>
+      <div><div class="prof-menu-item-lbl">Аз аккаунт баромадан</div></div>
+    </button>
+  </div>
+</div>
 
 <!-- Мобильная навигация -->
 <nav class="mob-nav" id="mob-nav">
