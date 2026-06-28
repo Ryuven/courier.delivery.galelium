@@ -16,17 +16,17 @@
    ДАШБОРД — ПОЛНОЭКРАННАЯ КАРТА (стиль Яндекс Про)
 ═══════════════════════════════════════════════════════════ */
 
-/* Дашборд-страница сама становится позиционированным контейнером */
+/* Дашборд-страница — скрыта по умолчанию как все .page */
 #page-dashboard{
-  position:relative;
+  display:none;
+  position:absolute;
+  inset:0;
   padding:0!important;
   overflow:hidden;
-  /* высота = всё доступное пространство */
-  height:100%;
-  display:flex;
   flex-direction:column;
+  z-index:1;
 }
-#page-dashboard.active{ display:flex }
+#page-dashboard.active{ display:flex!important }
 
 /* Карта — абсолютно на весь контейнер */
 #courier-map{
@@ -699,7 +699,7 @@ a{color:inherit;text-decoration:none}
 .mob-btn:hover{background:var(--s2);color:var(--tx)}
 
 /* ── PAGES ───────────────────────────────────────────────── */
-.pages{flex:1;overflow-y:auto}
+.pages{flex:1;overflow-y:auto;position:relative}
 .page{display:none;padding:22px 22px 36px;animation:pgIn .25s var(--ease) both}
 .page.active{display:block}
 @keyframes pgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
