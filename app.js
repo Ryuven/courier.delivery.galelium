@@ -34,36 +34,88 @@ let todayEarnings   = 0;
 let checkedItems    = new Set(); // Отмеченные товары при сборке
 
 // ═══════════════════════════════════════════════════════════
-//  КАРТА — GPS + Leaflet (полноэкранный дашборд)
+//  КАРТА — GPS + Leaflet + Магазины + Маршруты по фазам
 // ═══════════════════════════════════════════════════════════
-let _map          = null;
-let _markerMe     = null;
-let _markerStore  = null;
-let _markerClient = null;
-let _routeLine    = null;
-let _geoWatchId   = null;
-let _lastPos      = null;
-let _gpsReady     = false;
+let _map            = null;
+let _markerMe       = null;
+let _markerStore    = null;
+let _markerClient   = null;
+let _routeLine      = null;
+let _storeMarkers   = [];
+let _geoWatchId     = null;
+let _lastPos        = null;
+let _stores         = [];
 
-function mkIcon(html, size = 38) {
-  return window.L.divIcon({ html, className:'', iconSize:[size,size], iconAnchor:[size/2,size/2] });
+// ─── Хаверсин (расстояние в км) ──────────────────────────
+function haversine(lat1, lng1, lat2, lng2) {
+  const R = 6371, dLat = (lat2-lat1)*Math.PI/180, dLng = (lng2-lng1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
-function initMap() {
+// ─── Ближайший магазин ────────────────────────────────────
+function nearestStore(lat, lng, chainFilter) {
+  const list = _stores.filter(s => s.active && (!chainFilter || s.chain === chainFilter));
+  if (!list.length) return null;
+  return list.map(s => ({ ...s, dist: haversine(lat, lng, s.lat, s.lng) }))
+             .sort((a, b) => a.dist - b.dist)[0];
+}
+
+// ─── Иконки ───────────────────────────────────────────────
+function mkIcon(html, size) {
+  size = size || 38;
+  return window.L.divIcon({ html, className:'', iconSize:[size,size], iconAnchor:[size/2,size/2] });
+}
+function mkStorePin(chain) {
+  const colors = { bi1:'#3b82f6', '\u041f\u0430\u0439\u043a\u0430\u0440':'#d97706', '\u0401\u0432\u0430\u0440':'#2db87a' };
+  const color = colors[chain] || '#6b7280';
+  const letter = (chain||'')[0] || '?';
+  return window.L.divIcon({
+    html: '<div style="width:20px;height:20px;border-radius:50%;background:'+color+';opacity:.75;border:2px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:.55rem;color:#fff;font-weight:800;box-shadow:0 1px 5px rgba(0,0,0,.4)">'+letter+'</div>',
+    className:'', iconSize:[20,20], iconAnchor:[10,10],
+  });
+}
+
+// ─── Загрузка магазинов ───────────────────────────────────
+async function loadStores() {
+  if (_stores.length) return;
+  try {
+    const r = await fetch('/stores_dushanbe.json');
+    const j = await r.json();
+    _stores = (j.stores || []).filter(s => s.active);
+  } catch(e) { console.warn('stores_dushanbe.json:', e); }
+}
+
+// ─── Фоновые точки всех магазинов ────────────────────────
+function renderStoreMarkers() {
+  if (!_map || !_stores.length) return;
+  _storeMarkers.forEach(m => m.remove());
+  _storeMarkers = [];
+  _stores.forEach(s => {
+    const m = window.L.marker([s.lat, s.lng], { icon: mkStorePin(s.chain), zIndexOffset: 5, interactive: true })
+      .bindTooltip('<b>'+s.name+'</b><br><span style="font-size:.72em;opacity:.8">'+s.address+'</span>', { direction:'top', offset:[0,-6] })
+      .addTo(_map);
+    _storeMarkers.push(m);
+  });
+}
+
+// ─── Инициализация карты ──────────────────────────────────
+async function initMap() {
   if (_map || !window.L) return;
   const el = document.getElementById('courier-map');
   if (!el) return;
   _map = window.L.map('courier-map', {
-    center:[38.56,68.77], zoom:14,
-    zoomControl:true, attributionControl:false,
-    zoomAnimation:true,
+    center:[38.562,68.776], zoom:13,
+    zoomControl:true, attributionControl:false, zoomAnimation:true,
   });
   window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 }).addTo(_map);
-  // Перемещаем zoom-кнопки влево вниз
   _map.zoomControl.setPosition('bottomright');
   setTimeout(() => _map.invalidateSize(), 300);
+  await loadStores();
+  renderStoreMarkers();
 }
 
+// ─── GPS ──────────────────────────────────────────────────
 function startGPS() {
   if (!navigator.geolocation) { gpsUnavailable(); return; }
   if (_geoWatchId !== null) return;
@@ -73,90 +125,121 @@ function startGPS() {
     { enableHighAccuracy:true, maximumAge:5000, timeout:15000 }
   );
 }
-
 function gpsUnavailable() {
   const dot = document.getElementById('gps-pill-dot');
   const txt = document.getElementById('gps-pill-txt');
   if (dot) dot.style.background = 'var(--red)';
   if (txt) txt.textContent = 'GPS нест';
 }
-
 function onGPS(pos) {
-  const lat = pos.coords.latitude;
-  const lng = pos.coords.longitude;
+  const lat = pos.coords.latitude, lng = pos.coords.longitude;
   const acc = Math.round(pos.coords.accuracy);
   const spd = pos.coords.speed != null ? (pos.coords.speed * 3.6).toFixed(1) : null;
-  _lastPos  = { lat, lng, accuracy:acc, speed:spd };
-  _gpsReady = true;
-
-  // GPS пилюля
+  _lastPos = { lat, lng, accuracy:acc, speed:spd };
   const dot = document.getElementById('gps-pill-dot');
   const txt = document.getElementById('gps-pill-txt');
   if (dot) dot.className = 'dot on';
-  if (txt) txt.innerHTML = `<span>${acc}м</span>` + (spd ? ` · <span>${spd}км/с</span>` : '');
-
-  if (!_map) { initMap(); }
-  if (!_map) return;
-
-  const courierIcon = mkIcon(`<div class="m-courier">🛵</div>`);
+  if (txt) txt.innerHTML = '<span>'+acc+'м</span>' + (spd ? ' · <span>'+spd+'км/с</span>' : '');
+  if (!_map) { initMap().then(() => { if (_lastPos) _map && _map.setView([lat,lng],15); }); return; }
+  const icon = mkIcon('<div class="m-courier">\ud83d\udef5</div>');
   if (!_markerMe) {
-    _markerMe = window.L.marker([lat,lng], { icon:courierIcon, zIndexOffset:1000 }).addTo(_map);
+    _markerMe = window.L.marker([lat,lng], { icon, zIndexOffset:1000 }).addTo(_map);
     _map.setView([lat,lng], 15);
-  } else {
-    _markerMe.setLatLng([lat,lng]);
-    _markerMe.setIcon(courierIcon);
-  }
-
-  // Пишем в Firestore раз в 10 сек
-  if (CU && CD?.isOnline) {
+  } else { _markerMe.setLatLng([lat,lng]).setIcon(icon); }
+  if (CU && CD && CD.isOnline) {
     const now = Date.now();
-    if (!onGPS._lastWrite || now - onGPS._lastWrite > 10000) {
-      onGPS._lastWrite = now;
-      setDoc(doc(db, COL.COURIERS, CU.uid), {
-        location:{ lat, lng, updatedAt:serverTimestamp() }, updatedAt:serverTimestamp(),
-      }, { merge:true }).catch(()=>{});
+    if (!onGPS._lw || now - onGPS._lw > 10000) {
+      onGPS._lw = now;
+      setDoc(doc(db, COL.COURIERS, CU.uid), { location:{ lat, lng, updatedAt:serverTimestamp() }, updatedAt:serverTimestamp() }, { merge:true }).catch(()=>{});
     }
   }
-
-  if (activeOrder) updateMapForOrder(activeOrder);
+  if (activeOrder) updateMapRoute(activeOrder);
 }
 
-function updateMapForOrder(order) {
+// ═══════════════════════════════════════════════════════════
+//  МАРШРУТЫ ПО ФАЗАМ
+//  Фаза 1 (courier_heading/courier_arrived/collecting):
+//    курьер → ближайший магазин (зелёный маршрут)
+//    маркер клиента серый (неактивный)
+//  Фаза 2 (delivering/client_arrived):
+//    курьер → клиент (синий маршрут)
+//    маркер магазина убирается
+// ═══════════════════════════════════════════════════════════
+function updateMapRoute(order) {
   if (!_map || !_lastPos) return;
-  const storeLat = order.storeLat || order.store?.lat;
-  const storeLng = order.storeLng || order.store?.lng;
-  if (storeLat && storeLng) {
-    if (!_markerStore) {
-      _markerStore = window.L.marker([storeLat,storeLng], { icon:mkIcon(`<div class="m-store">🏪</div>`,32) })
-        .bindPopup(`<b>Дӯкон</b><br>${order.storeName||''}`)
-        .addTo(_map);
-    } else { _markerStore.setLatLng([storeLat,storeLng]); }
-  }
-  const clientLat = order.clientLat || order.deliveryLat || order.coords?.lat;
-  const clientLng = order.clientLng || order.deliveryLng || order.coords?.lng;
-  if (clientLat && clientLng) {
+  const PHASE1 = ['courier_heading','courier_arrived','collecting'];
+  const PHASE2 = ['delivering','client_arrived'];
+  const phase = PHASE1.includes(order.status) ? 1 : PHASE2.includes(order.status) ? 2 : 0;
+  const cLat = order.clientLat || order.deliveryLat || (order.coords && order.coords.lat);
+  const cLng = order.clientLng || order.deliveryLng || (order.coords && order.coords.lng);
+
+  // Маркер клиента (всегда)
+  if (cLat && cLng) {
+    const opacity = phase === 1 ? 'opacity:.45;' : '';
+    const ci = mkIcon('<div class="m-client" style="'+opacity+'">\ud83d\udc64</div>', 32);
     if (!_markerClient) {
-      _markerClient = window.L.marker([clientLat,clientLng], { icon:mkIcon(`<div class="m-client">👤</div>`,32) })
-        .bindPopup(`<b>Муштарӣ</b><br>${order.address||''}`)
+      _markerClient = window.L.marker([cLat,cLng], { icon:ci })
+        .bindTooltip('<b>\u041c\u0443\u0448\u0442\u0430\u0440\u04e3</b><br>'+(order.address||''), { direction:'top', offset:[0,-6] })
         .addTo(_map);
-    } else { _markerClient.setLatLng([clientLat,clientLng]); }
+    } else { _markerClient.setLatLng([cLat,cLng]).setIcon(ci); }
   }
-  const isPickup = ['courier_heading','courier_arrived','collecting'].includes(order.status);
-  const dLat = isPickup ? storeLat : clientLat;
-  const dLng = isPickup ? storeLng : clientLng;
-  if (dLat && dLng) {
-    const pts = [[_lastPos.lat,_lastPos.lng],[dLat,dLng]];
-    if (!_routeLine) {
-      _routeLine = window.L.polyline(pts, { color:'#3ecf8e', weight:3, opacity:.75, dashArray:'7 9' }).addTo(_map);
-    } else { _routeLine.setLatLngs(pts); }
-    _map.fitBounds(_routeLine.getBounds(), { padding:[52,52] });
+
+  if (phase === 1) {
+    const chain = order.storeChain || order.chain || null;
+    const nearest = nearestStore(_lastPos.lat, _lastPos.lng, chain);
+    if (nearest) {
+      const si = mkIcon('<div class="m-store">\ud83c\udfea</div>', 36);
+      if (!_markerStore) {
+        _markerStore = window.L.marker([nearest.lat,nearest.lng], { icon:si, zIndexOffset:500 })
+          .bindTooltip('<b>'+nearest.name+'</b><br>'+nearest.address+'<br><span style="color:#3ecf8e">'+Math.round(nearest.dist*1000)+'м от вас</span>', { direction:'top', permanent:false, offset:[0,-8] })
+          .addTo(_map);
+      } else { _markerStore.setLatLng([nearest.lat,nearest.lng]).setIcon(si); }
+      drawRoute([_lastPos.lat,_lastPos.lng], [nearest.lat,nearest.lng], '#3ecf8e');
+      const km = nearest.dist < 1 ? Math.round(nearest.dist*1000)+'м' : nearest.dist.toFixed(1)+'км';
+      updateRoutePill('\ud83c\udfea '+nearest.name, km);
+    }
+  } else if (phase === 2) {
+    if (_markerStore) { _markerStore.remove(); _markerStore = null; }
+    if (cLat && cLng) {
+      drawRoute([_lastPos.lat,_lastPos.lng], [cLat,cLng], '#3b82f6');
+      const d = haversine(_lastPos.lat, _lastPos.lng, cLat, cLng);
+      updateRoutePill('\ud83d\udc64 \u041c\u0443\u0448\u0442\u0430\u0440\u04e3', d < 1 ? Math.round(d*1000)+'м' : d.toFixed(1)+'км');
+    }
+  } else {
+    clearOrderMarkers();
   }
+}
+
+function drawRoute(from, to, color) {
+  const pts = [from, to];
+  if (!_routeLine) {
+    _routeLine = window.L.polyline(pts, { color:color, weight:3.5, opacity:.82, dashArray:'8 10' }).addTo(_map);
+  } else { _routeLine.setLatLngs(pts); _routeLine.setStyle({ color:color }); }
+  try { _map.fitBounds(_routeLine.getBounds(), { padding:[60,60], maxZoom:16 }); } catch(e) {}
+}
+
+function updateRoutePill(dest, dist) {
+  let pill = document.getElementById('map-route-pill');
+  if (!pill) {
+    pill = document.createElement('div');
+    pill.id = 'map-route-pill';
+    pill.style.cssText = 'position:absolute;bottom:calc(var(--sheet-peek) + 58px);left:50%;transform:translateX(-50%);z-index:15;background:rgba(13,19,14,.93);backdrop-filter:blur(14px);border:1px solid var(--b1);border-radius:99px;padding:7px 16px;display:flex;align-items:center;gap:10px;font-size:.68rem;color:var(--tx);white-space:nowrap;box-shadow:0 3px 16px rgba(0,0,0,.45);pointer-events:none;';
+    const dash = document.getElementById('page-dashboard');
+    if (dash) dash.appendChild(pill);
+  }
+  pill.innerHTML = '<span style="color:var(--acc2)">\u25b6</span><span style="font-weight:600">'+dest+'</span><span style="color:var(--tx3)">\u00b7</span><span style="color:var(--acc2);font-weight:700">'+dist+'</span>';
+  pill.style.display = 'flex';
+}
+function hideRoutePill() {
+  const p = document.getElementById('map-route-pill');
+  if (p) p.style.display = 'none';
 }
 
 function clearOrderMarkers() {
   if (_markerStore)  { _markerStore.remove();  _markerStore  = null; }
   if (_markerClient) { _markerClient.remove(); _markerClient = null; }
   if (_routeLine)    { _routeLine.remove();    _routeLine    = null; }
+  hideRoutePill();
 }
 
 window.mapCenterOnCourier = function () {
@@ -165,7 +248,7 @@ window.mapCenterOnCourier = function () {
 };
 
 function mapOnShowDashboard() {
-  if (!_map) { initMap(); startGPS(); return; }
+  if (!_map) { initMap().then(startGPS); return; }
   setTimeout(() => {
     _map.invalidateSize();
     if (_lastPos) _map.setView([_lastPos.lat, _lastPos.lng], 15, { animate:false });
@@ -349,7 +432,7 @@ onAuthStateChanged(auth, async u => {
   calcStats();
   startListeners();
   updateDashUI();
-  setTimeout(() => { initMap(); startGPS(); initSheetDrag(); }, 400);
+  setTimeout(() => { initMap().then(startGPS); initSheetDrag(); }, 400);
 });
 
 // ─── Проверка верификации ────────────────────────────────────
@@ -525,7 +608,7 @@ function listenActive() {
     updateActiveBadge();
     // Карта: показываем/убираем маркеры заказа
     if (activeOrder) {
-      if (_lastPos) updateMapForOrder(activeOrder);
+      if (_lastPos) updateMapRoute(activeOrder);
     } else {
       clearOrderMarkers();
       if (_map && _lastPos) _map.setView([_lastPos.lat, _lastPos.lng], 15, { animate: true });
@@ -674,7 +757,7 @@ window.acceptOrder = async function (oid) {
     checkedItems = new Set();
     toast('Фармоиш қабул шуд! 🚀', 'ok');
     // Обновляем карту с маршрутом
-    if (_lastPos && activeOrder) updateMapForOrder(activeOrder);
+    if (_lastPos && activeOrder) updateMapRoute(activeOrder);
     goPage('active');
   } catch (e) {
     toast('Хато: ' + e.message, 'err');
