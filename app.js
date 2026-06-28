@@ -215,7 +215,7 @@ function drawRoute(from, to, color) {
   if (!_routeLine) {
     _routeLine = window.L.polyline(pts, { color:color, weight:3.5, opacity:.82, dashArray:'8 10' }).addTo(_map);
   } else { _routeLine.setLatLngs(pts); _routeLine.setStyle({ color:color }); }
-  // Не фиксируем карту — курьер сам управляет видом
+  try { _map.fitBounds(_routeLine.getBounds(), { padding:[60,60], maxZoom:16 }); } catch(e) {}
 }
 
 function updateRoutePill(dest, dist) {
@@ -440,32 +440,6 @@ function isVerified() {
   return (CD?.verificationStatus || UD?.verificationStatus || 'unverified') === 'verified';
 }
 
-// ─── Меню профиля ────────────────────────────────────────
-window.openProfMenu = function() {
-  const ov = document.getElementById('prof-menu-overlay');
-  const sh = document.getElementById('prof-menu-sheet');
-  if (ov) { ov.style.display = 'block'; setTimeout(() => ov.classList.add('open'), 10); }
-  if (sh) setTimeout(() => sh.classList.add('open'), 10);
-  // Синхронизируем данные меню
-  const name = UD?.displayName || CU?.email || '—';
-  const init = name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) || '?';
-  const pmAv = document.getElementById('pm-av');
-  if (pmAv) pmAv.innerHTML = UD?.avatarUrl ? `<img src="${UD.avatarUrl}" alt="">` : init;
-  const pmName = document.getElementById('pm-name'); if (pmName) pmName.textContent = name;
-  const pmEarn = document.getElementById('pm-earn'); if (pmEarn) pmEarn.textContent = todayEarnings + ' см';
-  const isOn = CD?.isOnline || false;
-  const tog = document.getElementById('online-tog'); if (tog) tog.checked = isOn;
-  const pmOV = document.getElementById('pm-online-val');
-  if (pmOV) { pmOV.textContent = isOn ? 'Онлайн' : 'Офлайн'; pmOV.className = 'prof-menu-online-val ' + (isOn ? 'on' : 'off'); }
-  const pmSub = document.getElementById('pm-sound-sub'); if (pmSub) pmSub.textContent = soundEnabled ? 'Фаъол' : 'Хомӯш';
-};
-window.closeProfMenu = function() {
-  const ov = document.getElementById('prof-menu-overlay');
-  const sh = document.getElementById('prof-menu-sheet');
-  if (ov) { ov.classList.remove('open'); setTimeout(() => { ov.style.display = 'none'; }, 260); }
-  if (sh) sh.classList.remove('open');
-};
-
 // ─── Баромадан ───────────────────────────────────────────────
 window.doLogout = async function () {
   if (unsubNew)    { unsubNew();    unsubNew    = null; }
@@ -494,22 +468,16 @@ window.toggleOnline = async function (v) {
     CD = { ...CD, isOnline: v };
     updateOnlineUI(v);
     toast(v ? 'Шумо онлайн ед 🟢' : 'Шумо офлайн ед', v ? 'ok' : '');
-    // Перезапускаем слушатель заказов при смене статуса
-    if (isVerified()) listenNew();
   } catch { toast('Хато', 'err'); }
 };
 
 function updateOnlineUI(on) {
-  const tog  = document.getElementById('online-tog');    if (tog)  tog.checked = on;
-  const val  = document.getElementById('sb-online-val'); if (val)  { val.textContent = on ? 'Онлайн' : 'Офлайн'; val.className = 'sb-online-val' + (on ? ' on' : ''); }
-  const card = document.getElementById('sb-online-card');if (card) card.className = 'sb-online' + (on ? ' is-online' : '');
-  // Меню профиля
-  const pmOV = document.getElementById('pm-online-val');
-  if (pmOV) { pmOV.textContent = on ? 'Онлайн' : 'Офлайн'; pmOV.className = 'prof-menu-online-val ' + (on ? 'on' : 'off'); }
+  const tog     = document.getElementById('online-tog');     if (tog)     tog.checked = on;
+  const val     = document.getElementById('sb-online-val');  if (val)     { val.textContent = on ? 'Онлайн' : 'Офлайн'; val.className = 'sb-online-val' + (on ? ' on' : ''); }
+  const card    = document.getElementById('sb-online-card'); if (card)    card.className = 'sb-online' + (on ? ' is-online' : '');
+  const chip    = document.getElementById('tb-chip');        if (chip)    chip.className = 'tb-chip' + (on ? ' online' : ' offline');
+  const chipTxt = document.getElementById('tb-chip-txt');    if (chipTxt) chipTxt.textContent = on ? 'Онлайн' : 'Офлайн';
   updateDashOnlineBtn(on);
-  // Если переключили в офлайн — показываем офлайн-экран на вкладке заказов
-  renderNewOrders();
-  renderDashNew();
 }
 
 function updateEarnUI() {
@@ -566,6 +534,7 @@ window.goPage = function (page) {
   if (page === 'history')   loadHistory();
   if (page === 'active')    renderActive();
   if (page === 'dashboard') { renderDashNew(); renderDashActive(); mapOnShowDashboard(); }
+  closeSB();
   const pages = document.getElementById('pages');
   if (pages) pages.scrollTop = 0;
 };
@@ -611,8 +580,6 @@ function startListeners() {
 
 function listenNew() {
   if (unsubNew) { unsubNew(); unsubNew = null; }
-  // Не слушаем заказы в офлайн-режиме
-  if (!CD?.isOnline) { newOrders = []; updateNewBadge(); renderNewOrders(); renderDashNew(); return; }
   const q   = query(collection(db, COL.ORDERS), where('status', 'in', ['pending', 'confirmed']), where('courierId', '==', null));
   let first = true;
   unsubNew  = onSnapshot(q, sn => {
@@ -701,18 +668,11 @@ function orderCard(o, withCountdown = false) {
         <span class="oc-chip"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>${total} см</span>
         ${o.comment ? `<span class="oc-chip">💬 ${o.comment}</span>` : ''}
       </div>
+      <button class="btn-take" onclick="acceptOrder('${o.id}')" id="btn-${o.id}" ${activeOrder ? 'disabled title="Фармоиши фаъол дорад"' : ''}>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Қабул
+      </button>
     </div>
-    ${!activeOrder ? `<div class="swipe-btn" id="swipe-${o.id}" data-oid="${o.id}">
-      <div class="swipe-btn-fill" id="swipe-fill-${o.id}"></div>
-      <div class="swipe-btn-thumb" id="swipe-thumb-${o.id}">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-      <div class="swipe-btn-track">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-        Свайп барои қабул
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-    </div>` : `<div style="padding:10px 14px 14px"><div class="btn-take" style="opacity:.4;cursor:not-allowed;display:flex;align-items:center;gap:6px;justify-content:center;font-size:.7rem;color:var(--tx3)">Фармоиши фаъол дорад</div></div>`}
   </div>`;
 }
 
@@ -731,74 +691,10 @@ function startCD(oid) {
   }, 1000);
 }
 
-// ─── Свайп-кнопка принятия заказа ───────────────────────────
-function initSwipeBtn(oid) {
-  const el    = document.getElementById('swipe-' + oid);
-  const fill  = document.getElementById('swipe-fill-' + oid);
-  const thumb = document.getElementById('swipe-thumb-' + oid);
-  if (!el || !fill || !thumb) return;
-
-  const W    = el.offsetWidth;
-  const maxX = W - 56 - 4; // максимальное смещение thumb
-  let startX = 0, curX = 0, dragging = false;
-
-  function pct() { return Math.min(1, curX / maxX); }
-
-  function onStart(e) {
-    if (el.classList.contains('done')) return;
-    dragging = true;
-    startX = (e.touches ? e.touches[0].clientX : e.clientX) - curX;
-    el.style.transition = 'none';
-  }
-  function onMove(e) {
-    if (!dragging) return;
-    if (e.cancelable) e.preventDefault();
-    const raw = (e.touches ? e.touches[0].clientX : e.clientX) - startX;
-    curX = Math.max(0, Math.min(raw, maxX));
-    thumb.style.transform = `translateX(${curX}px)`;
-    fill.style.width = (56 + curX) + 'px';
-    // При достижении 85% — анимируем завершение
-    if (pct() >= 0.85) { onComplete(); }
-  }
-  function onEnd() {
-    if (!dragging) return;
-    dragging = false;
-    if (pct() < 0.85) {
-      // Откат
-      el.style.transition = '';
-      curX = 0;
-      thumb.style.transform = '';
-      fill.style.width = '56px';
-    }
-  }
-  function onComplete() {
-    dragging = false;
-    el.classList.add('done');
-    el.style.transition = '';
-    thumb.style.transform = `translateX(${maxX}px)`;
-    fill.style.width = '100%';
-    const track = el.querySelector('.swipe-btn-track');
-    if (track) track.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Қабул кардем…`;
-    setTimeout(() => acceptOrder(oid), 300);
-  }
-
-  el.addEventListener('touchstart', onStart, { passive: true });
-  el.addEventListener('touchmove',  onMove,  { passive: false });
-  el.addEventListener('touchend',   onEnd);
-  el.addEventListener('mousedown',  onStart);
-  window.addEventListener('mousemove', e => dragging && onMove(e));
-  window.addEventListener('mouseup',   e => dragging && onEnd(e));
-}
-
-
+// ─── Рендер новых заказов ────────────────────────────────────
 function renderNewOrders() {
   const el = document.getElementById('new-orders-list');
   if (!el) return;
-  // Офлайн — показываем заглушку
-  if (!CD?.isOnline) {
-    el.innerHTML = `<div class="offline-screen"><div class="offline-screen-ico">😴</div><div class="offline-screen-title">Шумо офлайн ед</div><div class="offline-screen-sub">Барои дидани фармоишҳо ба хат бароед</div></div>`;
-    return;
-  }
   const sorted = [...newOrders].sort((a, b) => (a.createdAt?.toDate?.().getTime() || 0) - (b.createdAt?.toDate?.().getTime() || 0));
   if (!sorted.length) {
     el.innerHTML = `<div class="empty"><div class="empty-ico">📭</div><div class="empty-t">Фармоишҳои нав нест</div><div class="empty-s">Фармоишҳо автоматӣ пайдо мешаванд</div></div>`;
@@ -806,8 +702,9 @@ function renderNewOrders() {
   }
   el.innerHTML = sorted.map((o, i) => orderCard(o, i === 0)).join('');
   if (sorted[0]) startCD(sorted[0].id);
-  // Инициализируем свайп-кнопки
-  sorted.forEach(o => { if (!activeOrder) setTimeout(() => initSwipeBtn(o.id), 50); });
+}
+
+function renderDashNew() {
   const el = document.getElementById('dash-new-orders');
   if (!el) return;
   const sorted = [...newOrders].sort((a, b) => (a.createdAt?.toDate?.().getTime() || 0) - (b.createdAt?.toDate?.().getTime() || 0));
