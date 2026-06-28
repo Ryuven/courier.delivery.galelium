@@ -7,10 +7,101 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <title>Galelium Courier</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Inter:wght@300;400;500;600;700&display=swap"/>
 <style>
+/* ═══════════════════════════════════════════════════════════
+   КАРТА — блок в дашборде
+═══════════════════════════════════════════════════════════ */
+.map-block{
+  margin-bottom:16px;
+  background:var(--s2);border:1px solid var(--b0);border-radius:14px;
+  overflow:hidden;
+}
+.map-block-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;border-bottom:1px solid var(--b0);
+}
+.map-block-title{
+  font-size:.73rem;font-weight:700;color:var(--tx);
+  display:flex;align-items:center;gap:7px;
+}
+.map-gps-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--tx3);flex-shrink:0;
+  transition:background .3s;
+}
+.map-gps-dot.active{background:var(--acc2);box-shadow:0 0 0 3px rgba(62,207,142,.2);animation:gpsPulse 2s ease-in-out infinite}
+@keyframes gpsPulse{0%,100%{box-shadow:0 0 0 0 rgba(62,207,142,.35)}50%{box-shadow:0 0 0 6px rgba(62,207,142,0)}}
+.map-meta{font-size:.6rem;color:var(--tx3)}
+.map-meta span{color:var(--tx2)}
+
+.map-wrap{
+  position:relative;height:280px;
+}
+@media(min-width:900px){.map-wrap{height:340px}}
+
+#courier-map{width:100%;height:100%}
+
+/* Leaflet тёмная тема */
+.leaflet-tile{filter:brightness(.75) saturate(.6) hue-rotate(160deg)}
+.leaflet-container{background:#0f1a14}
+.leaflet-control-zoom a{
+  background:var(--s2)!important;border-color:var(--b1)!important;
+  color:var(--tx)!important;
+}
+.leaflet-control-zoom a:hover{background:var(--s3)!important}
+.leaflet-control-attribution{display:none}
+
+/* Кастомные маркеры */
+.m-courier{
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  border:3px solid #0b0f0c;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.9rem;
+  box-shadow:0 2px 12px rgba(45,184,122,.4);
+}
+.m-store{
+  width:32px;height:32px;border-radius:8px;
+  background:var(--s3);border:2px solid var(--amber);
+  display:flex;align-items:center;justify-content:center;font-size:.85rem;
+  box-shadow:0 2px 8px rgba(217,119,6,.3);
+}
+.m-client{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--s3);border:2px solid var(--blue);
+  display:flex;align-items:center;justify-content:center;font-size:.85rem;
+  box-shadow:0 2px 8px rgba(59,130,246,.3);
+}
+
+/* Нижняя панель карты */
+.map-footer{
+  display:flex;align-items:center;gap:8px;padding:10px 16px;
+  border-top:1px solid var(--b0);flex-wrap:wrap;
+}
+.map-stat{
+  display:flex;align-items:center;gap:5px;
+  font-size:.63rem;color:var(--tx3);flex-shrink:0;
+}
+.map-stat svg{opacity:.6}
+.map-stat strong{color:var(--tx2);font-weight:600}
+.map-loc-btn{
+  margin-left:auto;
+  display:flex;align-items:center;gap:5px;
+  padding:5px 10px;border:1px solid var(--b0);border-radius:7px;
+  background:transparent;cursor:pointer;
+  font-size:.6rem;color:var(--tx2);font-family:var(--fs);
+  transition:border-color .15s,background .15s;
+}
+.map-loc-btn:hover{border-color:var(--b1);background:var(--s3)}
+.map-no-gps{
+  padding:20px;text-align:center;
+  font-size:.68rem;color:var(--tx3);line-height:1.6;
+}
+.map-no-gps svg{display:block;margin:0 auto 8px;opacity:.4}
+
 /* ═══════════════════════════════════════════════════════════
    ВЕРИФИКАЦИЯ — минималистичный дизайн
 ═══════════════════════════════════════════════════════════ */
@@ -1189,6 +1280,39 @@ a.ni{ text-decoration:none }
     <div class="page active" id="page-dashboard">
       <div id="notif-wrap"></div>
       <div id="dash-active-wrap"></div>
+
+      <!-- КАРТА -->
+      <div class="map-block">
+        <div class="map-block-head">
+          <div class="map-block-title">
+            <div class="map-gps-dot" id="map-gps-dot"></div>
+            Ҷойгиршавии ман
+          </div>
+          <div class="map-meta" id="map-meta">GPS интизор…</div>
+        </div>
+        <div class="map-wrap" id="map-wrap">
+          <div id="courier-map"></div>
+          <div class="map-no-gps" id="map-no-gps" style="display:none">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/><line x1="1" y1="1" x2="23" y2="23" stroke-width="1.5"/></svg>
+            GPS дастрас нест.<br>Иҷозат диҳед ё браузерро санҷед.
+          </div>
+        </div>
+        <div class="map-footer">
+          <div class="map-stat" id="map-stat-acc">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+            Аниқӣ: <strong id="map-acc-val">—</strong>
+          </div>
+          <div class="map-stat" id="map-stat-speed">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/></svg>
+            Суръат: <strong id="map-speed-val">— км/с</strong>
+          </div>
+          <button class="map-loc-btn" id="map-center-btn" onclick="mapCenterOnCourier()">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+            Марказ
+          </button>
+        </div>
+      </div>
+
       <div class="sh" style="margin-bottom:14px">
         <div><div class="sh-tag">Обзори навбат</div><div class="sh-title">Дашборд</div></div>
       </div>
@@ -1439,6 +1563,7 @@ window.sendVerifTelegram = function() {
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVerifModal(); });
 </script>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script type="module" src="./app.js"></script>
 </body>
 </html>
