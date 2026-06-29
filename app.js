@@ -461,34 +461,26 @@ function renderSB() {
   const av = document.getElementById('sb-av');
   if (av) av.innerHTML = avatarHtml;
 
-  // Профиль меню
-  const pmsName = document.getElementById('pms-name');
-  if (pmsName) pmsName.textContent = name;
-  const pmsAv = document.getElementById('pms-av');
-  if (pmsAv) pmsAv.innerHTML = avatarHtml;
-
   // Дашборд аватар
   const dashAv = document.getElementById('dash-av');
-  if (dashAv) {
-    dashAv.innerHTML = avatarHtml;
-    // keep the settings gear overlay
-    dashAv.innerHTML = avatarHtml + `<div style="position:absolute;bottom:-4px;right:-4px;width:16px;height:16px;background:var(--s2);border:1.5px solid var(--accg);border-radius:50%;display:flex;align-items:center;justify-content:center;pointer-events:none"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--acc2)" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>`;
-  }
+  if (dashAv) dashAv.innerHTML = avatarHtml;
 
   updateOnlineUI(CD?.isOnline || false);
   updateEarnUI();
 }
 
-// ─── Меню профиля ────────────────────────────────────────────
-window.openProfileMenu = function() {
-  document.getElementById('profile-menu-overlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
+window.openSettings = function() {
+  const p = document.getElementById('settings-page');
+  if (p) p.classList.add('open');
 };
-window.closeProfileMenu = function() {
-  document.getElementById('profile-menu-overlay').classList.remove('open');
-  document.body.style.overflow = '';
+window.closeSettings = function() {
+  const p = document.getElementById('settings-page');
+  if (p) p.classList.remove('open');
 };
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeProfileMenu?.(); } });
+// backward-compat aliases
+window.openProfileMenu  = window.openSettings;
+window.closeProfileMenu = window.closeSettings;
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { window.closeSettings?.(); } });
 
 // ─── Онлайн / Офлайн ─────────────────────────────────────────
 window.toggleOnline = async function (v) {
@@ -506,12 +498,15 @@ function updateOnlineUI(on) {
   const card    = document.getElementById('sb-online-card'); if (card)    card.className = 'sb-online' + (on ? ' is-online' : '');
   const chip    = document.getElementById('tb-chip');        if (chip)    chip.className = 'tb-chip' + (on ? ' online' : ' offline');
   const chipTxt = document.getElementById('tb-chip-txt');    if (chipTxt) chipTxt.textContent = on ? 'Онлайн' : 'Офлайн';
-  // Профиль меню
+  // Страница настроек
+  const stTog   = document.getElementById('st-online-tog');  if (stTog)   stTog.checked = on;
+  const stSub   = document.getElementById('st-online-sub');  if (stSub)   stSub.textContent = on ? 'Онлайн — фармоишҳо мерасанд' : 'Офлайн — фармоишҳо нест';
+  const stBlock = document.getElementById('st-online-block');if (stBlock) stBlock.className = 'settings-online-block' + (on ? ' is-online' : '');
+  // Старые pms-* (если ещё остались в DOM)
   const pmsTog  = document.getElementById('pms-online-tog'); if (pmsTog)  pmsTog.checked = on;
   const pmsVal  = document.getElementById('pms-online-val'); if (pmsVal)  { pmsVal.textContent = on ? 'Онлайн' : 'Офлайн'; pmsVal.className = 'pms-online-val' + (on ? ' on' : ''); }
   const pmsCard = document.getElementById('pms-online-card');if (pmsCard) pmsCard.className = 'pms-online-row' + (on ? ' is-online' : '');
   updateDashOnlineBtn(on);
-  // Если стали офлайн — очищаем заказы из UI
   if (!on) {
     renderNewOrdersIfOnline();
     renderDashNewIfOnline();
@@ -521,6 +516,7 @@ function updateOnlineUI(on) {
 function updateEarnUI() {
   const se = document.getElementById('sb-earn-val');   if (se)  se.textContent = todayEarnings + ' см';
   const pe = document.getElementById('pms-earn-val');  if (pe)  pe.textContent = todayEarnings + ' см';
+  const ste= document.getElementById('st-earn-val');   if (ste) ste.textContent = todayEarnings + ' см';
   const de = document.getElementById('d-earn');        if (de)  de.textContent = todayEarnings + ' см';
   updateDashUI();
 }
@@ -535,6 +531,11 @@ window.toggleSound = function () {
       ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg>`
       : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>`;
   }
+  // Settings page sync
+  const stTog = document.getElementById('st-sound-tog');
+  const stSub = document.getElementById('st-sound-sub');
+  if (stTog) stTog.checked = soundEnabled;
+  if (stSub) stSub.textContent = soundEnabled ? 'Фаъол' : 'Хомӯш';
   toast(soundEnabled ? 'Садо фаъол шуд' : 'Бе садо', 'ok');
 };
 
@@ -687,7 +688,7 @@ function listenActive() {
 // ─── Бейджи ──────────────────────────────────────────────────
 function updateNewBadge() {
   const cnt = newOrders.length;
-  ['new-badge', 'mob-new-badge', 'pms-new-badge'].forEach(id => {
+  ['new-badge', 'mob-new-badge', 'pms-new-badge', 'st-new-badge'].forEach(id => {
     const b = document.getElementById(id);
     if (b) { b.style.display = cnt > 0 ? '' : 'none'; b.textContent = cnt; }
   });
@@ -696,7 +697,7 @@ function updateNewBadge() {
 }
 
 function updateActiveBadge() {
-  ['active-badge', 'mob-active-badge', 'pms-active-badge'].forEach(id => {
+  ['active-badge', 'mob-active-badge', 'pms-active-badge', 'st-active-badge'].forEach(id => {
     const b = document.getElementById(id);
     if (b) b.style.display = activeOrder ? '' : 'none';
   });
