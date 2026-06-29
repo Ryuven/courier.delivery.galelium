@@ -456,25 +456,14 @@ function renderSB() {
   const init = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
   const avatarHtml = UD?.avatarUrl ? `<img src="${UD.avatarUrl}" alt="">` : init;
 
-  // Сайдбар (если есть)
   const uname = document.getElementById('sb-uname');
   if (uname) uname.textContent = name;
-  const sbAv = document.getElementById('sb-av');
-  if (sbAv) sbAv.innerHTML = avatarHtml;
+  const av = document.getElementById('sb-av');
+  if (av) av.innerHTML = avatarHtml;
 
   // Дашборд аватар
   const dashAv = document.getElementById('dash-av');
   if (dashAv) dashAv.innerHTML = avatarHtml;
-
-  // Страница настроек — герой
-  const stAv   = document.getElementById('st-av');   if (stAv)   stAv.innerHTML = avatarHtml;
-  const stName = document.getElementById('st-name'); if (stName) stName.textContent = name;
-
-  // Статистика в настройках
-  const stDel = document.getElementById('st-deliveries');
-  if (stDel) stDel.textContent = todayDeliveries;
-  const stRat = document.getElementById('st-rating');
-  if (stRat) stRat.textContent = UD?.rating ? UD.rating.toFixed(1) : '—';
 
   updateOnlineUI(CD?.isOnline || false);
   updateEarnUI();
@@ -483,10 +472,6 @@ function renderSB() {
 window.openSettings = function() {
   const p = document.getElementById('settings-page');
   if (p) p.classList.add('open');
-  // Обновляем статистику при каждом открытии
-  const std = document.getElementById('st-deliveries');  if (std) std.textContent = todayDeliveries;
-  const ste = document.getElementById('st-earn-val');    if (ste) ste.textContent = todayEarnings + ' см';
-  const stRat = document.getElementById('st-rating');    if (stRat) stRat.textContent = UD?.rating ? UD.rating.toFixed(1) : '—';
 };
 window.closeSettings = function() {
   const p = document.getElementById('settings-page');
@@ -508,18 +493,19 @@ window.toggleOnline = async function (v) {
 };
 
 function updateOnlineUI(on) {
-  // Сайдбар
   const tog     = document.getElementById('online-tog');     if (tog)     tog.checked = on;
   const val     = document.getElementById('sb-online-val');  if (val)     { val.textContent = on ? 'Онлайн' : 'Офлайн'; val.className = 'sb-online-val' + (on ? ' on' : ''); }
   const card    = document.getElementById('sb-online-card'); if (card)    card.className = 'sb-online' + (on ? ' is-online' : '');
-  // Топбар чип (если есть)
   const chip    = document.getElementById('tb-chip');        if (chip)    chip.className = 'tb-chip' + (on ? ' online' : ' offline');
   const chipTxt = document.getElementById('tb-chip-txt');    if (chipTxt) chipTxt.textContent = on ? 'Онлайн' : 'Офлайн';
-  // Страница настроек — новый герой
-  const stTog   = document.getElementById('st-online-tog');   if (stTog)   stTog.checked = on;
-  const stDot   = document.getElementById('st-role-dot');     if (stDot)   stDot.className = 'st-hero-role-dot' + (on ? ' on' : '');
-  const stRoleTxt = document.getElementById('st-role-txt');   if (stRoleTxt) stRoleTxt.textContent = on ? 'Онлайн · Курьер' : 'Офлайн · Курьер';
-  const stLbl   = document.getElementById('st-hero-tog-lbl'); if (stLbl)   { stLbl.textContent = on ? 'Онлайн' : 'Офлайн'; stLbl.className = 'st-hero-tog-lbl' + (on ? ' on' : ''); }
+  // Страница настроек
+  const stTog   = document.getElementById('st-online-tog');  if (stTog)   stTog.checked = on;
+  const stSub   = document.getElementById('st-online-sub');  if (stSub)   stSub.textContent = on ? 'Онлайн — фармоишҳо мерасанд' : 'Офлайн — фармоишҳо нест';
+  const stBlock = document.getElementById('st-online-block');if (stBlock) stBlock.className = 'settings-online-block' + (on ? ' is-online' : '');
+  // Старые pms-* (если ещё остались в DOM)
+  const pmsTog  = document.getElementById('pms-online-tog'); if (pmsTog)  pmsTog.checked = on;
+  const pmsVal  = document.getElementById('pms-online-val'); if (pmsVal)  { pmsVal.textContent = on ? 'Онлайн' : 'Офлайн'; pmsVal.className = 'pms-online-val' + (on ? ' on' : ''); }
+  const pmsCard = document.getElementById('pms-online-card');if (pmsCard) pmsCard.className = 'pms-online-row' + (on ? ' is-online' : '');
   updateDashOnlineBtn(on);
   if (!on) {
     renderNewOrdersIfOnline();
@@ -528,10 +514,10 @@ function updateOnlineUI(on) {
 }
 
 function updateEarnUI() {
-  const se  = document.getElementById('sb-earn-val');    if (se)  se.textContent  = todayEarnings + ' см';
-  const ste = document.getElementById('st-earn-val');    if (ste) ste.textContent  = todayEarnings + ' см';
-  const de  = document.getElementById('d-earn');         if (de)  de.textContent  = todayEarnings + ' см';
-  const std = document.getElementById('st-deliveries');  if (std) std.textContent = todayDeliveries;
+  const se = document.getElementById('sb-earn-val');   if (se)  se.textContent = todayEarnings + ' см';
+  const pe = document.getElementById('pms-earn-val');  if (pe)  pe.textContent = todayEarnings + ' см';
+  const ste= document.getElementById('st-earn-val');   if (ste) ste.textContent = todayEarnings + ' см';
+  const de = document.getElementById('d-earn');        if (de)  de.textContent = todayEarnings + ' см';
   updateDashUI();
 }
 
@@ -1170,7 +1156,7 @@ function renderStep2(o) {
 
 // ─── СКАНЕР ШТРИХ-КОДА ───────────────────────────────────
 
-// Открыть оверлей сканера для конкретного товара
+// Открыть полноэкранный экран товара
 window.openScanner = async function (key, oid, itemIdx) {
   if (scannerActive) return;
   const o = activeOrder;
@@ -1182,7 +1168,7 @@ window.openScanner = async function (key, oid, itemIdx) {
   scannerOid      = oid;
   scannerItemName = item.name;
 
-  // Если у товара нет barcode в данных заказа — берём из Firestore products
+  // Получаем штрихкод
   if (item.barcode) {
     scannerExpected = item.barcode;
   } else if (item.productId) {
@@ -1194,194 +1180,222 @@ window.openScanner = async function (key, oid, itemIdx) {
     scannerExpected = null;
   }
 
-  showScannerOverlay();
+  openItemDetail(item, key, o);
 };
 
-function showScannerOverlay() {
-  const ov = document.getElementById('scanner-overlay');
-  if (!ov) return;
+// ─── Полноэкранный экран товара ──────────────────────────
+let idpStream = null;
+let idpDetector = null;
+let idpRAF = null;
+let idpCamActive = false;
 
-  const hasBC = !!scannerExpected;
+function openItemDetail(item, key, order) {
+  const page = document.getElementById('item-detail-page');
+  if (!page) return;
 
-  ov.innerHTML = `
-    <div class="sc-panel">
-      <div class="sc-header">
-        <div class="sc-title">Скан штрих-код</div>
-        <button class="sc-close" onclick="closeScanner()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-      <div class="sc-item-info">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-        ${scannerItemName}
-        ${!hasBC ? '<span class="sc-nobc-warn">⚠️ Штрих-код нест — вуруди дастӣ</span>' : ''}
-      </div>
+  // Прогресс
+  const items = order.items || [];
+  const total = items.reduce((s, i) => s + i.quantity, 0);
+  const done  = checkedItems.size;
+  const pct   = total > 0 ? Math.round(done / total * 100) : 0;
 
-      ${hasBC ? `
-      <!-- Видео-камера -->
-      <div class="sc-cam-wrap" id="sc-cam-wrap">
-        <video id="sc-video" autoplay playsinline muted></video>
-        <div class="sc-laser"></div>
-        <div class="sc-corners">
-          <div class="sc-corner tl"></div><div class="sc-corner tr"></div>
-          <div class="sc-corner bl"></div><div class="sc-corner br"></div>
-        </div>
-        <div class="sc-cam-hint" id="sc-cam-hint">Камераро ба штрих-код нишон диҳед</div>
-      </div>
-      <div class="sc-result" id="sc-result"></div>
-      <div class="sc-divider"><span>ё</span></div>
-      ` : ''}
+  // Заголовок
+  const titleEl = document.getElementById('idp-title');
+  if (titleEl) titleEl.textContent = 'Собрать товар';
+  const chipEl = document.getElementById('idp-chip');
+  if (chipEl) chipEl.textContent = `${done} / ${total}`;
+  const fillEl = document.getElementById('idp-progress-fill');
+  if (fillEl) fillEl.style.width = pct + '%';
 
-      <!-- Ручной ввод -->
-      <div class="sc-manual">
-        <div class="sc-manual-lbl">Дастӣ ворид кунед</div>
-        <div class="sc-manual-row">
-          <input class="sc-manual-inp" id="sc-manual-inp" type="text"
-            inputmode="numeric" pattern="[0-9]*"
-            placeholder="${hasBC ? 'Рақами штрих-код' : 'Ҳар рақам ё код'}"
-            onkeydown="if(event.key==='Enter')submitManual()"
-          />
-          <button class="sc-manual-btn" onclick="submitManual()">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          </button>
-        </div>
-      </div>
+  // Фото
+  const imgWrap = document.getElementById('idp-img-wrap');
+  const imgPh   = document.getElementById('idp-img-placeholder');
+  if (imgWrap) {
+    const existing = imgWrap.querySelector('img');
+    if (existing) existing.remove();
+    if (item.imageUrl) {
+      if (imgPh) imgPh.style.display = 'none';
+      const img = document.createElement('img');
+      img.src = item.imageUrl;
+      img.alt = item.name;
+      imgWrap.appendChild(img);
+    } else {
+      if (imgPh) { imgPh.style.display = ''; imgPh.textContent = '🛍️'; }
+    }
+  }
 
-      ${!hasBC ? `
-      <button class="btn-flow-next" style="margin-top:4px" onclick="confirmItemNoBarcode()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-        Дастӣ тасдиқ — штрих-код нест
-      </button>
-      ` : ''}
-    </div>`;
+  // Название / цена
+  const nameEl  = document.getElementById('idp-name');
+  const priceEl = document.getElementById('idp-price');
+  const skuEl   = document.getElementById('idp-sku');
+  if (nameEl)  nameEl.textContent  = item.name || '—';
+  if (priceEl) priceEl.textContent = item.price ? `${item.price} см / шт.` : '';
+  if (skuEl)   skuEl.textContent   = item.sku || item.barcode || '';
 
-  ov.classList.add('open');
-  scannerActive = true;
+  // Мета
+  const metaEl = document.getElementById('idp-meta');
+  if (metaEl) {
+    const qty    = item.quantity || 1;
+    const weight = item.weight   ? item.weight + ' кг' : '—';
+    const bc     = item.barcode  || '—';
+    const art    = item.article  || item.productId || '—';
+    metaEl.innerHTML = `
+      <div class="idp-meta-cell"><div class="idp-meta-val">${weight}</div><div class="idp-meta-lbl">Вес / объём</div></div>
+      <div class="idp-meta-cell"><div class="idp-meta-val">${qty} шт.</div><div class="idp-meta-lbl">Количество</div></div>
+      <div class="idp-meta-cell"><div class="idp-meta-val" style="font-size:.68rem">${bc}</div><div class="idp-meta-lbl">Штрих-код</div></div>
+      <div class="idp-meta-cell"><div class="idp-meta-val" style="font-size:.68rem">${art}</div><div class="idp-meta-lbl">Артикул</div></div>
+    `;
+  }
 
-  if (hasBC) startCamera();
-  setTimeout(() => document.getElementById('sc-manual-inp')?.focus(), 300);
+  // Предупреждение о сроке
+  const warnEl = document.getElementById('idp-warn');
+  if (warnEl) {
+    if (item.expiryWarning || item.minDate) {
+      warnEl.style.display = '';
+      const dateEl = document.getElementById('idp-warn-date');
+      if (dateEl) dateEl.textContent = item.minDate || '';
+    } else {
+      warnEl.style.display = 'none';
+    }
+  }
+
+  // Кнопка сканирования — если нет штрихкода, меняем текст
+  const scanBtn = document.getElementById('idp-btn-scan');
+  if (scanBtn) {
+    scanBtn.textContent = scannerExpected ? 'СКАНИРОВАТЬ ТОВАР' : 'ПОДТВЕРДИТЬ ТОВАР';
+    scanBtn.onclick = scannerExpected ? openItemCamera : confirmItemManual;
+  }
+
+  page.classList.add('open');
 }
 
-// Запуск камеры с BarcodeDetector API
-async function startCamera() {
+window.closeItemDetail = function () {
+  closeItemCamera();
+  const page = document.getElementById('item-detail-page');
+  if (page) page.classList.remove('open');
+};
+
+// Открыть камеру внутри экрана товара
+window.openItemCamera = async function () {
+  if (idpCamActive) return;
+  const overlay = document.getElementById('idp-cam-overlay');
+  if (!overlay) return;
+
   if (!('BarcodeDetector' in window)) {
-    showScanResult('warn', '⚠️ Камераи браузер BarcodeDetector дастгирӣ намекунад. Дастӣ ворид кунед.');
+    // Браузер не поддерживает — подтверждаем вручную
+    toast('⚠️ Камера не поддерживается, подтвердите вручную', 'warn');
+    confirmItemManual();
     return;
   }
+
   try {
-    barcodeStream = await navigator.mediaDevices.getUserMedia({
+    idpStream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
     });
-    const video = document.getElementById('sc-video');
+    const video = document.getElementById('idp-video');
     if (!video) return;
-    video.srcObject = barcodeStream;
+    video.srcObject = idpStream;
     await video.play();
 
-    barcodeDetector = new BarcodeDetector({
+    idpDetector = new BarcodeDetector({
       formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'itf', 'qr_code', 'data_matrix']
     });
-    detectLoop(video);
+    idpCamActive = true;
+    overlay.classList.add('open');
+    idpDetectLoop(video);
   } catch (e) {
-    showScanResult('warn', '⚠️ Камера дастрас нест: ' + e.message);
+    toast('Камера недоступна: ' + e.message, 'warn');
   }
-}
+};
 
-let lastDetected = null;
-let lastDetectedTime = 0;
+let idpLastCode = null;
+let idpLastTime = 0;
 
-function detectLoop(video) {
-  if (!scannerActive || !barcodeDetector) return;
-  barcodeRAF = requestAnimationFrame(async () => {
+function idpDetectLoop(video) {
+  if (!idpCamActive || !idpDetector) return;
+  idpRAF = requestAnimationFrame(async () => {
     try {
-      const barcodes = await barcodeDetector.detect(video);
-      if (barcodes.length > 0) {
-        const now = Date.now();
-        const code = barcodes[0].rawValue;
-        // Дебаунс — один и тот же код не обрабатываем чаще раза в 2с
-        if (code !== lastDetected || now - lastDetectedTime > 2000) {
-          lastDetected     = code;
-          lastDetectedTime = now;
-          handleScannedCode(code);
-          return; // Пауза, дадим UI обновиться
+      const codes = await idpDetector.detect(video);
+      if (codes.length > 0) {
+        const now  = Date.now();
+        const code = codes[0].rawValue;
+        if (code !== idpLastCode || now - idpLastTime > 2000) {
+          idpLastCode = code;
+          idpLastTime = now;
+          idpHandleCode(code);
+          return;
         }
       }
     } catch {}
-    detectLoop(video);
+    idpDetectLoop(video);
   });
 }
 
-function handleScannedCode(code) {
-  const hint = document.getElementById('sc-cam-hint');
-  if (hint) hint.textContent = `Скан: ${code}`;
-  validateBarcode(code);
-}
+function idpHandleCode(code) {
+  if (idpRAF) { cancelAnimationFrame(idpRAF); idpRAF = null; }
+  const hint = document.getElementById('idp-cam-hint');
+  const res  = document.getElementById('idp-scan-result');
 
-// Ручной ввод
-window.submitManual = function () {
-  const inp = document.getElementById('sc-manual-inp');
-  const val = inp?.value.trim();
-  if (!val) { inp?.focus(); return; }
-  validateBarcode(val);
-};
-
-// Товар без штрихкода — подтвердить вручную
-window.confirmItemNoBarcode = function () {
-  markItemDone();
-};
-
-// Валидация кода
-function validateBarcode(code) {
   if (!scannerExpected) {
-    // Нет штрихкода в базе — любой ввод подтверждает
-    showScanResult('ok', `✅ Тасдиқ шуд!`, true);
+    // Нет штрихкода — любой код подтверждает
+    if (res) { res.className = 'idp-scan-result ok'; res.textContent = '✅ Товар подтверждён'; }
+    playSuccessBeep();
+    if (navigator.vibrate) navigator.vibrate([50, 30, 80]);
+    setTimeout(() => { closeItemCamera(); idpMarkDone(); }, 700);
     return;
   }
-  const clean   = code.trim().replace(/\s/g, '');
+
+  const clean    = code.trim().replace(/\s/g, '');
   const expected = String(scannerExpected).trim().replace(/\s/g, '');
+
   if (clean === expected) {
-    showScanResult('ok', `✅ Дуруст! ${scannerItemName}`, true);
+    if (res) { res.className = 'idp-scan-result ok'; res.textContent = '✅ Штрих-код совпадает!'; }
+    playSuccessBeep();
+    if (navigator.vibrate) navigator.vibrate([50, 30, 80]);
+    setTimeout(() => { closeItemCamera(); idpMarkDone(); }, 700);
   } else {
-    showScanResult('err', `❌ Хато! Интизор: ${expected} · Гирифт: ${clean}`);
+    if (res) { res.className = 'idp-scan-result err'; res.textContent = `❌ Не совпадает: ${clean}`; }
+    if (hint) hint.textContent = `Ожидается: ${expected}`;
     playErrorBeep();
-    // Через 2с продолжаем сканировать
+    // Через 2с продолжаем
     setTimeout(() => {
-      const res = document.getElementById('sc-result');
-      if (res) res.innerHTML = '';
-      const video = document.getElementById('sc-video');
-      if (video && scannerActive) detectLoop(video);
+      if (res) { res.className = 'idp-scan-result'; res.textContent = ''; }
+      if (hint) hint.textContent = 'Наведите камеру на штрих-код';
+      const video = document.getElementById('idp-video');
+      if (video && idpCamActive) idpDetectLoop(video);
     }, 2000);
   }
 }
 
-function showScanResult(type, msg, autoClose = false) {
-  // Стоп камеры пока показываем результат
-  if (barcodeRAF) { cancelAnimationFrame(barcodeRAF); barcodeRAF = null; }
-  const res = document.getElementById('sc-result');
-  if (res) {
-    res.className = `sc-result show ${type}`;
-    res.textContent = msg;
-  }
-  if (autoClose) {
-    playSuccessBeep();
-    setTimeout(() => {
-      markItemDone();
-    }, 700);
-  }
-}
+window.closeItemCamera = function () {
+  idpCamActive = false;
+  if (idpRAF)    { cancelAnimationFrame(idpRAF); idpRAF = null; }
+  if (idpStream) { idpStream.getTracks().forEach(t => t.stop()); idpStream = null; }
+  idpDetector  = null;
+  idpLastCode  = null;
+  const overlay = document.getElementById('idp-cam-overlay');
+  if (overlay) overlay.classList.remove('open');
+};
 
-// Успешно отсканировано — отметить товар
-function markItemDone() {
+// Подтвердить вручную (нет штрихкода / товар отсутствует)
+window.confirmItemManual = function () {
+  closeItemCamera();
+  closeItemDetail();
+  idpMarkDone();
+};
+
+function idpMarkDone() {
   const key = scannerItemKey;
-  closeScanner();
+  scannerActive = false;
   if (key) {
     checkedItems.add(key);
     renderActive();
-    // Виброотклик
     if (navigator.vibrate) navigator.vibrate([50, 30, 80]);
   }
+  closeItemDetail();
 }
 
-// Закрыть сканер
+// (Старый closeScanner оставляем для совместимости)
 window.closeScanner = function () {
   scannerActive = false;
   if (barcodeRAF)   { cancelAnimationFrame(barcodeRAF); barcodeRAF = null; }
