@@ -456,14 +456,25 @@ function renderSB() {
   const init = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
   const avatarHtml = UD?.avatarUrl ? `<img src="${UD.avatarUrl}" alt="">` : init;
 
+  // Сайдбар (если есть)
   const uname = document.getElementById('sb-uname');
   if (uname) uname.textContent = name;
-  const av = document.getElementById('sb-av');
-  if (av) av.innerHTML = avatarHtml;
+  const sbAv = document.getElementById('sb-av');
+  if (sbAv) sbAv.innerHTML = avatarHtml;
 
   // Дашборд аватар
   const dashAv = document.getElementById('dash-av');
   if (dashAv) dashAv.innerHTML = avatarHtml;
+
+  // Страница настроек — герой
+  const stAv   = document.getElementById('st-av');   if (stAv)   stAv.innerHTML = avatarHtml;
+  const stName = document.getElementById('st-name'); if (stName) stName.textContent = name;
+
+  // Статистика в настройках
+  const stDel = document.getElementById('st-deliveries');
+  if (stDel) stDel.textContent = todayDeliveries;
+  const stRat = document.getElementById('st-rating');
+  if (stRat) stRat.textContent = UD?.rating ? UD.rating.toFixed(1) : '—';
 
   updateOnlineUI(CD?.isOnline || false);
   updateEarnUI();
@@ -472,6 +483,10 @@ function renderSB() {
 window.openSettings = function() {
   const p = document.getElementById('settings-page');
   if (p) p.classList.add('open');
+  // Обновляем статистику при каждом открытии
+  const std = document.getElementById('st-deliveries');  if (std) std.textContent = todayDeliveries;
+  const ste = document.getElementById('st-earn-val');    if (ste) ste.textContent = todayEarnings + ' см';
+  const stRat = document.getElementById('st-rating');    if (stRat) stRat.textContent = UD?.rating ? UD.rating.toFixed(1) : '—';
 };
 window.closeSettings = function() {
   const p = document.getElementById('settings-page');
@@ -493,19 +508,18 @@ window.toggleOnline = async function (v) {
 };
 
 function updateOnlineUI(on) {
+  // Сайдбар
   const tog     = document.getElementById('online-tog');     if (tog)     tog.checked = on;
   const val     = document.getElementById('sb-online-val');  if (val)     { val.textContent = on ? 'Онлайн' : 'Офлайн'; val.className = 'sb-online-val' + (on ? ' on' : ''); }
   const card    = document.getElementById('sb-online-card'); if (card)    card.className = 'sb-online' + (on ? ' is-online' : '');
+  // Топбар чип (если есть)
   const chip    = document.getElementById('tb-chip');        if (chip)    chip.className = 'tb-chip' + (on ? ' online' : ' offline');
   const chipTxt = document.getElementById('tb-chip-txt');    if (chipTxt) chipTxt.textContent = on ? 'Онлайн' : 'Офлайн';
-  // Страница настроек
-  const stTog   = document.getElementById('st-online-tog');  if (stTog)   stTog.checked = on;
-  const stSub   = document.getElementById('st-online-sub');  if (stSub)   stSub.textContent = on ? 'Онлайн — фармоишҳо мерасанд' : 'Офлайн — фармоишҳо нест';
-  const stBlock = document.getElementById('st-online-block');if (stBlock) stBlock.className = 'settings-online-block' + (on ? ' is-online' : '');
-  // Старые pms-* (если ещё остались в DOM)
-  const pmsTog  = document.getElementById('pms-online-tog'); if (pmsTog)  pmsTog.checked = on;
-  const pmsVal  = document.getElementById('pms-online-val'); if (pmsVal)  { pmsVal.textContent = on ? 'Онлайн' : 'Офлайн'; pmsVal.className = 'pms-online-val' + (on ? ' on' : ''); }
-  const pmsCard = document.getElementById('pms-online-card');if (pmsCard) pmsCard.className = 'pms-online-row' + (on ? ' is-online' : '');
+  // Страница настроек — новый герой
+  const stTog   = document.getElementById('st-online-tog');   if (stTog)   stTog.checked = on;
+  const stDot   = document.getElementById('st-role-dot');     if (stDot)   stDot.className = 'st-hero-role-dot' + (on ? ' on' : '');
+  const stRoleTxt = document.getElementById('st-role-txt');   if (stRoleTxt) stRoleTxt.textContent = on ? 'Онлайн · Курьер' : 'Офлайн · Курьер';
+  const stLbl   = document.getElementById('st-hero-tog-lbl'); if (stLbl)   { stLbl.textContent = on ? 'Онлайн' : 'Офлайн'; stLbl.className = 'st-hero-tog-lbl' + (on ? ' on' : ''); }
   updateDashOnlineBtn(on);
   if (!on) {
     renderNewOrdersIfOnline();
@@ -514,10 +528,10 @@ function updateOnlineUI(on) {
 }
 
 function updateEarnUI() {
-  const se = document.getElementById('sb-earn-val');   if (se)  se.textContent = todayEarnings + ' см';
-  const pe = document.getElementById('pms-earn-val');  if (pe)  pe.textContent = todayEarnings + ' см';
-  const ste= document.getElementById('st-earn-val');   if (ste) ste.textContent = todayEarnings + ' см';
-  const de = document.getElementById('d-earn');        if (de)  de.textContent = todayEarnings + ' см';
+  const se  = document.getElementById('sb-earn-val');    if (se)  se.textContent  = todayEarnings + ' см';
+  const ste = document.getElementById('st-earn-val');    if (ste) ste.textContent  = todayEarnings + ' см';
+  const de  = document.getElementById('d-earn');         if (de)  de.textContent  = todayEarnings + ' см';
+  const std = document.getElementById('st-deliveries');  if (std) std.textContent = todayDeliveries;
   updateDashUI();
 }
 
