@@ -1232,19 +1232,38 @@ function openItemDetail(item, key, order) {
   if (priceEl) priceEl.textContent = item.price ? `${item.price} см / шт.` : '';
   if (skuEl)   skuEl.textContent   = item.sku || item.barcode || '';
 
-  // Мета
+  // Мета-сетка
   const metaEl = document.getElementById('idp-meta');
   if (metaEl) {
     const qty    = item.quantity || 1;
     const weight = item.weight   ? item.weight + ' кг' : '—';
-    const bc     = item.barcode  || '—';
     const art    = item.article  || item.productId || '—';
+    const price  = item.price    ? item.price + ' см' : '—';
     metaEl.innerHTML = `
-      <div class="idp-meta-cell"><div class="idp-meta-val">${weight}</div><div class="idp-meta-lbl">Вес / объём</div></div>
-      <div class="idp-meta-cell"><div class="idp-meta-val">${qty} шт.</div><div class="idp-meta-lbl">Количество</div></div>
-      <div class="idp-meta-cell"><div class="idp-meta-val" style="font-size:.68rem">${bc}</div><div class="idp-meta-lbl">Штрих-код</div></div>
-      <div class="idp-meta-cell"><div class="idp-meta-val" style="font-size:.68rem">${art}</div><div class="idp-meta-lbl">Артикул</div></div>
+      <div class="idp-meta-cell"><div class="idp-meta-val">${price}</div><div class="idp-meta-lbl">Цена / шт</div></div>
+      <div class="idp-meta-cell"><div class="idp-meta-val">${qty} шт.</div><div class="idp-meta-lbl">Кол-во</div></div>
+      <div class="idp-meta-cell"><div class="idp-meta-val">${weight}</div><div class="idp-meta-lbl">Вес</div></div>
+      <div class="idp-meta-cell"><div class="idp-meta-val" style="font-size:.64rem">${art}</div><div class="idp-meta-lbl">Артикул</div></div>
     `;
+  }
+
+  // Штрихкод
+  const bcWrap = document.getElementById('idp-bc-wrap');
+  if (bcWrap) {
+    if (scannerExpected) {
+      bcWrap.innerHTML = `
+        <div class="idp-bc-row">
+          <svg class="idp-bc-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="4" width="3" height="16" rx="1"/><rect x="7" y="4" width="1.5" height="16" rx=".5"/>
+            <rect x="10" y="4" width="3" height="16" rx="1"/><rect x="15" y="4" width="1.5" height="16" rx=".5"/>
+            <rect x="18" y="4" width="3" height="16" rx="1"/>
+          </svg>
+          <span class="idp-bc-val">${scannerExpected}</span>
+          <span class="idp-bc-lbl">Штрих-код</span>
+        </div>`;
+    } else {
+      bcWrap.innerHTML = `<div class="idp-nobc-badge">⚠️ Штрих-код отсутствует — подтвердите вручную</div>`;
+    }
   }
 
   // Предупреждение о сроке
@@ -1259,11 +1278,14 @@ function openItemDetail(item, key, order) {
     }
   }
 
-  // Кнопка сканирования — если нет штрихкода, меняем текст
+  // Кнопка сканирования — если нет штрихкода, меняем текст (сохраняя иконку)
   const scanBtn = document.getElementById('idp-btn-scan');
   if (scanBtn) {
-    scanBtn.textContent = scannerExpected ? 'СКАНИРОВАТЬ ТОВАР' : 'ПОДТВЕРДИТЬ ТОВАР';
-    scanBtn.onclick = scannerExpected ? openItemCamera : confirmItemManual;
+    const hasBC = !!scannerExpected;
+    scanBtn.innerHTML = hasBC
+      ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="4" width="3" height="16" rx="1"/><rect x="7" y="4" width="1.5" height="16" rx=".5"/><rect x="10" y="4" width="3" height="16" rx="1"/><rect x="15" y="4" width="1.5" height="16" rx=".5"/><rect x="18" y="4" width="3" height="16" rx="1"/></svg>Сканировать товар`
+      : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Подтвердить товар`;
+    scanBtn.onclick = hasBC ? openItemCamera : confirmItemManual;
   }
 
   page.classList.add('open');

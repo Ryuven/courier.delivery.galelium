@@ -1522,179 +1522,222 @@ a.ni{ text-decoration:none }
   font-size:.68rem;color:var(--acc2);
 }
 .ci-hint svg{flex-shrink:0}
-/* ── ITEM DETAIL — полноэкранный экран товара (стиль фото) ─ */
+/* ── ITEM DETAIL PAGE — тёмная тема курьерского приложения ─ */
 .item-detail-page{
   position:fixed;inset:0;z-index:8000;
-  background:#fff;
+  background:var(--bg);
   display:none;flex-direction:column;
   overflow:hidden;
   animation:itemPageIn .22s var(--ease) both;
 }
 .item-detail-page.open{ display:flex }
-@keyframes itemPageIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes itemPageIn{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:none}}
 
-/* Топбар */
+/* ── Топбар ── */
 .idp-topbar{
-  display:flex;align-items:center;justify-content:space-between;
+  display:flex;align-items:center;gap:10px;
   padding:calc(env(safe-area-inset-top,0px) + 10px) 14px 10px;
-  background:#fff;border-bottom:1px solid #f0f0f0;
-  flex-shrink:0;position:relative;z-index:2;
+  background:var(--s1);border-bottom:1px solid var(--b0);
+  flex-shrink:0;z-index:2;
 }
 .idp-back{
-  width:38px;height:38px;border-radius:50%;
-  background:#f5f5f5;border:none;
-  cursor:pointer;color:#333;
+  width:36px;height:36px;border-radius:10px;
+  background:var(--s2);border:1px solid var(--b0);
+  cursor:pointer;color:var(--tx2);
   display:flex;align-items:center;justify-content:center;
-  transition:background .15s;flex-shrink:0;
+  transition:all .12s;flex-shrink:0;
 }
-.idp-back:active{background:#e8e8e8}
+.idp-back:active{background:var(--s3)}
 .idp-title{
-  font-size:.82rem;font-weight:600;color:#1a1a1a;
-  flex:1;text-align:center;padding:0 8px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-family:var(--fd);font-size:.88rem;font-weight:900;color:var(--tx);
+  flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  letter-spacing:-.01em;
 }
 .idp-progress-chip{
-  background:#fff;border:1.5px solid #e0e0e0;border-radius:99px;
-  padding:5px 14px;font-size:.8rem;font-weight:700;color:#1a1a1a;
-  white-space:nowrap;flex-shrink:0;
+  background:var(--accd);border:1.5px solid var(--accg);border-radius:99px;
+  padding:4px 12px;font-family:var(--fd);font-size:.76rem;font-weight:900;
+  color:var(--acc2);white-space:nowrap;flex-shrink:0;
 }
 
-/* Прогресс-бар под топбаром */
-.idp-progress-bar{
-  height:4px;background:#f0f0f0;flex-shrink:0;
-}
+/* ── Прогресс-бар ── */
+.idp-progress-bar{ height:3px;background:var(--s3);flex-shrink:0 }
 .idp-progress-fill{
-  height:100%;background:#3dcf8e;border-radius:0 2px 2px 0;
+  height:100%;background:var(--acc);border-radius:0 2px 2px 0;
   transition:width .4s var(--ease);
 }
 
-/* Кнопка камеры */
+/* ── Кнопка «Включить камеру» ── */
 .idp-cam-btn{
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  padding:12px 20px;background:#f7f7f7;
-  border-bottom:1px solid #efefef;flex-shrink:0;
-  cursor:pointer;border:none;width:100%;font-family:var(--fs);
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:11px 20px;
+  background:var(--s1);border-bottom:1px solid var(--b0);
+  border-top:none;border-left:none;border-right:none;
+  flex-shrink:0;cursor:pointer;width:100%;font-family:var(--fs);
   transition:background .1s;
 }
-.idp-cam-btn:active{background:#efefef}
+.idp-cam-btn:active{background:var(--s2)}
 .idp-cam-btn-ico{
-  width:32px;height:32px;border-radius:50%;
-  background:#fff;border:1.5px solid #e0e0e0;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
+  width:30px;height:30px;border-radius:8px;
+  background:var(--accd);border:1px solid var(--accg);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
-.idp-cam-btn-lbl{font-size:.84rem;font-weight:500;color:#333}
+.idp-cam-btn-lbl{font-size:.78rem;font-weight:600;color:var(--tx2)}
 
-/* Скролл-область с фото и инфо */
-.idp-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#fff}
+/* ── Скролл-зона ── */
+.idp-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--bg)}
 
-/* Фото товара */
+/* ── Фото товара ── */
 .idp-img-wrap{
-  width:100%;aspect-ratio:1/1;max-height:52vw;
-  background:#fafafa;display:flex;align-items:center;justify-content:center;
+  width:100%;aspect-ratio:16/10;max-height:46vw;
+  background:var(--s1);border-bottom:1px solid var(--b0);
+  display:flex;align-items:center;justify-content:center;
   overflow:hidden;position:relative;
 }
 .idp-img-wrap img{
-  width:100%;height:100%;object-fit:contain;
-  padding:12px;
+  width:100%;height:100%;object-fit:contain;padding:16px;
 }
-.idp-img-placeholder{font-size:4rem;opacity:.25}
+.idp-img-placeholder{font-size:3.5rem;opacity:.18}
 
-/* Инфо о товаре */
+/* ── Инфо о товаре ── */
 .idp-info{padding:16px 18px 0}
-.idp-price{font-size:.9rem;color:#888;margin-bottom:4px}
-.idp-name{font-size:1.08rem;font-weight:700;color:#1a1a1a;line-height:1.3;margin-bottom:4px}
-.idp-sku{font-size:.76rem;color:#aaa;margin-bottom:14px}
+.idp-price{
+  font-size:.7rem;color:var(--tx3);margin-bottom:5px;
+  letter-spacing:.04em;text-transform:uppercase;
+}
+.idp-name{
+  font-family:var(--fd);font-size:1rem;font-weight:900;
+  color:var(--tx);line-height:1.25;margin-bottom:4px;
+}
+.idp-sku{
+  font-size:.64rem;color:var(--tx3);margin-bottom:14px;
+  font-variant-numeric:tabular-nums;
+}
 
-/* Мета-строка */
+/* ── Мета-сетка ── */
 .idp-meta{
   display:grid;grid-template-columns:1fr 1fr 1fr 1fr;
-  gap:0;border-top:1px solid #f0f0f0;border-bottom:1px solid #f0f0f0;
-  margin:0 -18px;padding:12px 18px;
+  background:var(--s1);border:1px solid var(--b0);border-radius:12px;
+  overflow:hidden;margin-bottom:12px;
 }
-.idp-meta-cell{ }
-.idp-meta-val{font-size:.82rem;font-weight:600;color:#1a1a1a;margin-bottom:2px}
-.idp-meta-lbl{font-size:.6rem;color:#aaa;line-height:1.3}
+.idp-meta-cell{
+  padding:11px 10px;position:relative;
+}
+.idp-meta-cell + .idp-meta-cell::before{
+  content:'';position:absolute;left:0;top:18%;bottom:18%;
+  width:1px;background:var(--b0);
+}
+.idp-meta-val{
+  font-family:var(--fd);font-size:.78rem;font-weight:900;
+  color:var(--tx);margin-bottom:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.idp-meta-lbl{font-size:.52rem;color:var(--tx3);letter-spacing:.06em;text-transform:uppercase}
 
-/* Предупреждение о сроке */
+/* ── Предупреждение о сроке ── */
 .idp-warn{
-  margin:14px 18px 0;
-  background:#fff9e6;border-radius:10px;
-  padding:11px 14px;
+  background:var(--amberd);border:1px solid rgba(217,119,6,.25);
+  border-radius:10px;padding:11px 14px;
   display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin-bottom:14px;
 }
-.idp-warn-txt{font-size:.75rem;color:#7a5c00;line-height:1.4}
-.idp-warn-date{font-size:.82rem;font-weight:700;color:#7a5c00;white-space:nowrap}
+.idp-warn-txt{font-size:.7rem;color:var(--amber);line-height:1.4}
+.idp-warn-date{font-size:.8rem;font-weight:700;color:var(--amber);white-space:nowrap}
 
-/* Нижние кнопки действий */
+/* ── Бейдж штрихкода ── */
+.idp-bc-row{
+  display:flex;align-items:center;gap:8px;margin-bottom:4px;
+  padding:10px 12px;background:var(--s1);border:1px solid var(--b0);
+  border-radius:10px;
+}
+.idp-bc-ico{color:var(--acc2);flex-shrink:0}
+.idp-bc-val{font-size:.74rem;font-weight:600;color:var(--tx2);font-variant-numeric:tabular-nums}
+.idp-bc-lbl{font-size:.58rem;color:var(--tx3);margin-left:auto}
+.idp-nobc-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 10px;background:var(--amberd);border:1px solid rgba(217,119,6,.2);
+  border-radius:7px;font-size:.62rem;font-weight:600;color:var(--amber);
+  margin-bottom:14px;
+}
+
+/* ── Нижние кнопки ── */
 .idp-actions{
-  padding:14px 16px calc(var(--nb) + var(--safe-b) + 14px);
-  background:#fff;border-top:1px solid #f0f0f0;
-  display:flex;flex-direction:column;gap:10px;
+  padding:12px 16px calc(var(--nb) + var(--safe-b) + 12px);
+  background:var(--s1);border-top:1px solid var(--b0);
+  display:flex;flex-direction:column;gap:9px;
   flex-shrink:0;
 }
 .idp-btn-primary{
-  width:100%;padding:15px;border-radius:99px;
-  background:linear-gradient(135deg,#ff8a3d,#ff6b1a);
-  border:none;cursor:pointer;font-family:var(--fs);
-  font-size:.8rem;font-weight:800;color:#fff;
-  letter-spacing:.08em;text-transform:uppercase;
-  transition:opacity .15s;
+  width:100%;padding:14px;border-radius:13px;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  border:none;cursor:pointer;font-family:var(--fd);
+  font-size:.8rem;font-weight:900;color:#0b0f0c;
+  letter-spacing:.06em;text-transform:uppercase;
+  box-shadow:0 4px 16px var(--acc-shadow);
+  transition:opacity .15s,transform .15s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
 }
-.idp-btn-primary:active{opacity:.88}
+.idp-btn-primary:active{opacity:.88;transform:scale(.98)}
 .idp-btn-secondary{
-  width:100%;padding:14px;border-radius:99px;
-  background:#f2f2f2;border:none;cursor:pointer;
-  font-family:var(--fs);font-size:.75rem;font-weight:700;
-  color:#555;letter-spacing:.07em;text-transform:uppercase;
-  transition:background .15s;
+  width:100%;padding:13px;border-radius:13px;
+  background:var(--s2);border:1px solid var(--b0);
+  cursor:pointer;font-family:var(--fd);font-size:.72rem;font-weight:700;
+  color:var(--tx3);letter-spacing:.06em;text-transform:uppercase;
+  transition:all .12s;
 }
-.idp-btn-secondary:active{background:#e8e8e8}
+.idp-btn-secondary:active{background:var(--s3);color:var(--tx2)}
 
-/* Камера внутри экрана товара */
+/* ── Камера-оверлей ── */
 .idp-cam-overlay{
   position:absolute;inset:0;z-index:10;
   background:#000;display:none;flex-direction:column;
 }
 .idp-cam-overlay.open{ display:flex }
 #idp-video{width:100%;height:100%;object-fit:cover;display:block;flex:1}
-.idp-cam-ui{
-  position:absolute;inset:0;pointer-events:none;
-}
+.idp-cam-ui{ position:absolute;inset:0;pointer-events:none }
 .idp-laser{
-  position:absolute;left:10%;right:10%;height:2px;
-  background:linear-gradient(90deg,transparent,#3dcf8e,transparent);
-  box-shadow:0 0 8px #3dcf8e;
-  animation:laserMove 2s ease-in-out infinite;
-  z-index:2;
+  position:absolute;left:8%;right:8%;height:2px;
+  background:linear-gradient(90deg,transparent,var(--acc2),transparent);
+  box-shadow:0 0 10px var(--acc);
+  animation:laserMove 2s ease-in-out infinite;z-index:2;
 }
-.idp-cam-corners{position:absolute;inset:20%;z-index:3}
-.idp-cam-corner{position:absolute;width:24px;height:24px;border-color:#fff;border-style:solid;}
+.idp-cam-corners{position:absolute;inset:18%;z-index:3}
+.idp-cam-corner{position:absolute;width:26px;height:26px;border-color:var(--acc2);border-style:solid}
 .idp-cam-corner.tl{top:0;left:0;border-width:3px 0 0 3px;border-radius:4px 0 0 0}
 .idp-cam-corner.tr{top:0;right:0;border-width:3px 3px 0 0;border-radius:0 4px 0 0}
 .idp-cam-corner.bl{bottom:0;left:0;border-width:0 0 3px 3px;border-radius:0 0 0 4px}
 .idp-cam-corner.br{bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 4px 0}
 .idp-cam-hint-txt{
-  position:absolute;bottom:80px;left:0;right:0;
-  text-align:center;font-size:.72rem;color:rgba(255,255,255,.8);
-  background:rgba(0,0,0,.45);padding:6px;z-index:4;
+  position:absolute;bottom:90px;left:0;right:0;
+  text-align:center;font-size:.7rem;color:rgba(255,255,255,.75);
+  padding:6px;z-index:4;letter-spacing:.04em;
 }
 .idp-cam-close-btn{
-  position:absolute;bottom:20px;left:50%;transform:translateX(-50%);
+  position:absolute;bottom:calc(var(--nb) + var(--safe-b) + 14px);
+  left:50%;transform:translateX(-50%);
   pointer-events:all;
-  background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);
-  color:#fff;font-family:var(--fs);font-size:.76rem;font-weight:600;
-  padding:10px 28px;border-radius:99px;cursor:pointer;z-index:5;
-  backdrop-filter:blur(8px);
+  background:rgba(11,15,12,.7);border:1.5px solid var(--b1);
+  color:var(--tx2);font-family:var(--fs);font-size:.74rem;font-weight:600;
+  padding:10px 30px;border-radius:99px;cursor:pointer;z-index:5;
+  backdrop-filter:blur(12px);white-space:nowrap;
 }
 .idp-scan-result{
-  position:absolute;bottom:70px;left:16px;right:16px;
-  padding:14px 18px;border-radius:14px;
-  font-size:.84rem;font-weight:700;text-align:center;
-  z-index:6;display:none;
+  position:absolute;bottom:calc(var(--nb) + var(--safe-b) + 70px);
+  left:16px;right:16px;
+  padding:14px 18px;border-radius:13px;
+  font-family:var(--fd);font-size:.82rem;font-weight:900;
+  text-align:center;z-index:6;display:none;
+  backdrop-filter:blur(12px);
 }
-.idp-scan-result.ok{ display:block;background:#d1fae5;color:#065f46 }
-.idp-scan-result.err{ display:block;background:#fee2e2;color:#991b1b }
+.idp-scan-result.ok{
+  display:block;
+  background:var(--accd);color:var(--acc2);
+  border:1.5px solid var(--accg);
+}
+.idp-scan-result.err{
+  display:block;
+  background:var(--redd);color:var(--red);
+  border:1.5px solid rgba(229,69,90,.35);
+}
 </style>
 </head>
 <body>
@@ -2134,25 +2177,26 @@ a.ni{ text-decoration:none }
   <!-- Топбар -->
   <div class="idp-topbar">
     <button class="idp-back" onclick="closeItemDetail()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
     </button>
     <div class="idp-title" id="idp-title">Собрать товар</div>
     <div class="idp-progress-chip" id="idp-chip">0 / 0</div>
   </div>
   <div class="idp-progress-bar"><div class="idp-progress-fill" id="idp-progress-fill" style="width:0%"></div></div>
 
-  <!-- Кнопка «Включить камеру» -->
-  <button class="idp-cam-btn" id="idp-cam-trigger" onclick="openItemCamera()">
+  <!-- Кнопка камеры -->
+  <button class="idp-cam-btn" onclick="openItemCamera()">
     <div class="idp-cam-btn-ico">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.8">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--acc2)" stroke-width="1.8">
         <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
         <circle cx="12" cy="13" r="4"/>
       </svg>
     </div>
     <span class="idp-cam-btn-lbl">Включить камеру</span>
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--tx3)" stroke-width="2" style="margin-left:auto"><path d="M9 18l6-6-6-6"/></svg>
   </button>
 
-  <!-- Скролл-зона: фото + инфо -->
+  <!-- Скролл-зона -->
   <div class="idp-scroll">
 
     <!-- Фото -->
@@ -2166,28 +2210,38 @@ a.ni{ text-decoration:none }
       <div class="idp-name"  id="idp-name">—</div>
       <div class="idp-sku"   id="idp-sku"></div>
 
+      <!-- Мета-сетка -->
       <div class="idp-meta" id="idp-meta"></div>
 
+      <!-- Штрихкод -->
+      <div id="idp-bc-wrap"></div>
+
+      <!-- Предупреждение о сроке -->
       <div class="idp-warn" id="idp-warn" style="display:none">
         <div class="idp-warn-txt">Убедитесь, что товар произведён или упакован после даты</div>
         <div class="idp-warn-date" id="idp-warn-date"></div>
       </div>
     </div>
 
-    <div style="height:12px"></div>
-  </div><!-- /scroll -->
+    <div style="height:8px"></div>
+  </div>
 
   <!-- Кнопки действий -->
   <div class="idp-actions">
     <button class="idp-btn-primary" id="idp-btn-scan" onclick="openItemCamera()">
-      СКАНИРОВАТЬ ТОВАР
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <rect x="2" y="4" width="3" height="16" rx="1"/><rect x="7" y="4" width="1.5" height="16" rx=".5"/>
+        <rect x="10" y="4" width="3" height="16" rx="1"/><rect x="15" y="4" width="1.5" height="16" rx=".5"/>
+        <rect x="18" y="4" width="3" height="16" rx="1"/>
+      </svg>
+      Сканировать товар
     </button>
     <button class="idp-btn-secondary" onclick="confirmItemManual()">
-      ТОВАР ОТСУТСТВУЕТ
+      Товар отсутствует
     </button>
   </div>
 
-  <!-- Слой камеры поверх всего экрана -->
+  <!-- Оверлей камеры -->
   <div class="idp-cam-overlay" id="idp-cam-overlay">
     <video id="idp-video" autoplay playsinline muted></video>
     <div class="idp-cam-ui">
