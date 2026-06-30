@@ -1458,92 +1458,81 @@ function playErrorBeep() {
 
 // ─── ШАГ 3: Расонидан ────────────────────────────────────
 function renderStep3(o) {
-  const atClient = o.status === 'client_arrived';
+  const atClient  = o.status === 'client_arrived';
   const itemCount = (o.items || []).reduce((s, i) => s + i.quantity, 0);
-  const pay = o.paymentMethod === 'cash' ? '💵 Нақдӣ ба курьер' : o.paymentMethod === 'card' ? '💳 Корт' : '🌐 Онлайн';
+  const pay = o.paymentMethod === 'cash' ? 'Нақдӣ ба курьер' : o.paymentMethod === 'card' ? 'Корт' : 'Онлайн';
 
   return `
-  <div class="flow-panel">
+  <div class="flow-panel s3c">
     ${renderStepBar(3)}
     ${renderOrderBadge(o)}
 
-    <!-- Hero -->
-    <div class="s1-hero ${atClient ? 'arrived' : ''}" style="${atClient ? '' : 'background:linear-gradient(135deg,rgba(59,130,246,.12),rgba(59,130,246,.04));border-color:rgba(59,130,246,.25)'}">
-      <div class="s1-hero-icon">${atClient ? '🎉' : '🛵'}</div>
-      <div class="s1-hero-body">
-        <div class="s1-hero-title" style="${atClient ? '' : 'color:#93c5fd'}">${atClient ? 'Расидед ба муштарӣ!' : 'Дар роҳ ба муштарӣ'}</div>
-        <div class="s1-hero-sub">${atClient ? 'Фармоишро супоред ва тасдиқ кунед' : 'Ба суроғ зер равед'}</div>
-      </div>
+    <!-- Статус -->
+    <div class="s3c-status ${atClient ? 'green' : 'blue'}">
+      <div class="s3c-status-dot"></div>
+      <div class="s3c-status-txt">${atClient ? 'Расидед ба муштарӣ' : 'Дар роҳ ба муштарӣ'}</div>
     </div>
 
-    <!-- Адрес клиента -->
-    <div class="info-card">
-      <div class="info-card-icon" style="background:rgba(59,130,246,.12);color:#60a5fa">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-      </div>
-      <div class="info-card-body">
-        <div class="info-card-lbl">Суроғи муштарӣ</div>
-        <div class="info-card-val">${o.address || '—'}</div>
-        ${o.comment ? `<div class="info-card-sub">💬 ${o.comment}</div>` : ''}
-      </div>
-      <div class="info-card-arrow">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-      </div>
-    </div>
-
-    <!-- Карточка оплаты -->
-    <div class="info-card">
-      <div class="info-card-icon" style="background:var(--amberd);color:var(--amber)">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="1"/><path d="M2 10h20"/></svg>
-      </div>
-      <div class="info-card-body">
-        <div class="info-card-lbl">Пардохт</div>
-        <div class="info-card-val">${pay}</div>
-        <div class="info-card-sub">Маблағи фармоиш: ${o.total || 0} см</div>
-      </div>
-    </div>
-
-    <!-- Итог товаров -->
-    <div class="s3-items">
-      <div class="s3-items-header">
-        <span class="s3-items-title">Таркиби фармоиш</span>
-        <span class="s3-items-count">${itemCount} мол</span>
-      </div>
-      ${(o.items || []).map(item => `
-        <div class="s3-item">
-          <div class="s3-item-img">
-            ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.name}">` : '<span style="font-size:1rem">🛍️</span>'}
-          </div>
-          <div class="s3-item-name">${item.name}</div>
-          <div class="s3-item-right">
-            <span class="s3-item-qty">×${item.quantity}</span>
-            <span class="s3-item-price">${item.price * item.quantity} см</span>
-          </div>
+    <!-- Адрес + Оплата (одна карточка) -->
+    <div class="s3c-card">
+      <div class="s3c-row clickable">
+        <div class="s3c-row-ico" style="background:rgba(59,130,246,.12);color:#60a5fa">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
         </div>
-      `).join('')}
-      <div class="s3-total-row">
-        <span>Ҷамъи шумо</span>
-        <span class="s3-total-earn">+${EPD} см</span>
+        <div class="s3c-row-body">
+          <div class="s3c-row-lbl">Суроға</div>
+          <div class="s3c-row-val">${o.address || '—'}</div>
+          ${o.comment ? `<div class="s3c-row-sub">💬 ${o.comment}</div>` : ''}
+        </div>
+        <svg class="s3c-row-chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
       </div>
+      <div class="s3c-row">
+        <div class="s3c-row-ico" style="background:var(--amberd);color:var(--amber)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="1"/><path d="M2 10h20"/></svg>
+        </div>
+        <div class="s3c-row-body">
+          <div class="s3c-row-lbl">Пардохт</div>
+          <div class="s3c-row-val">${pay} · ${o.total || 0} см</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Товары (свёрнутый список) -->
+    <div class="s3c-items">
+      <button class="s3c-items-toggle" onclick="toggleS3Items()">
+        <span class="s3c-items-toggle-lbl">Таркиби фармоиш</span>
+        <span class="s3c-items-toggle-count">${itemCount} мол</span>
+        <svg class="s3c-items-toggle-chev" id="s3c-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="s3c-items-body" id="s3c-items-body">
+        ${(o.items || []).map(item => `
+          <div class="s3c-mini-item">
+            <span class="s3c-mini-name">${item.name}</span>
+            <span class="s3c-mini-qty">×${item.quantity}</span>
+            <span class="s3c-mini-price">${item.price * item.quantity} см</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <!-- Доход -->
+    <div class="s3c-earn">
+      <span class="s3c-earn-lbl">Даромади шумо барои ин фармоиш</span>
+      <span class="s3c-earn-val">+${EPD} см</span>
     </div>
 
     <!-- Кнопки -->
     <div class="flow-actions">
       ${atClient
-        ? `<div style="background:linear-gradient(135deg,rgba(26,158,74,.08),rgba(34,197,94,.04));border:2px solid rgba(26,158,74,.22);border-radius:18px;padding:20px;margin-bottom:12px">
-            <div style="font-size:.55rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--acc);margin-bottom:12px;text-align:center">Рамзи тасдиқ аз муштарӣ</div>
-            <div style="display:flex;gap:8px;align-items:center">
-              <input id="confirm-code-inp" type="number" maxlength="4" placeholder="0000"
-                style="flex:1;font-family:var(--fd);font-weight:900;font-size:2rem;text-align:center;letter-spacing:.2em;background:var(--s1);border:2px solid var(--b1);border-radius:14px;color:var(--tx);padding:12px 8px;outline:none;appearance:textfield;-moz-appearance:textfield;width:100%;box-sizing:border-box"
-                oninput="this.value=this.value.slice(0,4)"
-                onfocus="this.style.borderColor='var(--acc)'"
-                onblur="this.style.borderColor='var(--b1)'"/>
-            </div>
-            <div style="font-size:.62rem;color:var(--tx3);margin-top:10px;text-align:center">Муштарӣ рамзи 4-рақамро мегӯяд</div>
+        ? `<div class="s3c-code">
+            <div class="s3c-code-lbl">Рамзи тасдиқ аз муштарӣ</div>
+            <input id="confirm-code-inp" class="s3c-code-inp" type="number" maxlength="4" placeholder="0000"
+              oninput="this.value=this.value.slice(0,4)"/>
+            <div class="s3c-code-hint">Муштарӣ рамзи 4-рақамро мегӯяд</div>
           </div>
           <button class="btn-flow-final" onclick="deliverOrder('${o.id}')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-            Тасдиқ ва анҷом додан 🎉
+            Тасдиқ ва анҷом додан
           </button>`
         : `<button class="btn-flow-primary" onclick="advance('${o.id}','client_arrived')" style="background:linear-gradient(135deg,#3b82f6,#60a5fa);box-shadow:0 4px 16px rgba(59,130,246,.3)">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -1553,6 +1542,14 @@ function renderStep3(o) {
     </div>
   </div>`;
 }
+
+window.toggleS3Items = function () {
+  const body = document.getElementById('s3c-items-body');
+  const chev = document.getElementById('s3c-chev');
+  if (!body) return;
+  const open = body.classList.toggle('open');
+  if (chev) chev.classList.toggle('open', open);
+};
 
 // ─── Рендер активного заказа ─────────────────────────────
 function renderActive() {
