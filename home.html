@@ -149,88 +149,134 @@
 @keyframes gpsPulse{0%,100%{box-shadow:0 0 0 0 rgba(62,207,142,.4)}50%{box-shadow:0 0 0 5px rgba(62,207,142,0)}}
 .dash-gps-pill span{color:var(--tx2)}
 
-/* ── НИЖНИЙ ВЫДВИЖНОЙ ЛИСТ ───────────────────────────────── */
-:root{ --sheet-peek: 148px }  /* сколько листа видно в закрытом виде */
 
-.dash-sheet{
-  position:absolute;bottom:0;left:0;right:0;z-index:20;
-  background:rgba(13,19,14,.97);
-  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  border-top:1px solid var(--b1);
+/* ════ ГЛОБАЛЬНЫЙ BOTTOM SHEET (единый для всех вкладок) ════ */
+:root{
+  --sheet-peek: 158px;
+}
+#global-sheet{
+  position:fixed;bottom:0;left:0;right:0;z-index:180;
+  background:var(--bg);
   border-radius:22px 22px 0 0;
-  /* начальная позиция: только peek виден */
-  transform:translateY(calc(100% - var(--sheet-peek)));
-  transition:transform .38s var(--ease);
-  will-change:transform;
-  box-shadow:0 -8px 40px rgba(0,0,0,.5);
-  /* листание */
-  touch-action:none;
-  /* максимальная высота */
-  max-height:calc(100% - 80px);
-  overflow:hidden;
+  border-top:1px solid var(--b1);
+  box-shadow:0 -6px 40px rgba(0,0,0,.45);
   display:flex;flex-direction:column;
+  max-height:calc(100svh - 44px);
+  overflow:hidden;
+  will-change:transform;
+  transition:transform .36s cubic-bezier(.32,.72,0,1);
+  touch-action:none;
+  transform:translateY(calc(100% - var(--sheet-peek) - var(--nb) - var(--safe-b)));
 }
-.dash-sheet.expanded{
-  transform:translateY(0);
-}
+#global-sheet.sheet-open{ transform:translateY(0) }
+#global-sheet.sheet-hidden{ transform:translateY(100%) }
 
-/* Drag handle */
-.dash-sheet-handle{
-  width:38px;height:4px;border-radius:99px;
-  background:var(--s4);margin:10px auto 0;flex-shrink:0;cursor:grab;
+/* Handle */
+.gsheet-handle-wrap{
+  flex-shrink:0;padding:10px 0 4px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:grab;user-select:none;-webkit-user-select:none;
 }
-.dash-sheet-handle:active{cursor:grabbing}
+.gsheet-handle-wrap:active{cursor:grabbing}
+.gsheet-handle{ width:38px;height:4px;border-radius:99px;background:var(--s4) }
 
-/* Кнопка ОНЛАЙН (На линию) */
+/* Табы внутри sheet */
+.gsheet-tabs{
+  flex-shrink:0;display:flex;align-items:stretch;
+  border-bottom:1px solid var(--b0);background:var(--bg);
+  overflow-x:auto;scrollbar-width:none;
+}
+.gsheet-tabs::-webkit-scrollbar{display:none}
+.gsht{
+  flex:1;min-width:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:4px;
+  padding:9px 6px;cursor:pointer;
+  border:none;background:none;font-family:var(--fs);
+  color:var(--tx3);transition:color .15s;
+  position:relative;white-space:nowrap;
+}
+.gsht .gsht-lbl{font-size:.52rem;font-weight:700;letter-spacing:.03em}
+.gsht::after{
+  content:'';position:absolute;bottom:0;left:15%;right:15%;height:2px;
+  background:var(--acc);border-radius:2px 2px 0 0;
+  transform:scaleX(0);transition:transform .22s var(--spring);
+}
+.gsht.active{ color:var(--acc2) }
+.gsht.active::after{ transform:scaleX(1) }
+.gsht-badge{
+  position:absolute;top:5px;right:10px;
+  min-width:15px;height:15px;padding:0 3px;
+  background:var(--amber);color:#fff;font-size:.44rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:99px;border:2px solid var(--bg);
+}
+.gsht-badge.green{background:var(--acc)}
+
+/* Контент-панели */
+.gsheet-panels{ flex:1;overflow:hidden;position:relative }
+.gsheet-panel{
+  position:absolute;inset:0;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  display:none;
+  animation:pgIn .18s var(--ease) both;
+}
+.gsheet-panel.active{ display:block }
+
+/* Шапка вкладки */
+.gsp-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px 10px;gap:10px;
+  position:sticky;top:0;z-index:2;background:var(--bg);
+}
+.gsp-title-wrap{ display:flex;flex-direction:column;gap:2px }
+.gsp-tag{font-size:.5rem;letter-spacing:.2em;text-transform:uppercase;color:var(--tx3)}
+.gsp-title{font-family:var(--fd);font-weight:900;font-size:1.1rem;color:#fff;letter-spacing:-.02em;line-height:1}
+.gsp-title em{color:var(--acc2);font-style:normal}
+.gsp-count{font-size:.62rem;color:var(--tx3)}
+.gsp-body{padding:12px 16px calc(var(--safe-b) + 90px)}
+
+/* Дашборд peek-зона (кнопка + статы) */
+.dash-peek{flex-shrink:0}
 .dash-online-btn{
-  margin:14px 20px 0;
-  padding:14px 20px;border:none;cursor:pointer;border-radius:16px;
-  font-family:var(--fd);font-weight:900;font-size:.9rem;letter-spacing:.04em;
+  margin:12px 16px 10px;padding:13px 20px;
+  border:none;cursor:pointer;border-radius:14px;
+  font-family:var(--fd);font-weight:900;font-size:.88rem;letter-spacing:.04em;
   display:flex;align-items:center;justify-content:center;gap:10px;
-  transition:all .25s var(--spring);
-  flex-shrink:0;
+  transition:all .25s var(--spring);flex-shrink:0;width:calc(100% - 32px);
 }
 .dash-online-btn.offline{
   background:linear-gradient(135deg,var(--acc),var(--acc2));
-  color:#0b0f0c;
-  box-shadow:0 4px 22px var(--acc-shadow);
+  color:#0b0f0c;box-shadow:0 4px 22px var(--acc-shadow);
 }
 .dash-online-btn.offline:hover{transform:translateY(-1px);box-shadow:0 6px 28px var(--acc-shadow)}
 .dash-online-btn.online{
-  background:var(--redd);
-  border:1.5px solid rgba(229,69,90,.35);
-  color:var(--red);
-  box-shadow:none;
+  background:var(--redd);border:1.5px solid rgba(229,69,90,.35);color:var(--red);
 }
 .dash-online-btn.online:hover{background:rgba(229,69,90,.18)}
 
-/* Строка статистики под кнопкой */
+/* Быстрая статистика */
 .dash-quick-stats{
-  display:flex;align-items:center;gap:0;
-  margin:12px 20px 0;flex-shrink:0;
+  display:flex;align-items:center;padding:0 12px 6px;flex-shrink:0;
 }
 .dqs{
-  flex:1;text-align:center;padding:10px 8px;
-  border-radius:10px;
-  transition:background .15s;
+  flex:1;text-align:center;padding:8px 6px;
+  border-radius:10px;transition:background .15s;cursor:pointer;
 }
-.dqs:hover{background:var(--s3)}
-.dqs-val{font-family:var(--fd);font-weight:900;font-size:1.1rem;color:var(--tx);line-height:1}
-.dqs-val.g{color:var(--acc2)}
-.dqs-val.a{color:var(--amber)}
-.dqs-lbl{font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);margin-top:3px}
-.dqs-div{width:1px;background:var(--b0);height:32px;flex-shrink:0}
+.dqs:hover{background:var(--s2)}
+.dqs-val{font-family:var(--fd);font-weight:900;font-size:1rem;color:var(--tx);line-height:1}
+.dqs-val.g{color:var(--acc2)}.dqs-val.a{color:var(--amber)}
+.dqs-lbl{font-size:.48rem;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);margin-top:3px}
+.dqs-div{width:1px;background:var(--b0);height:28px;flex-shrink:0}
 
-/* Скроллируемый контент листа */
-.dash-sheet-scroll{
-  flex:1;overflow-y:auto;padding:16px 20px calc(var(--safe-b) + 16px);
-}
-
-/* Заголовок секции в листе */
+/* Скролл дашборд-панели */
+.dash-sheet-scroll{padding:10px 16px calc(var(--safe-b) + 16px)}
 .dash-sheet-section-title{
-  font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--tx3);margin-bottom:10px;font-weight:600;
+  font-size:.54rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--tx3);font-weight:700;padding:12px 0 6px;
 }
+
+/* Совместимость — старый dash-sheet скрыт */
+.dash-sheet{display:none!important}
 
 /* Активный заказ в листе */
 .dash-active-row{
@@ -294,10 +340,6 @@
 .leaflet-tooltip-top::before{border-top-color:var(--b1)!important}
 @media(max-width:860px){
   :root{ --sheet-peek: 162px }
-  .dash-sheet{
-    bottom:calc(var(--nb) + var(--safe-b));
-    border-radius:18px 18px 0 0;
-  }
   .dash-control-zoom{
     bottom:calc(var(--sheet-peek) + var(--nb) + var(--safe-b) + 12px)!important;
   }
@@ -848,16 +890,16 @@ a{color:inherit;text-decoration:none}
 .page{display:none;padding:22px 22px 36px;animation:pgIn .25s var(--ease) both;
   position:absolute;inset:0;overflow-y:auto;}
 .page.active{display:block}
-/* Дашборд — флекс-колонка, без паддинга, без скролла (скролл внутри листа) */
+/* Дашборд — карта всегда на весь экран, контент в global-sheet */
 #page-dashboard{
   padding:0!important;
   overflow:hidden;
-  display:none;
+  display:flex!important;   /* всегда видима */
   flex-direction:column;
   z-index:2;
   top:0!important;
+  position:absolute;inset:0;
 }
-#page-dashboard.active{ display:flex!important }
 @keyframes pgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
 /* Заголовок секции */
@@ -1948,168 +1990,178 @@ a.ni{ text-decoration:none }
       </div>
 
       <!-- НИЖНИЙ ВЫДВИЖНОЙ ЛИСТ -->
-      <div class="dash-sheet" id="dash-sheet">
-        <div class="dash-sheet-handle" id="dash-sheet-handle"></div>
+      <!-- ══ ГЛОБАЛЬНЫЙ BOTTOM SHEET ══════════════════════════ -->
+      <div id="global-sheet">
 
-        <!-- Кнопка "На линию" / "Офлайн" -->
-        <button class="dash-online-btn offline" id="dash-online-btn" onclick="dashToggleOnline()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-          Ба хат баромадан
-        </button>
-
-        <!-- Быстрая статистика -->
-        <div class="dash-quick-stats">
-          <div class="dqs">
-            <div class="dqs-val g" id="dqs-earn">0 см</div>
-            <div class="dqs-lbl">Имрӯз</div>
-          </div>
-          <div class="dqs-div"></div>
-          <div class="dqs">
-            <div class="dqs-val" id="dqs-today">0</div>
-            <div class="dqs-lbl">Расониш</div>
-          </div>
-          <div class="dqs-div"></div>
-          <div class="dqs">
-            <div class="dqs-val" id="dqs-total">0</div>
-            <div class="dqs-lbl">Ҷамъ</div>
-          </div>
-          <div class="dqs-div"></div>
-          <div class="dqs">
-            <div class="dqs-val a" id="dqs-rating">—</div>
-            <div class="dqs-lbl">Рейтинг</div>
-          </div>
+        <!-- Handle -->
+        <div class="gsheet-handle-wrap" id="gsheet-handle">
+          <div class="gsheet-handle"></div>
         </div>
 
-        <!-- Скроллируемый контент -->
-        <div class="dash-sheet-scroll" id="dash-sheet-scroll">
-          <!-- Активный заказ (если есть) -->
-          <div id="dash-active-wrap"></div>
-          <!-- Уведомление о новых -->
-          <div id="notif-wrap"></div>
-          <!-- Список новых заказов -->
-          <div class="dash-sheet-section-title" id="dash-new-title" style="display:none">Фармоишҳои нав</div>
-          <div id="dash-new-orders"></div>
+        <!-- ТАБЫ -->
+        <div class="gsheet-tabs" id="gsheet-tabs">
+          <button class="gsht active" data-tab="dashboard" onclick="switchTab('dashboard')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            <span class="gsht-lbl">Дашборд</span>
+          </button>
+          <button class="gsht" data-tab="new-orders" onclick="switchTab('new-orders')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            <span class="gsht-lbl">Нав</span>
+            <span class="gsht-badge" id="gsht-new-badge" style="display:none">0</span>
+          </button>
+          <button class="gsht" data-tab="active" onclick="switchTab('active')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="1"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>
+            <span class="gsht-lbl">Фаъол</span>
+            <span class="gsht-badge green" id="gsht-active-badge" style="display:none">●</span>
+          </button>
+          <button class="gsht" data-tab="history" onclick="switchTab('history')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span class="gsht-lbl">Таърих</span>
+          </button>
+          <button class="gsht" data-tab="profile" onclick="switchTab('profile')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span class="gsht-lbl">Профил</span>
+          </button>
         </div>
-      </div>
 
-    </div>
+        <!-- ПАНЕЛИ -->
+        <div class="gsheet-panels">
 
-    <!-- НОВЫЕ ЗАКАЗЫ -->
-    <div class="page" id="page-new-orders">
-      <div class="sh">
-        <div><div class="sh-tag">Дастрас</div><div class="sh-title">Фармоишҳои <em>нав</em></div></div>
-        <div style="font-size:.62rem;color:var(--tx3)" id="new-count-txt">0 фармоиш</div>
-      </div>
-      <div id="new-orders-list"><div class="pload"><div class="spin"></div> Интизор…</div></div>
-    </div>
-
-    <!-- АКТИВНЫЙ ЗАКАЗ -->
-    <div class="page" id="page-active">
-      <div class="sh">
-        <div><div class="sh-tag">Дар кор</div><div class="sh-title">Фармоиши <em>фаъол</em></div></div>
-      </div>
-      <div id="active-content">
-        <div class="empty"><div class="empty-ico">🛵</div><div class="empty-t">Фармоиши фаъол нест</div><div class="empty-s">Аз рӯйхат фармоиш қабул кунед</div></div>
-      </div>
-    </div>
-
-    <!-- ИСТОРИЯ -->
-    <div class="page" id="page-history">
-      <div class="sh">
-        <div><div class="sh-tag">Архив</div><div class="sh-title">Таърихи <em>расониш</em></div></div>
-        <div style="font-size:.62rem;color:var(--tx3)" id="hist-total-txt"></div>
-      </div>
-      <div id="history-list"><div class="pload"><div class="spin"></div> Боргузорӣ…</div></div>
-    </div>
-
-    <!-- ПРОФИЛЬ -->
-    <div class="page" id="page-profile">
-      <div class="sh">
-        <div><div class="sh-tag">Аккаунт</div><div class="sh-title">Профил</div></div>
-        <button class="profile-settings-btn" onclick="openSettings()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-          Танзимот
-        </button>
-      </div>
-      <div class="pg2">
-        <div>
-          <div class="pcard">
-            <div class="p-av" id="p-av">?</div>
-            <div class="p-name"  id="p-name">—</div>
-            <div class="p-email" id="p-email">—</div>
-            <div class="p-veh"   id="p-veh">—</div>
-            <div id="p-verif-badge-wrap"></div>
-            <div class="p-stats">
-              <div class="p-st"><div class="p-st-val" id="ps-total">0</div><div class="p-st-lbl">Расониш</div></div>
-              <div class="p-st"><div class="p-st-val" id="ps-earn">0</div><div class="p-st-lbl">Даромад</div></div>
-              <div class="p-st"><div class="p-st-val" id="ps-rating">—</div><div class="p-st-lbl">Рейтинг</div></div>
+          <!-- ─ ДАШБОРД ─────────────────────────────────────── -->
+          <div class="gsheet-panel active" id="gpanel-dashboard">
+            <div class="dash-peek">
+              <!-- Кнопка "На линию" -->
+              <button class="dash-online-btn offline" id="dash-online-btn" onclick="dashToggleOnline()">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                Ба хат баромадан
+              </button>
+              <!-- Быстрая статистика -->
+              <div class="dash-quick-stats">
+                <div class="dqs"><div class="dqs-val g" id="dqs-earn">0 см</div><div class="dqs-lbl">Имрӯз</div></div>
+                <div class="dqs-div"></div>
+                <div class="dqs"><div class="dqs-val" id="dqs-today">0</div><div class="dqs-lbl">Расониш</div></div>
+                <div class="dqs-div"></div>
+                <div class="dqs"><div class="dqs-val" id="dqs-total">0</div><div class="dqs-lbl">Ҷамъ</div></div>
+                <div class="dqs-div"></div>
+                <div class="dqs"><div class="dqs-val a" id="dqs-rating">—</div><div class="dqs-lbl">Рейтинг</div></div>
+              </div>
+            </div>
+            <!-- Скролл-контент дашборда -->
+            <div class="dash-sheet-scroll">
+              <div id="dash-active-wrap"></div>
+              <div id="notif-wrap"></div>
+              <div class="dash-sheet-section-title" id="dash-new-title" style="display:none">Фармоишҳои нав</div>
+              <div id="dash-new-orders"></div>
             </div>
           </div>
-          <div id="verif-banner-wrap"></div>
-          <div style="margin-top:10px">
-            <button class="btn-outline danger" style="width:100%;padding:11px" onclick="doLogout()">Аз аккаунт баромадан</button>
-          </div>
-        </div>
-        <div>
-          <div class="pform">
-            <div class="pform-t">Маълумоти шахсӣ</div>
-            <div class="fr2">
-              <div class="ff"><label class="fl">Ном ва насаб</label><input class="fi" type="text" id="pf-name" placeholder="Аҳмад Назаров"/></div>
-              <div class="ff"><label class="fl">Телефон</label><input class="fi" type="tel" id="pf-phone" placeholder="+992 900 000-000"/></div>
-            </div>
-            <div class="ff"><label class="fl">Email</label><input class="fi" type="email" id="pf-email" readonly/></div>
-            <div class="ff">
-              <label class="fl">Нақлиёт</label>
-              <select class="fi" id="pf-vehicle">
-                <option value="bicycle">🚴 Велосипед</option>
-                <option value="scooter">🛵 Скутер</option>
-                <option value="car">🚗 Автомобил</option>
-                <option value="foot">🚶 Пиёда</option>
-              </select>
-            </div>
-            <button class="btn-primary" onclick="saveProfile()">Тағйиротро сақл кунед</button>
-          </div>
-          <div class="pform">
-            <div class="pform-t">Акси профил</div>
-            <input type="file" id="av-inp" accept="image/*" style="display:none" onchange="uploadAvUI(this)"/>
-            <button class="btn-outline" onclick="document.getElementById('av-inp').click()">Аксро бор кунед</button>
-            <div style="font-size:.62rem;color:var(--tx3);margin-top:7px">JPG, PNG то 2 МБ</div>
-          </div>
-        </div>
-      </div>
-    </div>
 
+          <!-- ─ НОВЫЕ ЗАКАЗЫ ────────────────────────────────── -->
+          <div class="gsheet-panel" id="gpanel-new-orders">
+            <div class="gsp-header">
+              <div class="gsp-title-wrap">
+                <div class="gsp-tag">Дастрас</div>
+                <div class="gsp-title">Фармоишҳои <em>нав</em></div>
+              </div>
+              <div class="gsp-count" id="new-count-txt">0 фармоиш</div>
+            </div>
+            <div class="gsp-body">
+              <div id="new-orders-list"><div class="pload"><div class="spin"></div> Интизор…</div></div>
+            </div>
+          </div>
+
+          <!-- ─ АКТИВНЫЙ ЗАКАЗ ──────────────────────────────── -->
+          <div class="gsheet-panel" id="gpanel-active">
+            <div class="gsp-header">
+              <div class="gsp-title-wrap">
+                <div class="gsp-tag">Дар кор</div>
+                <div class="gsp-title">Фармоиши <em>фаъол</em></div>
+              </div>
+            </div>
+            <div class="gsp-body">
+              <div id="active-content">
+                <div class="empty"><div class="empty-ico">🛵</div><div class="empty-t">Фармоиши фаъол нест</div><div class="empty-s">Аз рӯйхат фармоиш қабул кунед</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ─ ИСТОРИЯ ─────────────────────────────────────── -->
+          <div class="gsheet-panel" id="gpanel-history">
+            <div class="gsp-header">
+              <div class="gsp-title-wrap">
+                <div class="gsp-tag">Архив</div>
+                <div class="gsp-title">Таърихи <em>расониш</em></div>
+              </div>
+              <div class="gsp-count" id="hist-total-txt"></div>
+            </div>
+            <div class="gsp-body">
+              <div id="history-list"><div class="pload"><div class="spin"></div> Боргузорӣ…</div></div>
+            </div>
+          </div>
+
+          <!-- ─ ПРОФИЛЬ ─────────────────────────────────────── -->
+          <div class="gsheet-panel" id="gpanel-profile">
+            <div class="gsp-header">
+              <div class="gsp-title-wrap">
+                <div class="gsp-tag">Аккаунт</div>
+                <div class="gsp-title">Профил</div>
+              </div>
+              <button class="profile-settings-btn" onclick="openSettings()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                Танзимот
+              </button>
+            </div>
+            <div class="gsp-body">
+              <div class="pcard">
+                <div class="p-av" id="p-av">?</div>
+                <div class="p-name"  id="p-name">—</div>
+                <div class="p-email" id="p-email">—</div>
+                <div class="p-veh"   id="p-veh">—</div>
+                <div id="p-verif-badge-wrap"></div>
+                <div class="p-stats">
+                  <div class="p-st"><div class="p-st-val" id="ps-total">0</div><div class="p-st-lbl">Расониш</div></div>
+                  <div class="p-st"><div class="p-st-val" id="ps-earn">0</div><div class="p-st-lbl">Даромад</div></div>
+                  <div class="p-st"><div class="p-st-val" id="ps-rating">—</div><div class="p-st-lbl">Рейтинг</div></div>
+                </div>
+              </div>
+              <div id="verif-banner-wrap"></div>
+              <div style="margin-top:10px">
+                <button class="btn-outline danger" style="width:100%;padding:11px" onclick="doLogout()">Аз аккаунт баромадан</button>
+              </div>
+              <div class="pform" style="margin-top:14px">
+                <div class="pform-t">Маълумоти шахсӣ</div>
+                <div class="ff"><label class="fl">Ном ва насаб</label><input class="fi" type="text" id="pf-name" placeholder="Аҳмад Назаров"/></div>
+                <div class="ff"><label class="fl">Телефон</label><input class="fi" type="tel" id="pf-phone" placeholder="+992 900 000-000"/></div>
+                <div class="ff"><label class="fl">Email</label><input class="fi" type="email" id="pf-email" readonly/></div>
+                <div class="ff">
+                  <label class="fl">Нақлиёт</label>
+                  <select class="fi" id="pf-vehicle">
+                    <option value="bicycle">🚴 Велосипед</option>
+                    <option value="scooter">🛵 Скутер</option>
+                    <option value="car">🚗 Автомобил</option>
+                    <option value="foot">🚶 Пиёда</option>
+                  </select>
+                </div>
+                <button class="btn-primary" onclick="saveProfile()">Тағйиротро сақл кунед</button>
+              </div>
+              <div class="pform">
+                <div class="pform-t">Акси профил</div>
+                <input type="file" id="av-inp" accept="image/*" style="display:none" onchange="uploadAvUI(this)"/>
+                <button class="btn-outline" onclick="document.getElementById('av-inp').click()">Аксро бор кунед</button>
+                <div style="font-size:.62rem;color:var(--tx3);margin-top:7px">JPG, PNG то 2 МБ</div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /gsheet-panels -->
+      </div><!-- /global-sheet -->
+
+    </div><!-- /#page-dashboard -->
   </div><!-- /pages -->
 </div><!-- /main -->
 </div><!-- /app -->
 
-<!-- Мобильная навигация -->
-<nav class="mob-nav" id="mob-nav">
-  <div class="mn-inner">
-    <button class="mn-item active" data-page="dashboard" onclick="goPage('dashboard')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      <span class="mn-lbl">Дашборд</span>
-    </button>
-    <button class="mn-item" data-page="new-orders" onclick="goPage('new-orders')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-      <span class="mn-lbl">Нав</span>
-      <span class="mn-badge" id="mob-new-badge" style="display:none">0</span>
-    </button>
-    <button class="mn-item" data-page="active" onclick="goPage('active')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="1"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>
-      <span class="mn-lbl">Фаъол</span>
-      <span class="mn-badge green" id="mob-active-badge" style="display:none">1</span>
-    </button>
-    <button class="mn-item" data-page="history" onclick="goPage('history')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      <span class="mn-lbl">Таърих</span>
-    </button>
-    <button class="mn-item" data-page="profile" onclick="goPage('profile')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <span class="mn-lbl">Профил</span>
-    </button>
-  </div>
-</nav>
+<!-- Мобильная навигация скрыта — табы перенесены в global-sheet -->
+<nav class="mob-nav" id="mob-nav" style="display:none!important"></nav>
 
 <!-- ══════════ НАСТРОЙКИ — полноэкранная страница ══════════ -->
 <div class="settings-page" id="settings-page">

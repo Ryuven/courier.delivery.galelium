@@ -225,7 +225,7 @@ function updateRoutePill(dest, dist) {
     pill = document.createElement('div');
     pill.id = 'map-route-pill';
     pill.style.cssText = 'position:absolute;bottom:calc(var(--sheet-peek) + 58px);left:50%;transform:translateX(-50%);z-index:15;background:rgba(13,19,14,.93);backdrop-filter:blur(14px);border:1px solid var(--b1);border-radius:99px;padding:7px 16px;display:flex;align-items:center;gap:10px;font-size:.68rem;color:var(--tx);white-space:nowrap;box-shadow:0 3px 16px rgba(0,0,0,.45);pointer-events:none;';
-    const dash = document.getElementById('page-dashboard');
+    const dash = document.getElementById('page-dashboard') || document.getElementById('map-wrap') || document.body;
     if (dash) dash.appendChild(pill);
   }
   pill.innerHTML = '<span style="color:var(--acc2)">\u25b6</span><span style="font-weight:600">'+dest+'</span><span style="color:var(--tx3)">\u00b7</span><span style="color:var(--acc2);font-weight:700">'+dist+'</span>';
@@ -257,61 +257,12 @@ function mapOnShowDashboard() {
 }
 
 // ═══════════════════════════════════════════════════════════
-//  ВЫДВИЖНОЙ ЛИСТ — drag (свайп вверх/вниз)
+//  ВЫДВИЖНОЙ ЛИСТ — drag (теперь обрабатывается global-sheet в HTML)
+//  initSheetDrag оставлен для совместимости, новая логика — в switchTab
 // ═══════════════════════════════════════════════════════════
 function initSheetDrag() {
-  const sheet  = document.getElementById('dash-sheet');
-  const handle = document.getElementById('dash-sheet-handle');
-  const scroll = document.getElementById('dash-sheet-scroll');
-  if (!sheet || !handle) return;
-
-  let startY = 0, startExpanded = false, dragging = false;
-
-  function onStart(e) {
-    startY = (e.touches ? e.touches[0].clientY : e.clientY);
-    startExpanded = sheet.classList.contains('expanded');
-    dragging = true;
-    sheet.style.transition = 'none';
-  }
-  function onMove(e) {
-    if (!dragging) return;
-    const y = (e.touches ? e.touches[0].clientY : e.clientY);
-    const delta = y - startY;
-    // не тянем вниз если скролл не в начале
-    if (startExpanded && scroll && scroll.scrollTop > 0 && delta > 0) return;
-    if (e.cancelable) e.preventDefault();
-    const peek = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sheet-peek') || '148');
-    const maxH = sheet.parentElement.clientHeight - 80;
-    // Текущее смещение translateY
-    const baseY = startExpanded ? 0 : (sheet.clientHeight - peek);
-    const newY  = Math.max(0, Math.min(baseY + delta, sheet.clientHeight - peek));
-    sheet.style.transform = `translateY(${newY}px)`;
-  }
-  function onEnd(e) {
-    if (!dragging) return;
-    dragging = false;
-    sheet.style.transition = '';
-    const y = (e.changedTouches ? e.changedTouches[0].clientY : e.clientY);
-    const delta = y - startY;
-    if (startExpanded) {
-      if (delta > 60) sheet.classList.remove('expanded');
-      else sheet.classList.add('expanded');
-    } else {
-      if (delta < -40) sheet.classList.add('expanded');
-      else sheet.classList.remove('expanded');
-    }
-    sheet.style.transform = '';
-  }
-
-  handle.addEventListener('touchstart', onStart, { passive:true });
-  handle.addEventListener('touchmove',  onMove,  { passive:false });
-  handle.addEventListener('touchend',   onEnd);
-  handle.addEventListener('mousedown',  onStart);
-  window.addEventListener('mousemove',  e => dragging && onMove(e));
-  window.addEventListener('mouseup',    e => dragging && onEnd(e));
-
-  // Клик по handle — переключение
-  handle.addEventListener('click', () => { sheet.classList.toggle('expanded'); });
+  // Новый sheet drag инициализируется в switchTab / global-sheet блоке выше.
+  // Этот вызов оставлен для обратной совместимости с initMap chain.
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -556,29 +507,120 @@ function playBeep() {
 }
 
 // ─── Навигация ────────────────────────────────────────────────
-window.goPage = function (page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.ni,.mn-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + page)?.classList.add('active');
-  document.querySelectorAll(`.ni[data-page="${page}"],.mn-item[data-page="${page}"]`).forEach(n => n.classList.add('active'));
-  const titles = {
-    dashboard:    'Дашборд',
-    'new-orders': 'Фармоишҳои нав',
-    active:       'Фармоиши фаъол',
-    history:      'Таърих',
-    profile:      'Профил',
-  };
-  // tb-title теперь содержит логотип — текст не меняем
-  // const tb = document.getElementById('tb-title');
-  // if (tb) tb.textContent = titles[page] || 'Galelium Courier';
-  if (page === 'history')   loadHistory();
-  if (page === 'active')    renderActive();
-  if (page === 'new-orders') renderNewOrdersIfOnline();
-  if (page === 'dashboard') { renderDashNewIfOnline(); renderDashActive(); mapOnShowDashboard(); }
-  closeSB();
-  const pages = document.getElementById('pages');
-  if (pages) pages.scrollTop = 0;
+// ─── ГЛОБАЛЬНЫЙ BOTTOM SHEET ──────────────────────────────
+
+let currentTab = 'dashboard';
+
+/** Переключить вкладку + открыть/закрыть sheet */
+window.switchTab = function(tab) {
+  const sheet = document.getElementById('global-sheet');
+  if (!sheet) return;
+
+  // Переключаем активную вкладку в табах
+  document.querySelectorAll('.gsht').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === tab);
+  });
+
+  // Переключаем панели
+  document.querySelectorAll('.gsheet-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById('gpanel-' + tab);
+  if (panel) panel.classList.add('active');
+
+  currentTab = tab;
+
+  // Дашборд — peek, остальные — полный экран
+  if (tab === 'dashboard') {
+    sheet.classList.remove('sheet-open');
+  } else {
+    sheet.classList.add('sheet-open');
+    // Скроллим панель в топ
+    if (panel) panel.scrollTop = 0;
+  }
+
+  // Старый goPage для совместимости (рендер контента)
+  if (tab === 'history')    loadHistory();
+  if (tab === 'active')     renderActive();
+  if (tab === 'new-orders') renderNewOrdersIfOnline();
+  if (tab === 'dashboard')  { renderDashNewIfOnline(); renderDashActive(); mapOnShowDashboard(); }
 };
+
+// Обратная совместимость — goPage вызывает switchTab
+window.goPage = function(page) {
+  switchTab(page);
+};
+
+// ─── Drag to dismiss / expand sheet ───────────────────────
+(function() {
+  const sheet = document.getElementById('global-sheet');
+  const handle = document.getElementById('gsheet-handle');
+  if (!sheet || !handle) return;
+
+  let startY = 0, startTranslate = 0, dragging = false;
+  const SNAP_OPEN = 120;   // px вниз от open → close (peek)
+  const SNAP_CLOSE = 80;   // px вверх от peek → open
+
+  function getTranslate() {
+    const m = new WebKitCSSMatrix(getComputedStyle(sheet).transform);
+    return m.m42;
+  }
+
+  function onStart(e) {
+    dragging = true;
+    startY = e.touches ? e.touches[0].clientY : e.clientY;
+    startTranslate = getTranslate();
+    sheet.style.transition = 'none';
+  }
+
+  function onMove(e) {
+    if (!dragging) return;
+    if (e.cancelable) e.preventDefault();
+    const y = e.touches ? e.touches[0].clientY : e.clientY;
+    const dy = y - startY;
+    const newY = Math.max(0, startTranslate + dy);
+    sheet.style.transform = `translateY(${newY}px)`;
+  }
+
+  function onEnd(e) {
+    if (!dragging) return;
+    dragging = false;
+    sheet.style.transition = '';
+    const y = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+    const dy = y - startY;
+    const isOpen = sheet.classList.contains('sheet-open');
+
+    if (isOpen) {
+      // Если потянули вниз достаточно — сворачиваем к peek (только для дашборда)
+      if (dy > SNAP_OPEN) {
+        sheet.classList.remove('sheet-open');
+        currentTab = 'dashboard';
+        document.querySelectorAll('.gsht').forEach(b => {
+          b.classList.toggle('active', b.dataset.tab === 'dashboard');
+        });
+        document.querySelectorAll('.gsheet-panel').forEach(p => p.classList.remove('active'));
+        const dp = document.getElementById('gpanel-dashboard');
+        if (dp) dp.classList.add('active');
+        mapOnShowDashboard();
+      } else {
+        // snap back open
+        sheet.classList.add('sheet-open');
+      }
+    } else {
+      // peek → open при свайпе вверх
+      if (dy < -SNAP_CLOSE) {
+        sheet.classList.add('sheet-open');
+      } else {
+        sheet.classList.remove('sheet-open');
+      }
+    }
+  }
+
+  handle.addEventListener('touchstart', onStart, { passive: true });
+  handle.addEventListener('touchmove', onMove, { passive: false });
+  handle.addEventListener('touchend', onEnd);
+  handle.addEventListener('mousedown', onStart);
+  window.addEventListener('mousemove', e => dragging && onMove(e));
+  window.addEventListener('mouseup', e => dragging && onEnd(e));
+})();
 
 window.toggleSidebar = function () {
   document.getElementById('sidebar').classList.toggle('open');
@@ -688,7 +730,7 @@ function listenActive() {
 // ─── Бейджи ──────────────────────────────────────────────────
 function updateNewBadge() {
   const cnt = newOrders.length;
-  ['new-badge', 'mob-new-badge', 'pms-new-badge', 'st-new-badge'].forEach(id => {
+  ['new-badge', 'mob-new-badge', 'pms-new-badge', 'st-new-badge', 'gsht-new-badge'].forEach(id => {
     const b = document.getElementById(id);
     if (b) { b.style.display = cnt > 0 ? '' : 'none'; b.textContent = cnt; }
   });
@@ -697,7 +739,7 @@ function updateNewBadge() {
 }
 
 function updateActiveBadge() {
-  ['active-badge', 'mob-active-badge', 'pms-active-badge', 'st-active-badge'].forEach(id => {
+  ['active-badge', 'mob-active-badge', 'pms-active-badge', 'st-active-badge', 'gsht-active-badge'].forEach(id => {
     const b = document.getElementById(id);
     if (b) b.style.display = activeOrder ? '' : 'none';
   });
