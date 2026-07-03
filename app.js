@@ -256,14 +256,7 @@ function mapOnShowDashboard() {
   }, 150);
 }
 
-// ═══════════════════════════════════════════════════════════
-//  ВЫДВИЖНОЙ ЛИСТ — drag (теперь обрабатывается global-sheet в HTML)
-//  initSheetDrag оставлен для совместимости, новая логика — в switchTab
-// ═══════════════════════════════════════════════════════════
-function initSheetDrag() {
-  // Новый sheet drag инициализируется в switchTab / global-sheet блоке выше.
-  // Этот вызов оставлен для обратной совместимости с initMap chain.
-}
+// initSheetDrag — логика drag теперь в IIFE ниже (после goPage)
 
 // ═══════════════════════════════════════════════════════════
 //  ОНЛАЙН-КНОПКА В ДАШБОРДЕ
@@ -384,7 +377,7 @@ onAuthStateChanged(auth, async u => {
   calcStats();
   startListeners();
   updateDashUI();
-  setTimeout(() => { initMap().then(startGPS); initSheetDrag(); }, 400);
+  setTimeout(() => { initMap().then(startGPS); }, 400);
 });
 
 // ─── Проверка верификации ────────────────────────────────────
@@ -507,120 +500,129 @@ function playBeep() {
 }
 
 // ─── Навигация ────────────────────────────────────────────────
-// ─── ГЛОБАЛЬНЫЙ BOTTOM SHEET ──────────────────────────────
+// ─── BOTTOM SHEET + НАВИГАЦИЯ ─────────────────────────────
 
-let currentTab = 'dashboard';
+let _currentPage = 'dashboard';
+let _sheetOpen   = false;
 
-/** Переключить вкладку + открыть/закрыть sheet */
-window.switchTab = function(tab) {
+/** Переключить страницу: нажатие на любую кнопку нижней навигации */
+window.goPage = function(page) {
   const sheet = document.getElementById('global-sheet');
   if (!sheet) return;
 
-  // Переключаем активную вкладку в табах
-  document.querySelectorAll('.gsht').forEach(b => {
-    b.classList.toggle('active', b.dataset.tab === tab);
+  _currentPage = page;
+
+  // 1. Обновляем активную кнопку навигации
+  document.querySelectorAll('.bn-item').forEach(b => {
+    const id = b.id.replace('bn-', '');
+    b.classList.toggle('active', id === page);
   });
 
-  // Переключаем панели
-  document.querySelectorAll('.gsheet-panel').forEach(p => p.classList.remove('active'));
-  const panel = document.getElementById('gpanel-' + tab);
-  if (panel) panel.classList.add('active');
+  // 2. Переключаем панель контента
+  document.querySelectorAll('.gs-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById('gs-' + page);
+  if (panel) { panel.classList.add('active'); panel.scrollTop = 0; }
 
-  currentTab = tab;
+  // 3. Показываем/скрываем peek
+  const peek = document.getElementById('gs-peek');
 
-  // Дашборд — peek, остальные — полный экран
-  if (tab === 'dashboard') {
-    sheet.classList.remove('sheet-open');
+  if (page === 'dashboard') {
+    // Дашборд — sheet в peek, peek-контент виден
+    _sheetOpen = false;
+    sheet.classList.remove('open');
+    if (peek) peek.style.display = '';
+    renderDashNewIfOnline();
+    renderDashActive();
+    mapOnShowDashboard();
   } else {
-    sheet.classList.add('sheet-open');
-    // Скроллим панель в топ
-    if (panel) panel.scrollTop = 0;
+    // Любая другая вкладка — sheet открыт полностью, peek скрыт
+    _sheetOpen = true;
+    sheet.classList.add('open');
+    if (peek) peek.style.display = 'none';
+
+    if (page === 'new-orders')  renderNewOrdersIfOnline();
+    if (page === 'active')      renderActive();
+    if (page === 'history')     loadHistory();
   }
 
-  // Старый goPage для совместимости (рендер контента)
-  if (tab === 'history')    loadHistory();
-  if (tab === 'active')     renderActive();
-  if (tab === 'new-orders') renderNewOrdersIfOnline();
-  if (tab === 'dashboard')  { renderDashNewIfOnline(); renderDashActive(); mapOnShowDashboard(); }
+  closeSB();
 };
 
-// Обратная совместимость — goPage вызывает switchTab
-window.goPage = function(page) {
-  switchTab(page);
-};
+// Инициализируем drag на handle
+(function initSheetDrag() {
+  // Drag выполняется после DOM готов
+  window.addEventListener('DOMContentLoaded', setupDrag);
+  // На случай если DOMContentLoaded уже прошёл
+  if (document.readyState !== 'loading') setupDrag();
 
-// ─── Drag to dismiss / expand sheet ───────────────────────
-(function() {
-  const sheet = document.getElementById('global-sheet');
-  const handle = document.getElementById('gsheet-handle');
-  if (!sheet || !handle) return;
+  function setupDrag() {
+    const sheet  = document.getElementById('global-sheet');
+    const handle = document.getElementById('gs-handle');
+    if (!sheet || !handle) return;
 
-  let startY = 0, startTranslate = 0, dragging = false;
-  const SNAP_OPEN = 120;   // px вниз от open → close (peek)
-  const SNAP_CLOSE = 80;   // px вверх от peek → open
+    let startY = 0, dragging = false, startTransY = 0;
 
-  function getTranslate() {
-    const m = new WebKitCSSMatrix(getComputedStyle(sheet).transform);
-    return m.m42;
-  }
-
-  function onStart(e) {
-    dragging = true;
-    startY = e.touches ? e.touches[0].clientY : e.clientY;
-    startTranslate = getTranslate();
-    sheet.style.transition = 'none';
-  }
-
-  function onMove(e) {
-    if (!dragging) return;
-    if (e.cancelable) e.preventDefault();
-    const y = e.touches ? e.touches[0].clientY : e.clientY;
-    const dy = y - startY;
-    const newY = Math.max(0, startTranslate + dy);
-    sheet.style.transform = `translateY(${newY}px)`;
-  }
-
-  function onEnd(e) {
-    if (!dragging) return;
-    dragging = false;
-    sheet.style.transition = '';
-    const y = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
-    const dy = y - startY;
-    const isOpen = sheet.classList.contains('sheet-open');
-
-    if (isOpen) {
-      // Если потянули вниз достаточно — сворачиваем к peek (только для дашборда)
-      if (dy > SNAP_OPEN) {
-        sheet.classList.remove('sheet-open');
-        currentTab = 'dashboard';
-        document.querySelectorAll('.gsht').forEach(b => {
-          b.classList.toggle('active', b.dataset.tab === 'dashboard');
-        });
-        document.querySelectorAll('.gsheet-panel').forEach(p => p.classList.remove('active'));
-        const dp = document.getElementById('gpanel-dashboard');
-        if (dp) dp.classList.add('active');
-        mapOnShowDashboard();
-      } else {
-        // snap back open
-        sheet.classList.add('sheet-open');
-      }
-    } else {
-      // peek → open при свайпе вверх
-      if (dy < -SNAP_CLOSE) {
-        sheet.classList.add('sheet-open');
-      } else {
-        sheet.classList.remove('sheet-open');
-      }
+    function getTransY() {
+      const s = window.getComputedStyle(sheet);
+      const m = new DOMMatrix(s.transform);
+      return m.m42;
     }
-  }
 
-  handle.addEventListener('touchstart', onStart, { passive: true });
-  handle.addEventListener('touchmove', onMove, { passive: false });
-  handle.addEventListener('touchend', onEnd);
-  handle.addEventListener('mousedown', onStart);
-  window.addEventListener('mousemove', e => dragging && onMove(e));
-  window.addEventListener('mouseup', e => dragging && onEnd(e));
+    function onStart(e) {
+      dragging = true;
+      startY = e.touches ? e.touches[0].clientY : e.clientY;
+      startTransY = getTransY();
+      sheet.style.transition = 'none';
+    }
+
+    function onMove(e) {
+      if (!dragging) return;
+      if (e.cancelable) e.preventDefault();
+      const y  = e.touches ? e.touches[0].clientY : e.clientY;
+      const dy = y - startY;
+      const newY = Math.max(0, startTransY + dy);
+      sheet.style.transform = `translateY(${newY}px)`;
+    }
+
+    function onEnd(e) {
+      if (!dragging) return;
+      dragging = false;
+      sheet.style.transition = '';
+      const y  = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+      const dy = y - startY;
+
+      if (_sheetOpen) {
+        // Если потянули вниз > 100px — возвращаем на дашборд
+        if (dy > 100) {
+          goPage('dashboard');
+        } else {
+          sheet.classList.add('open');
+        }
+      } else {
+        // Если потянули вверх > 60px — открываем (показываем дашборд-панель)
+        if (dy < -60) {
+          sheet.classList.add('open');
+          _sheetOpen = true;
+          const peek = document.getElementById('gs-peek');
+          if (peek) peek.style.display = 'none';
+        } else {
+          sheet.classList.remove('open');
+        }
+      }
+      sheet.style.transform = '';
+    }
+
+    handle.addEventListener('touchstart', onStart, { passive: true });
+    handle.addEventListener('touchmove',  onMove,  { passive: false });
+    handle.addEventListener('touchend',   onEnd);
+    handle.addEventListener('mousedown',  onStart);
+    window.addEventListener('mousemove',  e => { if (dragging) onMove(e); });
+    window.addEventListener('mouseup',    e => { if (dragging) onEnd(e); });
+  }
 })();
+
+// switchTab — псевдоним для обратной совместимости
+window.switchTab = window.goPage;
 
 window.toggleSidebar = function () {
   document.getElementById('sidebar').classList.toggle('open');
@@ -730,7 +732,7 @@ function listenActive() {
 // ─── Бейджи ──────────────────────────────────────────────────
 function updateNewBadge() {
   const cnt = newOrders.length;
-  ['new-badge', 'mob-new-badge', 'pms-new-badge', 'st-new-badge', 'gsht-new-badge'].forEach(id => {
+  ['new-badge', 'mob-new-badge', 'pms-new-badge', 'st-new-badge'].forEach(id => {
     const b = document.getElementById(id);
     if (b) { b.style.display = cnt > 0 ? '' : 'none'; b.textContent = cnt; }
   });
@@ -739,7 +741,7 @@ function updateNewBadge() {
 }
 
 function updateActiveBadge() {
-  ['active-badge', 'mob-active-badge', 'pms-active-badge', 'st-active-badge', 'gsht-active-badge'].forEach(id => {
+  ['active-badge', 'mob-active-badge', 'pms-active-badge', 'st-active-badge'].forEach(id => {
     const b = document.getElementById(id);
     if (b) b.style.display = activeOrder ? '' : 'none';
   });
