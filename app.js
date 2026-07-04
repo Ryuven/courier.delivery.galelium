@@ -543,6 +543,7 @@ window.goPage = function(page) {
     if (page === 'new-orders')  renderNewOrdersIfOnline();
     if (page === 'active')      renderActive();
     if (page === 'history')     loadHistory();
+    if (page === 'profile')     renderProfile();
   }
 
   closeSB();
