@@ -1755,17 +1755,42 @@ function renderHistory() {
 function renderProfile() {
   const name = UD?.displayName || CU.displayName || '';
   const init = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
-  const pn  = document.getElementById('p-name');     if (pn)  pn.textContent  = name || 'Курьер';
-  const pe  = document.getElementById('p-email');    if (pe)  pe.textContent  = CU.email || '';
-  const av  = document.getElementById('p-av');       if (av)  av.innerHTML    = UD?.avatarUrl ? `<img src="${UD.avatarUrl}" alt="">` : init;
-  const pv  = document.getElementById('p-veh');      if (pv)  pv.textContent  = VEHICLE_TYPES[CD?.vehicle || 'foot'] || '—';
-  const pfn = document.getElementById('pf-name');    if (pfn) pfn.value       = name;
-  const pfe = document.getElementById('pf-email');   if (pfe) pfe.value       = CU.email || '';
-  const pfp = document.getElementById('pf-phone');   if (pfp) pfp.value       = UD?.phone || '';
-  const pfv = document.getElementById('pf-vehicle'); if (pfv) pfv.value       = CD?.vehicle || 'foot';
-  const pst = document.getElementById('ps-total');   if (pst) pst.textContent = CD?.totalDeliveries || 0;
-  const pse = document.getElementById('ps-earn');    if (pse) pse.textContent = (CD?.earnings || 0) + ' см';
-  const psr = document.getElementById('ps-rating');  if (psr) psr.textContent = CD?.rating ? CD.rating.toFixed(1) : '—';
+
+  // Аватар (сохраняем кнопку редактирования внутри)
+  const av = document.getElementById('p-av');
+  if (av) {
+    const editBtn = av.querySelector('.prof-av-edit');
+    av.innerHTML = UD?.avatarUrl
+      ? `<img src="${UD.avatarUrl}" alt="">`
+      : init;
+    if (editBtn) av.appendChild(editBtn);
+  }
+
+  // Также синхронизируем маленький превью в настройках (если есть)
+  const avSmall = document.getElementById('st-av');
+  if (avSmall) avSmall.innerHTML = UD?.avatarUrl ? `<img src="${UD.avatarUrl}" alt="">` : init;
+
+  const pn = document.getElementById('p-name');    if (pn) pn.textContent = name || 'Курьер';
+  const pe = document.getElementById('p-email');   if (pe) pe.textContent = CU.email || '';
+
+  // Нақлиёт-чип
+  const pv = document.getElementById('p-veh');
+  if (pv) {
+    const vLabel = VEHICLE_TYPES[CD?.vehicle || 'foot'] || '—';
+    pv.textContent = vLabel;
+    pv.style.display = vLabel ? '' : 'none';
+  }
+
+  // Поля формы
+  const pfn = document.getElementById('pf-name');    if (pfn) pfn.value = name;
+  const pfe = document.getElementById('pf-email');   if (pfe) pfe.value = CU.email || '';
+  const pfp = document.getElementById('pf-phone');   if (pfp) pfp.value = UD?.phone || '';
+  const pfv = document.getElementById('pf-vehicle'); if (pfv) pfv.value = CD?.vehicle || 'foot';
+
+  // Статистика
+  const pst = document.getElementById('ps-total');  if (pst) pst.textContent = CD?.totalDeliveries || 0;
+  const pse = document.getElementById('ps-earn');   if (pse) pse.textContent = (CD?.earnings || 0) + ' см';
+  const psr = document.getElementById('ps-rating'); if (psr) psr.textContent = CD?.rating ? CD.rating.toFixed(1) : '—';
 
   // — Данные для модала
   window.__verifUID   = CU.uid;

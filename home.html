@@ -1407,41 +1407,190 @@ a{color:inherit;text-decoration:none}
 .hc-meta{font-size:.62rem;color:var(--tx3);margin-top:2px}
 
 /* ── ПРОФИЛЬ ────────────────────────────────────────────── */
-.pg2{display:grid;grid-template-columns:240px 1fr;gap:16px;align-items:start}
-.pcard{
-  background:var(--s1);border:1.5px solid var(--b0);border-radius:16px;
-  padding:22px 18px;text-align:center;box-shadow:var(--shadow);
+/* ═══════════════════════════════════════════════════════════
+   ПРОФИЛЬ — переработан под single-column sheet
+══════════════════════════════════════════════════════════ */
+
+/* ── Герой: аватар + имя + роль ─────────────────────────── */
+.prof-hero{
+  display:flex;flex-direction:column;align-items:center;
+  padding:22px 20px 18px;
+  background:var(--s1);
+  border:1px solid var(--b0);
+  border-radius:18px;
+  margin-bottom:10px;
+  position:relative;
 }
-.p-av{
-  width:70px;height:70px;border-radius:50%;
+.prof-av{
+  width:76px;height:76px;border-radius:50%;flex-shrink:0;
   background:var(--accd);border:3px solid var(--accg);
   display:flex;align-items:center;justify-content:center;
-  font-size:1.5rem;font-weight:700;color:var(--acc2);
-  margin:0 auto 12px;overflow:hidden;
+  font-family:var(--fd);font-size:1.6rem;font-weight:900;color:var(--acc2);
+  overflow:hidden;margin-bottom:12px;
+  position:relative;
 }
-.p-av img{width:100%;height:100%;object-fit:cover}
-.p-name{font-family:var(--fd);font-weight:900;font-size:1.05rem;color:#fff;margin-bottom:2px}
-.p-email{font-size:.68rem;color:var(--tx3);margin-bottom:10px}
-.p-veh{
+.prof-av img{width:100%;height:100%;object-fit:cover}
+.prof-av-edit{
+  position:absolute;bottom:0;right:0;
+  width:22px;height:22px;border-radius:50%;
+  background:var(--acc);border:2px solid var(--s1);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+}
+.prof-name{
+  font-family:var(--fd);font-weight:900;font-size:1.1rem;
+  color:#fff;letter-spacing:-.01em;margin-bottom:3px;text-align:center;
+}
+.prof-email{
+  font-size:.68rem;color:var(--tx3);margin-bottom:10px;text-align:center;
+}
+.prof-role-chip{
   display:inline-flex;align-items:center;gap:5px;
-  padding:3px 12px;border-radius:99px;
-  border:1px solid var(--accg);background:var(--accd);
-  color:var(--acc2);font-size:.58rem;font-weight:600;
-  letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px;
+  padding:4px 12px;border-radius:99px;
+  background:var(--accd);border:1px solid var(--accg);
+  color:var(--acc2);font-size:.58rem;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;
+  margin-bottom:10px;
 }
-.p-stats{
+.prof-role-dot{
+  width:5px;height:5px;border-radius:50%;background:var(--acc2);
+}
+.prof-veh-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 11px;border-radius:99px;
+  background:var(--s3);border:1px solid var(--b0);
+  color:var(--tx2);font-size:.6rem;font-weight:600;
+}
+
+/* Плашка верификации в герое */
+#p-verif-badge-wrap{ margin-top:4px }
+.p-verif-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 11px;border-radius:99px;font-size:.58rem;font-weight:700;
+  margin:0 auto;
+}
+.p-verif-badge.unverified{ background:var(--amberd);color:var(--amber); }
+.p-verif-badge.pending{ background:rgba(59,130,246,.1);color:var(--blue); }
+.p-verif-badge.verified{ background:var(--accd);color:var(--acc2); }
+.p-verif-badge-dot{ width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0; }
+
+/* ── Статистика: 3 ячейки ────────────────────────────────── */
+.prof-stats{
   display:grid;grid-template-columns:1fr 1fr 1fr;
-  gap:1px;background:var(--b0);
-  border-radius:0 0 12px 12px;overflow:hidden;
-  margin:0 -18px -22px;
+  background:var(--s1);border:1px solid var(--b0);border-radius:14px;
+  overflow:hidden;margin-bottom:10px;
 }
-.p-st{background:var(--s2);padding:11px 6px;text-align:center}
-.p-st-val{font-family:var(--fd);font-weight:900;font-size:1.05rem;color:var(--acc2)}
-.p-st-lbl{font-size:.44rem;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
-.pform{background:var(--s1);border:1.5px solid var(--b0);border-radius:14px;padding:18px 20px;margin-bottom:12px;box-shadow:var(--shadow)}
-.pform-t{font-weight:700;font-size:.86rem;color:var(--tx);margin-bottom:14px}
-.ff{margin-bottom:11px}
-.fl{font-size:.44rem;letter-spacing:.2em;text-transform:uppercase;color:var(--tx3);display:block;margin-bottom:5px}
+.prof-stat{
+  display:flex;flex-direction:column;align-items:center;
+  padding:14px 8px;position:relative;
+}
+.prof-stat + .prof-stat::before{
+  content:'';position:absolute;left:0;top:20%;bottom:20%;
+  width:1px;background:var(--b0);
+}
+.prof-stat-val{
+  font-family:var(--fd);font-weight:900;font-size:1.1rem;
+  color:var(--acc2);line-height:1;margin-bottom:4px;
+}
+.prof-stat-lbl{
+  font-size:.46rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--tx3);text-align:center;
+}
+
+/* ── Секция-блок (форма) ────────────────────────────────── */
+.prof-section{
+  background:var(--s1);border:1px solid var(--b0);border-radius:14px;
+  overflow:hidden;margin-bottom:10px;
+}
+.prof-section-title{
+  font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--tx3);font-weight:700;
+  padding:13px 16px 0;
+}
+.prof-field{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;border-top:1px solid var(--b0);
+  position:relative;
+}
+.prof-field:first-of-type{ border-top:none }
+.prof-field-ico{
+  width:32px;height:32px;border-radius:9px;flex-shrink:0;
+  background:var(--s3);border:1px solid var(--b0);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--tx3);
+}
+.prof-field-body{ flex:1;min-width:0 }
+.prof-field-label{
+  font-size:.48rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--tx3);margin-bottom:3px;
+}
+.prof-field-input{
+  width:100%;background:none;border:none;outline:none;
+  font-family:var(--fs);font-size:.82rem;font-weight:500;
+  color:var(--tx);padding:0;
+  caret-color:var(--acc);
+}
+.prof-field-input::placeholder{ color:var(--tx3) }
+.prof-field-input:read-only{ color:var(--tx3);cursor:default }
+.prof-field-input option{ background:var(--s1) }
+
+/* ── Кнопка сохранить (плавающая внизу секции) ───────────── */
+.prof-save-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:calc(100% - 32px);margin:0 16px 14px;
+  padding:12px;border-radius:11px;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  border:none;cursor:pointer;
+  font-family:var(--fd);font-weight:900;font-size:.78rem;
+  color:#0b0f0c;letter-spacing:.04em;
+  transition:opacity .15s,transform .15s;
+  box-shadow:0 3px 14px var(--acc-shadow);
+}
+.prof-save-btn:hover{ opacity:.9;transform:translateY(-1px) }
+.prof-save-btn:active{ transform:translateY(0) }
+
+/* ── Кнопка выхода ───────────────────────────────────────── */
+.prof-logout-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:13px;border-radius:14px;
+  background:var(--redd);border:1px solid rgba(229,69,90,.2);
+  cursor:pointer;font-family:var(--fs);font-size:.78rem;font-weight:600;
+  color:var(--red);letter-spacing:.02em;
+  transition:background .15s,border-color .15s;
+  margin-bottom:10px;
+}
+.prof-logout-btn:hover{
+  background:rgba(229,69,90,.18);border-color:rgba(229,69,90,.4);
+}
+
+/* ── Аватар-загрузчик ───────────────────────────────────── */
+.prof-av-upload{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;
+}
+.prof-av-preview{
+  width:44px;height:44px;border-radius:50%;flex-shrink:0;
+  background:var(--accd);border:2px solid var(--accg);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.9rem;font-weight:700;color:var(--acc2);overflow:hidden;
+}
+.prof-av-preview img{width:100%;height:100%;object-fit:cover}
+.prof-av-upload-body{ flex:1;min-width:0 }
+.prof-av-upload-title{ font-size:.78rem;font-weight:600;color:var(--tx);margin-bottom:2px }
+.prof-av-upload-sub{ font-size:.6rem;color:var(--tx3) }
+.prof-av-upload-btn{
+  padding:7px 14px;border-radius:9px;
+  background:var(--s3);border:1px solid var(--b1);
+  cursor:pointer;font-family:var(--fs);font-size:.7rem;font-weight:600;
+  color:var(--tx2);white-space:nowrap;transition:all .15s;
+}
+.prof-av-upload-btn:hover{ background:var(--s4);color:var(--tx) }
+
+/* Убираем старые классы профиля */
+.pcard,.pg2{ all:unset }
+.p-av,.p-name,.p-email,.p-veh,.p-stats,.p-st,.p-st-val,.p-st-lbl{ all:unset }
+.pform,.pform-t,.ff,.fl{ all:unset }
+.pform,.ff{ display:block }
 .fi{
   width:100%;background:var(--s2);border:1.5px solid var(--b0);border-radius:9px;
   color:var(--tx);font-family:var(--fs);font-size:.8rem;
@@ -2130,45 +2279,104 @@ a.ni{ text-decoration:none }
                 Танзимот
               </button>
             </div>
+
             <div class="gsp-body">
-              <div class="pcard">
-                <div class="p-av" id="p-av">?</div>
-                <div class="p-name" id="p-name">—</div>
-                <div class="p-email" id="p-email">—</div>
-                <div class="p-veh" id="p-veh">—</div>
-                <div id="p-verif-badge-wrap"></div>
-                <div class="p-stats">
-                  <div class="p-st"><div class="p-st-val" id="ps-total">0</div><div class="p-st-lbl">Расониш</div></div>
-                  <div class="p-st"><div class="p-st-val" id="ps-earn">0</div><div class="p-st-lbl">Даромад</div></div>
-                  <div class="p-st"><div class="p-st-val" id="ps-rating">—</div><div class="p-st-lbl">Рейтинг</div></div>
+
+              <!-- Герой: аватар + имя + статистика -->
+              <div class="prof-hero">
+                <div class="prof-av" id="p-av">?
+                  <div class="prof-av-edit" onclick="document.getElementById('av-inp').click()">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0b0f0c" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </div>
                 </div>
-              </div>
-              <div id="verif-banner-wrap"></div>
-              <div style="margin-top:10px">
-                <button class="btn-outline danger" style="width:100%;padding:11px" onclick="doLogout()">Аз аккаунт баромадан</button>
-              </div>
-              <div class="pform" style="margin-top:14px">
-                <div class="pform-t">Маълумоти шахсӣ</div>
-                <div class="ff"><label class="fl">Ном ва насаб</label><input class="fi" type="text" id="pf-name" placeholder="Аҳмад Назаров"/></div>
-                <div class="ff"><label class="fl">Телефон</label><input class="fi" type="tel" id="pf-phone" placeholder="+992 900 000-000"/></div>
-                <div class="ff"><label class="fl">Email</label><input class="fi" type="email" id="pf-email" readonly/></div>
-                <div class="ff">
-                  <label class="fl">Нақлиёт</label>
-                  <select class="fi" id="pf-vehicle">
-                    <option value="bicycle">🚴 Велосипед</option>
-                    <option value="scooter">🛵 Скутер</option>
-                    <option value="car">🚗 Автомобил</option>
-                    <option value="foot">🚶 Пиёда</option>
-                  </select>
-                </div>
-                <button class="btn-primary" onclick="saveProfile()">Тағйиротро сақл кунед</button>
-              </div>
-              <div class="pform">
-                <div class="pform-t">Акси профил</div>
                 <input type="file" id="av-inp" accept="image/*" style="display:none" onchange="uploadAvUI(this)"/>
-                <button class="btn-outline" onclick="document.getElementById('av-inp').click()">Аксро бор кунед</button>
-                <div style="font-size:.62rem;color:var(--tx3);margin-top:7px">JPG, PNG то 2 МБ</div>
+                <div class="prof-name" id="p-name">—</div>
+                <div class="prof-email" id="p-email">—</div>
+                <div class="prof-veh-chip" id="p-veh" style="display:none">—</div>
+                <div id="p-verif-badge-wrap"></div>
               </div>
+
+              <!-- Статистика -->
+              <div class="prof-stats">
+                <div class="prof-stat">
+                  <div class="prof-stat-val" id="ps-total">0</div>
+                  <div class="prof-stat-lbl">Расониш</div>
+                </div>
+                <div class="prof-stat">
+                  <div class="prof-stat-val" id="ps-earn">0 см</div>
+                  <div class="prof-stat-lbl">Даромад</div>
+                </div>
+                <div class="prof-stat">
+                  <div class="prof-stat-val" id="ps-rating">—</div>
+                  <div class="prof-stat-lbl">Рейтинг</div>
+                </div>
+              </div>
+
+              <!-- Верификация -->
+              <div id="verif-banner-wrap"></div>
+
+              <!-- Форма данных -->
+              <div class="prof-section">
+                <div class="prof-section-title">Маълумоти шахсӣ</div>
+
+                <div class="prof-field">
+                  <div class="prof-field-ico">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  </div>
+                  <div class="prof-field-body">
+                    <div class="prof-field-label">Ном ва насаб</div>
+                    <input class="prof-field-input" type="text" id="pf-name" placeholder="Аҳмад Назаров"/>
+                  </div>
+                </div>
+
+                <div class="prof-field">
+                  <div class="prof-field-ico">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01.06 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                  </div>
+                  <div class="prof-field-body">
+                    <div class="prof-field-label">Телефон</div>
+                    <input class="prof-field-input" type="tel" id="pf-phone" placeholder="+992 900 000-000"/>
+                  </div>
+                </div>
+
+                <div class="prof-field">
+                  <div class="prof-field-ico">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  </div>
+                  <div class="prof-field-body">
+                    <div class="prof-field-label">Email</div>
+                    <input class="prof-field-input" type="email" id="pf-email" readonly placeholder="—"/>
+                  </div>
+                </div>
+
+                <div class="prof-field">
+                  <div class="prof-field-ico">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+                  </div>
+                  <div class="prof-field-body">
+                    <div class="prof-field-label">Нақлиёт</div>
+                    <select class="prof-field-input" id="pf-vehicle">
+                      <option value="bicycle">🚴 Велосипед</option>
+                      <option value="scooter">🛵 Скутер</option>
+                      <option value="car">🚗 Автомобил</option>
+                      <option value="foot">🚶 Пиёда</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Кнопка сохранить -->
+              <button class="prof-save-btn" onclick="saveProfile()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Тағйиротро сақл кунед
+              </button>
+
+              <!-- Кнопка выхода -->
+              <button class="prof-logout-btn" onclick="doLogout()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Аз аккаунт баромадан
+              </button>
+
             </div>
           </div>
 
