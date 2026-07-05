@@ -323,10 +323,10 @@ const SL = {
 
 // ─── Қадамҳои визуалии пайгирӣ ──────────────────────────────
 const TRACK_STEPS = [
-  { key: 'courier_heading', icon: '🏪', label: 'Ба дӯкон' },
-  { key: 'collecting',      icon: '🛒', label: 'Ҷамъоварӣ' },
-  { key: 'delivering',      icon: '🛵', label: 'Расонидан' },
-  { key: 'delivered',       icon: '✅', label: 'Расонида шуд' },
+  { key: 'courier_heading', icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>', label: 'Ба дӯкон' },
+  { key: 'collecting',      icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>', label: 'Ҷамъоварӣ' },
+  { key: 'delivering',      icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="1"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>', label: 'Расонидан' },
+  { key: 'delivered',       icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>', label: 'Расонида шуд' },
 ];
 
 // Маппинг статусов к шагам трекера
@@ -432,7 +432,7 @@ window.toggleOnline = async function (v) {
     await setDoc(doc(db, COL.COURIERS, CU.uid), { isOnline: v, updatedAt: serverTimestamp() }, { merge: true });
     CD = { ...CD, isOnline: v };
     updateOnlineUI(v);
-    toast(v ? 'Шумо онлайн ед 🟢' : 'Шумо офлайн ед', v ? 'ok' : '');
+    toast(v ? 'Шумо онлайн ед' : 'Шумо офлайн ед', v ? 'ok' : '');
   } catch { toast('Хато', 'err'); }
 };
 
@@ -675,7 +675,7 @@ function listenNew() {
     renderNewOrdersIfOnline();
     renderDashNewIfOnline();
     if (!first && newOrders.length > prev && CD?.isOnline) {
-      playBeep(); toast('🔔 Фармоиши нав!', 'info'); renderNotif();
+      playBeep(); toast('Фармоиши нав!', 'info'); renderNotif();
     }
     first = false;
   });
@@ -686,7 +686,7 @@ function renderNewOrdersIfOnline() {
   const el = document.getElementById('new-orders-list');
   if (!el) return;
   if (!CD?.isOnline) {
-    el.innerHTML = `<div class="empty"><div class="empty-ico">🔴</div><div class="empty-t">Шумо офлайн ед</div><div class="empty-s">Барои дидани фармоишҳо онлайн шавед</div></div>`;
+    el.innerHTML = `<div class="empty"><div class="empty-ico"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></div><div class="empty-t">Шумо офлайн ед</div><div class="empty-s">Барои дидани фармоишҳо онлайн шавед</div></div>`;
     return;
   }
   renderNewOrders();
@@ -695,7 +695,7 @@ function renderNewOrdersIfOnline() {
 function renderDashNewIfOnline() {
   if (!CD?.isOnline) {
     const el = document.getElementById('dash-new-orders');
-    if (el) el.innerHTML = `<div class="empty" style="padding:28px 20px"><div class="empty-ico">🔴</div><div class="empty-t">Офлайн</div><div class="empty-s">Фармоишҳо пас аз онлайн шудан намоён мешаванд</div></div>`;
+    if (el) el.innerHTML = `<div class="empty" style="padding:28px 20px"><div class="empty-ico"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></div><div class="empty-t">Офлайн</div><div class="empty-s">Фармоишҳо пас аз онлайн шудан намоён мешаванд</div></div>`;
     const notif = document.getElementById('notif-wrap');
     if (notif) notif.innerHTML = '';
     const title = document.getElementById('dash-new-title');
@@ -780,7 +780,7 @@ function orderCard(o, withCountdown = false) {
       <div class="oc-chips">
         <span class="oc-chip"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="1"/><path d="M2 10h20"/></svg>${pay}</span>
         <span class="oc-chip"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>${total} см</span>
-        ${o.comment ? `<span class="oc-chip">💬 ${o.comment}</span>` : ''}
+        ${o.comment ? `<span class="oc-chip"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>${o.comment}</span>` : ''}
       </div>
     </div>
     <div style="padding:0 0 4px">
@@ -822,7 +822,7 @@ function renderNewOrders() {
   if (!el) return;
   const sorted = [...newOrders].sort((a, b) => (a.createdAt?.toDate?.().getTime() || 0) - (b.createdAt?.toDate?.().getTime() || 0));
   if (!sorted.length) {
-    el.innerHTML = `<div class="empty"><div class="empty-ico">📭</div><div class="empty-t">Фармоишҳои нав нест</div><div class="empty-s">Фармоишҳо автоматӣ пайдо мешаванд</div></div>`;
+    el.innerHTML = `<div class="empty"><div class="empty-ico"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg></div><div class="empty-t">Фармоишҳои нав нест</div><div class="empty-s">Фармоишҳо автоматӣ пайдо мешаванд</div></div>`;
     return;
   }
   el.innerHTML = sorted.map((o, i) => orderCard(o, i === 0)).join('');
@@ -844,7 +844,7 @@ function renderDashNew() {
   if (title) title.style.display = sorted.length ? '' : 'none';
 
   if (!sorted.length) {
-    el.innerHTML = `<div class="empty" style="padding:28px 20px"><div class="empty-ico">📭</div><div class="empty-t">Фармоишҳо нест</div><div class="empty-s">Интизор ем…</div></div>`;
+    el.innerHTML = `<div class="empty" style="padding:28px 20px"><div class="empty-ico"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg></div><div class="empty-t">Фармоишҳо нест</div><div class="empty-s">Интизор ем…</div></div>`;
     renderNotif(); return;
   }
   el.innerHTML = sorted.slice(0, 2).map(o => orderCard(o)).join('');
@@ -927,7 +927,7 @@ function initSwipeButtons() {
 
 // ─── Қабули фармоиш ──────────────────────────────────────────
 window.acceptOrder = async function (oid) {
-  if (!isVerified()) { toast('Ҳувият тасдиқ нашудааст 🔒', 'err'); return; }
+  if (!isVerified()) { toast('Ҳувият тасдиқ нашудааст', 'err'); return; }
   if (activeOrder) { toast('Шумо аллакай фармоиш доред', 'err'); return; }
   const btn = document.getElementById('btn-' + oid);
   if (btn) { btn.disabled = true; btn.innerHTML = '<div class="spin" style="width:13px;height:13px;border-color:rgba(0,0,0,.2);border-top-color:#000"></div>'; }
@@ -944,7 +944,7 @@ window.acceptOrder = async function (oid) {
     CD = { ...CD, currentOrderId: oid, isActive: true, isOnline: true };
     updateOnlineUI(true);
     checkedItems = new Set();
-    toast('Фармоиш қабул шуд! 🚀', 'ok');
+    toast('Фармоиш қабул шуд!', 'ok');
     // Обновляем карту с маршрутом
     if (_lastPos && activeOrder) updateMapRoute(activeOrder);
     goPage('active');
@@ -980,7 +980,7 @@ function renderStepBar(currentStep) {
         </div>
         <div class="fsb-step-inner">
           <div class="fsb-lbl">${s.label}</div>
-          <div class="fsb-lbl-sub">${isDone ? 'Тайёр ✓' : s.sub}</div>
+          <div class="fsb-lbl-sub">${isDone ? 'Тайёр' : s.sub}</div>
         </div>
         ${i < steps.length - 1 ? '<div class="fsb-line"></div>' : ''}
       </div>`;
@@ -1014,7 +1014,7 @@ function renderStep1(o) {
   const itemPreviews = (o.items || []).slice(0, 4).map(item => {
     const img = item.imageUrl
       ? `<img src="${item.imageUrl}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;border-radius:9px">`
-      : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;opacity:.6">🛍️</div>`;
+      : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;opacity:.6"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></div>`;
     return `<div class="s1-thumb">${img}</div>`;
   }).join('');
 
@@ -1025,7 +1025,7 @@ function renderStep1(o) {
 
     <!-- Hero блок -->
     <div class="s1-hero ${arrived ? 'arrived' : ''}">
-      <div class="s1-hero-icon">${arrived ? '✅' : '🏪'}</div>
+      <div class="s1-hero-icon">${arrived ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>' : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>'}</div>
       <div class="s1-hero-body">
         <div class="s1-hero-title">${arrived ? 'Расидед ба дӯкон!' : 'Ба дӯкон равед'}</div>
         <div class="s1-hero-sub">${arrived ? 'Молҳоро ҷамъ кардан мумкин аст' : 'Galelium · Дӯкони марказӣ'}</div>
@@ -1058,7 +1058,7 @@ function renderStep1(o) {
         ${(o.items || []).map(item => `
           <div class="s1-item">
             <div class="s1-item-img">
-              ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.name}">` : '<span style="font-size:1.1rem">🛍️</span>'}
+              ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.name}">` : '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" opacity=".3"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>'}
             </div>
             <div class="s1-item-info">
               <div class="s1-item-name">${item.name}</div>
@@ -1111,7 +1111,7 @@ function renderStep2(o) {
       const chk = checkedItems.has(key);
       const imgHtml = item.imageUrl
         ? `<img src="${item.imageUrl}" alt="${item.name}">`
-        : `<div class="ci-no-img">🛍️</div>`;
+        : `<div class="ci-no-img"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></div>`;
       const hasBarcode = !!item.barcode;
       itemBlocks += `
         <div class="ci-block ${chk ? 'checked' : ''}" onclick="${chk ? '' : `openScanner('${key}','${o.id}',${idx})`}">
@@ -1265,7 +1265,7 @@ function openItemDetail(item, key, order) {
       img.alt = item.name;
       imgWrap.appendChild(img);
     } else {
-      if (imgPh) { imgPh.style.display = ''; imgPh.textContent = '🛍️'; }
+      if (imgPh) { imgPh.style.display = ''; imgPh.innerHTML = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" opacity=".3"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>'; }
     }
   }
 
@@ -1307,7 +1307,7 @@ function openItemDetail(item, key, order) {
           <span class="idp-bc-lbl">Штрих-код</span>
         </div>`;
     } else {
-      bcWrap.innerHTML = `<div class="idp-nobc-badge">⚠️ Штрих-код отсутствует — подтвердите вручную</div>`;
+      bcWrap.innerHTML = `<div class="idp-nobc-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Штрих-код отсутствует — подтвердите вручную</div>`;
     }
   }
 
@@ -1350,7 +1350,7 @@ window.openItemCamera = async function () {
 
   if (!('BarcodeDetector' in window)) {
     // Браузер не поддерживает — подтверждаем вручную
-    toast('⚠️ Камера не поддерживается, подтвердите вручную', 'warn');
+    toast('Камера дастгирӣ намешавад — дастӣ тасдиқ кунед', 'warn');
     confirmItemManual();
     return;
   }
@@ -1405,7 +1405,7 @@ function idpHandleCode(code) {
 
   if (!scannerExpected) {
     // Нет штрихкода — любой код подтверждает
-    if (res) { res.className = 'idp-scan-result ok'; res.textContent = '✅ Товар подтверждён'; }
+    if (res) { res.className = 'idp-scan-result ok'; res.textContent = 'Товар подтверждён'; }
     playSuccessBeep();
     if (navigator.vibrate) navigator.vibrate([50, 30, 80]);
     setTimeout(() => { closeItemCamera(); idpMarkDone(); }, 700);
@@ -1416,12 +1416,12 @@ function idpHandleCode(code) {
   const expected = String(scannerExpected).trim().replace(/\s/g, '');
 
   if (clean === expected) {
-    if (res) { res.className = 'idp-scan-result ok'; res.textContent = '✅ Штрих-код совпадает!'; }
+    if (res) { res.className = 'idp-scan-result ok'; res.textContent = 'Штрих-код совпадает!'; }
     playSuccessBeep();
     if (navigator.vibrate) navigator.vibrate([50, 30, 80]);
     setTimeout(() => { closeItemCamera(); idpMarkDone(); }, 700);
   } else {
-    if (res) { res.className = 'idp-scan-result err'; res.textContent = `❌ Не совпадает: ${clean}`; }
+    if (res) { res.className = 'idp-scan-result err'; res.textContent = `Не совпадает: ${clean}`; }
     if (hint) hint.textContent = `Ожидается: ${expected}`;
     playErrorBeep();
     // Через 2с продолжаем
@@ -1527,7 +1527,7 @@ function renderStep3(o) {
         <div class="s3c-row-body">
           <div class="s3c-row-lbl">Суроға</div>
           <div class="s3c-row-val">${o.address || '—'}</div>
-          ${o.comment ? `<div class="s3c-row-sub">💬 ${o.comment}</div>` : ''}
+          ${o.comment ? `<div class="s3c-row-sub"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> ${o.comment}</div>` : ''}
         </div>
         <svg class="s3c-row-chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
       </div>
@@ -1601,7 +1601,7 @@ function renderActive() {
   const el = document.getElementById('active-content');
   if (!el) return;
   if (!activeOrder) {
-    el.innerHTML = `<div class="empty"><div class="empty-ico">🛵</div><div class="empty-t">Фармоиши фаъол нест</div><div class="empty-s">Аз рӯйхат фармоиш қабул кунед</div></div>`;
+    el.innerHTML = `<div class="empty"><div class="empty-ico"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="1"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg></div><div class="empty-t">Фармоиши фаъол нест</div><div class="empty-s">Аз рӯйхат фармоиш қабул кунед</div></div>`;
     return;
   }
   const o = activeOrder;
@@ -1609,7 +1609,7 @@ function renderActive() {
   if (['courier_heading', 'courier_arrived'].includes(o.status)) stepHtml = renderStep1(o);
   else if (['collecting'].includes(o.status))                    stepHtml = renderStep2(o);
   else if (['delivering', 'client_arrived'].includes(o.status))  stepHtml = renderStep3(o);
-  el.innerHTML = stepHtml || `<div class="empty"><div class="empty-ico">⏳</div><div class="empty-t">Интизор…</div></div>`;
+  el.innerHTML = stepHtml || `<div class="empty"><div class="empty-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="empty-t">Интизор…</div></div>`;
 }
 
 // toggleItem удалён — заменён на openScanner + validateBarcode
@@ -1618,7 +1618,7 @@ function renderActive() {
 window.confirmCollect = async function (oid) {
   try {
     await updateDoc(doc(db, COL.ORDERS, oid), { status: 'delivering', updatedAt: serverTimestamp() });
-    toast('Молҳо ҷамъ шуданд! Ба роҳ бароед 🛵', 'ok');
+    toast('Молҳо ҷамъ шуданд! Ба роҳ бароед', 'ok');
   } catch { toast('Хато', 'err'); }
 };
 
@@ -1633,7 +1633,7 @@ window.deliverOrder = async function (oid) {
     return;
   }
   if (activeOrder && activeOrder.confirmCode && enteredCode !== activeOrder.confirmCode) {
-    toast('Рамз нодуруст аст! Аз муштарӣ пурсед 🔐', 'err');
+    toast('Рамз нодуруст аст! Аз муштарӣ пурсед', 'err');
     if (inp) { inp.style.borderColor = '#ef4444'; inp.value = ''; setTimeout(() => inp.style.borderColor = 'var(--b1)', 1500); }
     return;
   }
@@ -1657,7 +1657,7 @@ window.deliverOrder = async function (oid) {
     const pt = document.getElementById('ps-total'); if (pt) pt.textContent = CD.totalDeliveries;
     const pe = document.getElementById('ps-earn');  if (pe) pe.textContent = CD.earnings + ' см';
     updateEarnUI();
-    toast('🎉 Расонида шуд! +' + EPD + ' см', 'ok');
+    toast('Расонида шуд! +' + EPD + ' см', 'ok');
     goPage('dashboard');
     loadHistory();
   } catch { toast('Хато', 'err'); }
@@ -1667,7 +1667,7 @@ window.deliverOrder = async function (oid) {
 window.advance = async function (oid, ns) {
   try {
     await updateDoc(doc(db, COL.ORDERS, oid), { status: ns, updatedAt: serverTimestamp() });
-    toast(SL[ns] ? SL[ns] + ' ✓' : 'Навсозӣ шуд', 'ok');
+    toast(SL[ns] ? SL[ns] + '' : 'Навсозӣ шуд', 'ok');
   } catch { toast('Хато', 'err'); }
 };
 
@@ -1690,7 +1690,7 @@ function renderDashActive() {
   if (!activeOrder) { w.innerHTML = ''; return; }
   const o  = activeOrder;
   const si = statusToStep(o.status);
-  const icon = TRACK_STEPS[si]?.icon || '📦';
+  const icon = TRACK_STEPS[si]?.icon || '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>';
   w.innerHTML = `<div class="dash-active-row" onclick="goPage('active')">
     <div class="dash-active-dot"></div>
     <div style="flex:1;min-width:0">
@@ -1723,7 +1723,7 @@ async function loadHistory() {
     renderHistory();
   } catch (e) {
     console.error('loadHistory error:', e);
-    el.innerHTML = `<div class="empty"><div class="empty-ico">📭</div><div class="empty-t">Расониданиҳо нест</div><div class="empty-s">Хатои боргузорӣ: ${e.message}</div></div>`;
+    el.innerHTML = `<div class="empty"><div class="empty-ico"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div><div class="empty-t">Расониданиҳо нест</div><div class="empty-s">Хатои боргузорӣ: ${e.message}</div></div>`;
   }
 }
 
@@ -1734,7 +1734,7 @@ function renderHistory() {
   const ht = document.getElementById('hist-total-txt');
   if (ht) ht.textContent = historyOrders.length + ' расониш · ' + te + ' см';
   if (!historyOrders.length) {
-    el.innerHTML = `<div class="empty"><div class="empty-ico">📭</div><div class="empty-t">Расониданиҳо нест</div><div class="empty-s">Расониданиҳои иҷрошуда ин ҷо намоён мешаванд</div></div>`;
+    el.innerHTML = `<div class="empty"><div class="empty-ico"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div><div class="empty-t">Расониданиҳо нест</div><div class="empty-s">Расониданиҳои иҷрошуда ин ҷо намоён мешаванд</div></div>`;
     return;
   }
   el.innerHTML = historyOrders.map(o => {
@@ -1810,7 +1810,7 @@ function renderProfile() {
       CD = { ...CD, verificationStatus: 'pending' };
       UD = { ...UD, verificationStatus: 'pending' };
       renderProfile();
-      toast('Дархост фиристода шуд ✓', 'ok');
+      toast('Дархост фиристода шуд', 'ok');
     } catch { toast('Хато ҳангоми сабт', 'err'); }
   };
 
@@ -1834,7 +1834,7 @@ function renderProfile() {
     bannerWrap.innerHTML = `
       <div class="verif-card">
         <div class="verif-card-top">
-          <div class="verif-card-icon verified">✅</div>
+          <div class="verif-card-icon verified"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
           <div class="verif-card-info">
             <div class="verif-card-title">Ҳувият тасдиқ шудааст</div>
             <div class="verif-card-sub verified">Шумо метавонед фармоишҳо қабул кунед</div>
@@ -1874,7 +1874,7 @@ function renderProfile() {
   bannerWrap.innerHTML = `
     <div class="verif-card">
       <div class="verif-card-top">
-        <div class="verif-card-icon">🪪</div>
+        <div class="verif-card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M16 10a2 2 0 11-4 0 2 2 0 014 0z"/><path d="M8 9h2M8 13h2M14 15H8"/></svg></div>
         <div class="verif-card-info">
           <div class="verif-card-title">Тасдиқи ҳувият</div>
           <div class="verif-card-sub">Барои қабули фармоишҳо зарур аст</div>
@@ -1900,7 +1900,7 @@ window.saveProfile = async function () {
     UD = { ...UD, displayName: name, phone };
     CD = { ...CD, vehicle };
     renderSB(); renderProfile();
-    toast('Сақл шуд ✓', 'ok');
+    toast('Сақл шуд', 'ok');
   } catch { toast('Хато', 'err'); }
 };
 
@@ -1916,6 +1916,6 @@ window.uploadAvUI = async function (inp) {
     await setDoc(doc(db, COL.USERS, CU.uid), { avatarUrl: url, updatedAt: serverTimestamp() }, { merge: true });
     UD.avatarUrl = url;
     renderSB(); renderProfile();
-    toast('Акс навсозӣ шуд ✓', 'ok');
+    toast('Акс навсозӣ шуд', 'ok');
   } catch { toast('Хатои боргузорӣ', 'err'); }
 };

@@ -1409,188 +1409,117 @@ a{color:inherit;text-decoration:none}
 
 /* ── ПРОФИЛЬ ────────────────────────────────────────────── */
 /* ═══════════════════════════════════════════════════════════
-   ПРОФИЛЬ — переработан под single-column sheet
+   ПРОФИЛЬ — чистый, выровненный, без загрузки аватара
 ══════════════════════════════════════════════════════════ */
 
-/* ── Герой: аватар + имя + роль ─────────────────────────── */
 .prof-hero{
   display:flex;flex-direction:column;align-items:center;
-  padding:22px 20px 18px;
-  background:var(--s1);
-  border:1px solid var(--b0);
-  border-radius:18px;
-  margin-bottom:10px;
-  position:relative;
+  padding:24px 20px 20px;text-align:center;
+  background:var(--s1);border:1px solid var(--b0);border-radius:16px;
+  margin-bottom:8px;
 }
 .prof-av{
-  width:76px;height:76px;border-radius:50%;flex-shrink:0;
-  background:var(--accd);border:3px solid var(--accg);
+  width:68px;height:68px;border-radius:50%;
+  background:var(--s3);border:2.5px solid var(--accg);
   display:flex;align-items:center;justify-content:center;
-  font-family:var(--fd);font-size:1.6rem;font-weight:900;color:var(--acc2);
-  overflow:hidden;margin-bottom:12px;
-  position:relative;
+  font-family:var(--fd);font-size:1.4rem;font-weight:900;color:var(--acc2);
+  overflow:hidden;margin-bottom:11px;flex-shrink:0;
 }
 .prof-av img{width:100%;height:100%;object-fit:cover}
-.prof-av-edit{
-  position:absolute;bottom:0;right:0;
-  width:22px;height:22px;border-radius:50%;
-  background:var(--acc);border:2px solid var(--s1);
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;
-}
+.prof-av-edit,.prof-av-upload,.prof-av-upload-btn{ display:none!important }
 .prof-name{
-  font-family:var(--fd);font-weight:900;font-size:1.1rem;
-  color:#fff;letter-spacing:-.01em;margin-bottom:3px;text-align:center;
+  font-family:var(--fd);font-weight:900;font-size:1rem;
+  color:var(--tx);margin-bottom:3px;
 }
-.prof-email{
-  font-size:.68rem;color:var(--tx3);margin-bottom:10px;text-align:center;
-}
-.prof-role-chip{
-  display:inline-flex;align-items:center;gap:5px;
-  padding:4px 12px;border-radius:99px;
-  background:var(--accd);border:1px solid var(--accg);
-  color:var(--acc2);font-size:.58rem;font-weight:700;
-  letter-spacing:.08em;text-transform:uppercase;
-  margin-bottom:10px;
-}
-.prof-role-dot{
-  width:5px;height:5px;border-radius:50%;background:var(--acc2);
-}
+.prof-email{ font-size:.68rem;color:var(--tx3);margin-bottom:10px }
 .prof-veh-chip{
   display:inline-flex;align-items:center;gap:5px;
-  padding:4px 11px;border-radius:99px;
-  background:var(--s3);border:1px solid var(--b0);
-  color:var(--tx2);font-size:.6rem;font-weight:600;
+  padding:4px 12px;border-radius:99px;
+  background:var(--s3);border:1px solid var(--b1);
+  color:var(--tx2);font-size:.62rem;font-weight:600;
 }
-
-/* Плашка верификации в герое */
-#p-verif-badge-wrap{ margin-top:4px }
+#p-verif-badge-wrap{ margin-top:6px }
 .p-verif-badge{
   display:inline-flex;align-items:center;gap:5px;
-  padding:4px 11px;border-radius:99px;font-size:.58rem;font-weight:700;
-  margin:0 auto;
+  padding:4px 12px;border-radius:99px;font-size:.58rem;font-weight:700;
 }
-.p-verif-badge.unverified{ background:var(--amberd);color:var(--amber); }
-.p-verif-badge.pending{ background:rgba(59,130,246,.1);color:var(--blue); }
-.p-verif-badge.verified{ background:var(--accd);color:var(--acc2); }
-.p-verif-badge-dot{ width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0; }
+.p-verif-badge.unverified{ background:var(--amberd);color:var(--amber) }
+.p-verif-badge.pending{ background:rgba(59,130,246,.1);color:var(--blue) }
+.p-verif-badge.verified{ background:var(--accd);color:var(--acc2) }
 
-/* ── Статистика: 3 ячейки ────────────────────────────────── */
 .prof-stats{
   display:grid;grid-template-columns:1fr 1fr 1fr;
-  background:var(--s1);border:1px solid var(--b0);border-radius:14px;
-  overflow:hidden;margin-bottom:10px;
+  background:var(--s1);border:1px solid var(--b0);
+  border-radius:14px;overflow:hidden;margin-bottom:8px;
 }
 .prof-stat{
   display:flex;flex-direction:column;align-items:center;
-  padding:14px 8px;position:relative;
+  padding:13px 6px;position:relative;
 }
-.prof-stat + .prof-stat::before{
-  content:'';position:absolute;left:0;top:20%;bottom:20%;
+.prof-stat+.prof-stat::before{
+  content:'';position:absolute;left:0;top:22%;bottom:22%;
   width:1px;background:var(--b0);
 }
 .prof-stat-val{
-  font-family:var(--fd);font-weight:900;font-size:1.1rem;
+  font-family:var(--fd);font-weight:900;font-size:1rem;
   color:var(--acc2);line-height:1;margin-bottom:4px;
 }
 .prof-stat-lbl{
-  font-size:.46rem;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--tx3);text-align:center;
+  font-size:.46rem;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);
 }
 
-/* ── Секция-блок (форма) ────────────────────────────────── */
 .prof-section{
-  background:var(--s1);border:1px solid var(--b0);border-radius:14px;
-  overflow:hidden;margin-bottom:10px;
+  background:var(--s1);border:1px solid var(--b0);
+  border-radius:14px;overflow:hidden;margin-bottom:8px;
 }
 .prof-section-title{
-  font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;
-  color:var(--tx3);font-weight:700;
-  padding:13px 16px 0;
+  font-size:.48rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--tx3);font-weight:700;padding:12px 16px 0;
 }
 .prof-field{
-  display:flex;align-items:center;gap:12px;
-  padding:12px 16px;border-top:1px solid var(--b0);
-  position:relative;
+  display:flex;align-items:center;gap:12px;padding:12px 16px;
 }
-.prof-field:first-of-type{ border-top:none }
+.prof-field+.prof-field{ border-top:1px solid var(--b0) }
 .prof-field-ico{
-  width:32px;height:32px;border-radius:9px;flex-shrink:0;
+  width:30px;height:30px;border-radius:8px;flex-shrink:0;
   background:var(--s3);border:1px solid var(--b0);
-  display:flex;align-items:center;justify-content:center;
-  color:var(--tx3);
+  display:flex;align-items:center;justify-content:center;color:var(--tx3);
 }
 .prof-field-body{ flex:1;min-width:0 }
 .prof-field-label{
-  font-size:.48rem;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--tx3);margin-bottom:3px;
+  font-size:.46rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--tx3);margin-bottom:3px;display:block;
 }
 .prof-field-input{
   width:100%;background:none;border:none;outline:none;
   font-family:var(--fs);font-size:.82rem;font-weight:500;
-  color:var(--tx);padding:0;
-  caret-color:var(--acc);
+  color:var(--tx);padding:0;caret-color:var(--acc);display:block;
+  -webkit-appearance:none;
 }
-.prof-field-input::placeholder{ color:var(--tx3) }
+.prof-field-input::placeholder{ color:var(--s4) }
 .prof-field-input:read-only{ color:var(--tx3);cursor:default }
-.prof-field-input option{ background:var(--s1) }
+.prof-field-input option{ background:var(--s1);color:var(--tx) }
 
-/* ── Кнопка сохранить (плавающая внизу секции) ───────────── */
 .prof-save-btn{
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  width:calc(100% - 32px);margin:0 16px 14px;
-  padding:12px;border-radius:11px;
+  width:100%;padding:13px;border-radius:12px;border:none;
   background:linear-gradient(135deg,var(--acc),var(--acc2));
-  border:none;cursor:pointer;
-  font-family:var(--fd);font-weight:900;font-size:.78rem;
-  color:#0b0f0c;letter-spacing:.04em;
-  transition:opacity .15s,transform .15s;
-  box-shadow:0 3px 14px var(--acc-shadow);
+  cursor:pointer;font-family:var(--fd);font-weight:900;font-size:.8rem;
+  color:#0b0f0c;display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-bottom:8px;box-shadow:0 3px 14px var(--acc-shadow);transition:opacity .15s;
 }
-.prof-save-btn:hover{ opacity:.9;transform:translateY(-1px) }
-.prof-save-btn:active{ transform:translateY(0) }
-
-/* ── Кнопка выхода ───────────────────────────────────────── */
+.prof-save-btn:active{ opacity:.85 }
 .prof-logout-btn{
+  width:100%;padding:12px;border-radius:12px;
+  border:1px solid rgba(229,69,90,.2);background:var(--redd);cursor:pointer;
+  font-family:var(--fs);font-size:.78rem;font-weight:600;color:var(--red);
   display:flex;align-items:center;justify-content:center;gap:8px;
-  width:100%;padding:13px;border-radius:14px;
-  background:var(--redd);border:1px solid rgba(229,69,90,.2);
-  cursor:pointer;font-family:var(--fs);font-size:.78rem;font-weight:600;
-  color:var(--red);letter-spacing:.02em;
-  transition:background .15s,border-color .15s;
-  margin-bottom:10px;
+  margin-bottom:8px;transition:background .15s;
 }
-.prof-logout-btn:hover{
-  background:rgba(229,69,90,.18);border-color:rgba(229,69,90,.4);
-}
+.prof-logout-btn:hover{ background:rgba(229,69,90,.18) }
 
-/* ── Аватар-загрузчик ───────────────────────────────────── */
-.prof-av-upload{
-  display:flex;align-items:center;gap:12px;
-  padding:12px 16px;
-}
-.prof-av-preview{
-  width:44px;height:44px;border-radius:50%;flex-shrink:0;
-  background:var(--accd);border:2px solid var(--accg);
-  display:flex;align-items:center;justify-content:center;
-  font-size:.9rem;font-weight:700;color:var(--acc2);overflow:hidden;
-}
-.prof-av-preview img{width:100%;height:100%;object-fit:cover}
-.prof-av-upload-body{ flex:1;min-width:0 }
-.prof-av-upload-title{ font-size:.78rem;font-weight:600;color:var(--tx);margin-bottom:2px }
-.prof-av-upload-sub{ font-size:.6rem;color:var(--tx3) }
-.prof-av-upload-btn{
-  padding:7px 14px;border-radius:9px;
-  background:var(--s3);border:1px solid var(--b1);
-  cursor:pointer;font-family:var(--fs);font-size:.7rem;font-weight:600;
-  color:var(--tx2);white-space:nowrap;transition:all .15s;
-}
-.prof-av-upload-btn:hover{ background:var(--s4);color:var(--tx) }
-
-/* Убираем старые классы профиля */
-.pcard,.pg2{ all:unset }
-.p-av,.p-name,.p-email,.p-veh,.p-stats,.p-st,.p-st-val,.p-st-lbl{ all:unset }
-.pform,.pform-t,.ff,.fl{ all:unset }
+/* Убираем старые классы */
+.pcard,.pg2,.p-av,.p-name,.p-email,.p-veh,.p-stats,
+.p-st,.p-st-val,.p-st-lbl,.pform,.pform-t,.ff,.fl{ all:unset }
 .pform,.ff{ display:block }
 .fi{
   width:100%;background:var(--s2);border:1.5px solid var(--b0);border-radius:9px;
@@ -2249,7 +2178,7 @@ a.ni{ text-decoration:none }
             </div>
             <div class="gsp-body">
               <div id="active-content">
-                <div class="empty"><div class="empty-ico">🛵</div><div class="empty-t">Фармоиши фаъол нест</div><div class="empty-s">Аз рӯйхат фармоиш қабул кунед</div></div>
+                <div class="empty"><div class="empty-ico"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" opacity=".35"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="1"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg></div><div class="empty-t">Фармоиши фаъол нест</div><div class="empty-s">Аз рӯйхат фармоиш қабул кунед</div></div>
               </div>
             </div>
           </div>
@@ -2285,12 +2214,7 @@ a.ni{ text-decoration:none }
 
               <!-- Герой: аватар + имя + статистика -->
               <div class="prof-hero">
-                <div class="prof-av" id="p-av">?
-                  <div class="prof-av-edit" onclick="document.getElementById('av-inp').click()">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0b0f0c" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                  </div>
-                </div>
-                <input type="file" id="av-inp" accept="image/*" style="display:none" onchange="uploadAvUI(this)"/>
+                <div class="prof-av" id="p-av">?</div>
                 <div class="prof-name" id="p-name">—</div>
                 <div class="prof-email" id="p-email">—</div>
                 <div class="prof-veh-chip" id="p-veh" style="display:none">—</div>
@@ -2357,10 +2281,10 @@ a.ni{ text-decoration:none }
                   <div class="prof-field-body">
                     <div class="prof-field-label">Нақлиёт</div>
                     <select class="prof-field-input" id="pf-vehicle">
-                      <option value="bicycle">🚴 Велосипед</option>
-                      <option value="scooter">🛵 Скутер</option>
-                      <option value="car">🚗 Автомобил</option>
-                      <option value="foot">🚶 Пиёда</option>
+                      <option value="bicycle">Велосипед</option>
+                      <option value="scooter">Скутер</option>
+                      <option value="car">Автомобил</option>
+                      <option value="foot">Пиёда</option>
                     </select>
                   </div>
                 </div>
@@ -2570,7 +2494,7 @@ a.ni{ text-decoration:none }
 
     <!-- Фото -->
     <div class="idp-img-wrap" id="idp-img-wrap">
-      <div class="idp-img-placeholder" id="idp-img-placeholder">🛍️</div>
+      <div class="idp-img-placeholder" id="idp-img-placeholder"></div>
     </div>
 
     <!-- Инфо -->
@@ -2718,12 +2642,12 @@ window.sendVerifTelegram = function() {
   const email = window.__verifEmail || '—';
   const phone = window.__verifPhone || '—';
   const text =
-    `🪪 Дархости тасдиқи ҳувият\n\n` +
-    `👤 Ном: ${name}\n` +
-    `🆔 UID: ${uid}\n` +
-    `📧 Email: ${email}\n` +
-    `📞 Телефон: ${phone}\n\n` +
-    `📸 Аксҳои паспорт:\n` +
+    `Дархости тасдиқи ҳувият\n\n` +
+    `Ном: ${name}\n` +
+    `UID: ${uid}\n` +
+    `Email: ${email}\n` +
+    `Телефон: ${phone}\n\n` +
+    `Аксҳои паспорт:\n` +
     `1. Рӯи паспорт\n2. Пушти паспорт\n3. Селфи бо паспорт\n\n` +
     `courier.delivery.galelium.com`;
   window.open('https://t.me/lucas_vegas?text=' + encodeURIComponent(text), '_blank');
