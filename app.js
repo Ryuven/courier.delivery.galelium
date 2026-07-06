@@ -4,6 +4,10 @@
 // ============================================================
 
 import { auth, db, storage, COL, EPD, VEHICLE_TYPES } from './firebase.js';
+// Сумма доставки для курьера: берём из заказа, fallback на EPD
+function getFee(o) { return o?.deliveryFee ?? EPD; }
+
+
 
 import {
   onAuthStateChanged, signOut,
@@ -646,7 +650,7 @@ async function calcStats() {
     const all = sn.docs.map(d => d.data());
     const td  = all.filter(o => o.updatedAt?.toDate && o.updatedAt.toDate() >= today);
     todayDeliveries = td.length;
-    todayEarnings   = todayDeliveries * EPD;
+    todayEarnings   = td.reduce((s, o) => s + getFee(o), 0);
     const dt  = document.getElementById('d-today');   if (dt)  dt.textContent  = todayDeliveries;
     const dT  = document.getElementById('d-total');   if (dT)  dT.textContent  = CD?.totalDeliveries || 0;
     const dr  = document.getElementById('d-rating');  if (dr)  dr.textContent  = CD?.rating ? CD.rating.toFixed(1) : '—';
@@ -768,7 +772,7 @@ function orderCard(o, withCountdown = false) {
       </div>
       <div class="oc-time-wrap">
         <div class="oc-time">${time}</div>
-        <div class="oc-earn-badge">${EPD} см</div>
+        <div class="oc-earn-badge">+${getFee(o)} см</div>
       </div>
     </div>
     ${withCountdown ? `<div class="cd-wrap"><div class="cd-track"><div class="cd-fill" id="cd-${o.id}"></div></div><div class="cd-row"><span>Қабул кунед</span><span id="cd-txt-${o.id}">60с</span></div></div>` : ''}
@@ -999,7 +1003,7 @@ function renderOrderBadge(o) {
     <div class="ob-chips">
       <span class="ob-chip pay">${pay}</span>
       <span class="ob-chip total">${o.total || 0} см</span>
-      <span class="ob-chip earn">+${EPD} см</span>
+      <span class="ob-chip earn">+${getFee(o)} см</span>
     </div>
   </div>`;
 }
@@ -1563,7 +1567,7 @@ function renderStep3(o) {
     <!-- Доход -->
     <div class="s3c-earn">
       <span class="s3c-earn-lbl">Даромади шумо барои ин фармоиш</span>
-      <span class="s3c-earn-val">+${EPD} см</span>
+      <span class="s3c-earn-val">+${getFee(o)} см</span>
     </div>
 
     <!-- Кнопки -->
@@ -1645,19 +1649,20 @@ window.deliverOrder = async function (oid) {
       currentOrderId:  null,
       isActive:        false,
       totalDeliveries: (CD?.totalDeliveries || 0) + 1,
-      earnings:        (CD?.earnings || 0) + EPD,
+      earnings:        (CD?.earnings || 0) + getFee(activeOrder),
       updatedAt:       serverTimestamp(),
     }, { merge: true });
-    CD = { ...CD, currentOrderId: null, isActive: false, totalDeliveries: (CD?.totalDeliveries || 0) + 1, earnings: (CD?.earnings || 0) + EPD };
+    const _fee = getFee(activeOrder);
+    CD = { ...CD, currentOrderId: null, isActive: false, totalDeliveries: (CD?.totalDeliveries || 0) + 1, earnings: (CD?.earnings || 0) + _fee };
     todayDeliveries++;
-    todayEarnings += EPD;
+    todayEarnings += _fee;
     checkedItems = new Set();
     const dt = document.getElementById('d-today');  if (dt) dt.textContent = todayDeliveries;
     const dT = document.getElementById('d-total');  if (dT) dT.textContent = CD.totalDeliveries;
     const pt = document.getElementById('ps-total'); if (pt) pt.textContent = CD.totalDeliveries;
     const pe = document.getElementById('ps-earn');  if (pe) pe.textContent = CD.earnings + ' см';
     updateEarnUI();
-    toast('Расонида шуд! +' + EPD + ' см', 'ok');
+    toast('Расонида шуд! +' + _fee + ' см', 'ok');
     goPage('dashboard');
     loadHistory();
   } catch { toast('Хато', 'err'); }
@@ -1730,7 +1735,7 @@ async function loadHistory() {
 function renderHistory() {
   const el = document.getElementById('history-list');
   if (!el) return;
-  const te = historyOrders.length * EPD;
+  const te = historyOrders.reduce((s, o) => s + getFee(o), 0);
   const ht = document.getElementById('hist-total-txt');
   if (ht) ht.textContent = historyOrders.length + ' расониш · ' + te + ' см';
   if (!historyOrders.length) {
@@ -1744,7 +1749,7 @@ function renderHistory() {
     return `<div class="hc">
       <div class="hc-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
       <div class="hc-body">
-        <div class="hc-top"><span class="hc-num">#${o.orderNumber || o.id.slice(-6).toUpperCase()}</span><span class="hc-earn">+${EPD} см</span></div>
+        <div class="hc-top"><span class="hc-num">#${o.orderNumber || o.id.slice(-6).toUpperCase()}</span><span class="hc-earn">+${getFee(o)} см</span></div>
         <div class="hc-addr">${o.address || '—'}</div>
         <div class="hc-meta">${d} · ${cnt} мол</div>
       </div>
