@@ -4,8 +4,22 @@
 // ============================================================
 
 import { auth, db, storage, COL, EPD, VEHICLE_TYPES } from './firebase.js';
-// Сумма доставки для курьера: берём из заказа, fallback на EPD
-function getFee(o) { return o?.deliveryFee ?? EPD; }
+// Сумма доставки для курьера: берём deliveryFee из заказа,
+// или считаем как total − subtotal (сумма товаров),
+// или считаем total − сумму items, последний резерв — EPD
+function getFee(o) {
+  if (o?.deliveryFee != null && o.deliveryFee > 0) return o.deliveryFee;
+  // Считаем subtotal из items
+  const itemsSum = (o?.items || []).reduce((s, i) => s + (i.price || 0) * (i.quantity || 1), 0);
+  if (o?.subtotal != null && o.subtotal > 0) {
+    const fee = (o.total || 0) - o.subtotal;
+    return fee > 0 ? fee : EPD;
+  }
+  if (itemsSum > 0 && o?.total > itemsSum) {
+    return o.total - itemsSum;
+  }
+  return EPD;
+}
 
 
 
