@@ -4,21 +4,20 @@
 // ============================================================
 
 import { auth, db, storage, COL, EPD, VEHICLE_TYPES } from './firebase.js';
-// Сумма доставки для курьера: берём deliveryFee из заказа,
-// или считаем как total − subtotal (сумма товаров),
-// или считаем total − сумму items, последний резерв — EPD
+
+// Сумма доставки курьеру — берётся из поля deliveryFee документа заказа в Firestore.
+// Клиент пишет его при оформлении (DFEE=7). Fallback: total - сумма товаров.
 function getFee(o) {
-  if (o?.deliveryFee != null && o.deliveryFee > 0) return o.deliveryFee;
-  // Считаем subtotal из items
-  const itemsSum = (o?.items || []).reduce((s, i) => s + (i.price || 0) * (i.quantity || 1), 0);
-  if (o?.subtotal != null && o.subtotal > 0) {
-    const fee = (o.total || 0) - o.subtotal;
-    return fee > 0 ? fee : EPD;
+  // 1. Явное поле deliveryFee — самый точный способ
+  if (o?.deliveryFee != null && Number(o.deliveryFee) > 0) return Number(o.deliveryFee);
+  // 2. subtotal есть — вычитаем из total
+  if (o?.subtotal != null && o?.total != null && o.total > o.subtotal) return o.total - o.subtotal;
+  // 3. Считаем сумму items вручную
+  if (Array.isArray(o?.items) && o.items.length > 0 && o?.total > 0) {
+    const s = o.items.reduce((acc, i) => acc + (Number(i.price)||0) * (Number(i.quantity)||1), 0);
+    if (o.total > s) return o.total - s;
   }
-  if (itemsSum > 0 && o?.total > itemsSum) {
-    return o.total - itemsSum;
-  }
-  return EPD;
+  return 0; // лучше 0 чем хардкод EPD
 }
 
 

@@ -43,7 +43,7 @@ export const ORDER_STATUS = {
   CANCELLED:       'cancelled',
 };
 
-export const EPD = 80; // Заработок за доставку (сомони)
+export const EPD = 0; // Не используется — реальная сумма берётся из o.deliveryFee в заказе
 
 export const VEHICLE_TYPES = {
   bicycle: '🚴 Велосипед',
