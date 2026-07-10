@@ -1971,6 +1971,106 @@ a.ni{ text-decoration:none }
   background:var(--redd);color:var(--red);
   border:1.5px solid rgba(229,69,90,.35);
 }
+
+/* ═══ ЧАТ З МУШТАРӢ ══════════════════════════════════════════ */
+.ob-right{ display:flex;align-items:center;gap:8px;flex-shrink:0 }
+.ob-chat-btn{
+  width:34px;height:34px;border-radius:10px;flex-shrink:0;
+  background:var(--s2);border:1px solid var(--b0);
+  cursor:pointer;color:var(--tx2);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;transition:all .12s;
+}
+.ob-chat-btn:active{ background:var(--s3);color:var(--tx) }
+.ob-chat-badge{
+  position:absolute;top:-4px;right:-4px;
+  min-width:16px;height:16px;padding:0 4px;
+  background:var(--red);color:#fff;
+  border-radius:99px;font-size:.55rem;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+  border:2px solid var(--bg);
+}
+
+.chat-page{
+  position:fixed;inset:0;z-index:9000;
+  background:var(--bg);
+  display:none;flex-direction:column;
+  animation:itemPageIn .22s var(--ease) both;
+}
+.chat-page.open{ display:flex }
+.chat-page-topbar{
+  display:flex;align-items:center;gap:10px;
+  padding:calc(env(safe-area-inset-top,0px) + 10px) 14px 10px;
+  background:var(--s1);border-bottom:1px solid var(--b0);
+  flex-shrink:0;
+}
+.chat-page-back{
+  width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  background:var(--s2);border:1px solid var(--b0);
+  cursor:pointer;color:var(--tx2);
+  display:flex;align-items:center;justify-content:center;
+  transition:all .12s;
+}
+.chat-page-back:active{ background:var(--s3) }
+.chat-page-av{
+  width:34px;height:34px;border-radius:50%;flex-shrink:0;
+  background:var(--accd);border:2px solid var(--accg);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fd);font-weight:800;color:var(--acc2);font-size:.75rem;
+}
+.chat-page-info{ flex:1;min-width:0 }
+.chat-page-name{
+  font-family:var(--fd);font-size:.85rem;font-weight:900;color:var(--tx);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.chat-page-sub{ font-size:.62rem;color:var(--tx3);margin-top:1px }
+.chat-page-messages{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:16px 14px 8px;
+  display:flex;flex-direction:column;gap:8px;
+}
+.chat-msg{
+  max-width:78%;padding:9px 13px;border-radius:16px;
+  font-size:.82rem;line-height:1.42;word-wrap:break-word;white-space:pre-wrap;
+}
+.chat-msg-them{
+  align-self:flex-start;background:var(--s2);border:1px solid var(--b0);
+  color:var(--tx);border-bottom-left-radius:4px;
+}
+.chat-msg-me{
+  align-self:flex-end;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  color:#0b0f0c;border-bottom-right-radius:4px;font-weight:500;
+}
+.chat-msg-time{ font-size:.58rem;opacity:.65;margin-top:3px;display:block }
+.chat-msg-me .chat-msg-time{ text-align:right }
+.chat-page-empty{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;color:var(--tx3);padding:40px 20px;text-align:center;
+}
+.chat-page-empty svg{ opacity:.3;margin-bottom:2px }
+.chat-page-empty-t{ font-weight:700;font-size:.82rem;color:var(--tx2) }
+.chat-page-empty-s{ font-size:.7rem;max-width:220px }
+.chat-page-input-row{
+  display:flex;align-items:flex-end;gap:8px;
+  padding:10px 14px calc(var(--safe-b) + 10px);
+  border-top:1px solid var(--b0);flex-shrink:0;background:var(--s1);
+}
+.chat-page-input{
+  flex:1;resize:none;max-height:100px;
+  border:1.5px solid var(--b1);border-radius:20px;padding:9px 15px;
+  font-family:var(--fs);font-size:.84rem;
+  background:var(--s2);color:var(--tx);outline:none;
+  transition:border-color .15s;
+}
+.chat-page-input:focus{ border-color:var(--acc) }
+.chat-page-send{
+  width:38px;height:38px;border-radius:50%;flex-shrink:0;
+  background:var(--acc);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;color:#0b0f0c;
+  transition:transform .12s;
+}
+.chat-page-send:active{ transform:scale(.9) }
 </style>
 </head>
 <body>
@@ -2461,6 +2561,31 @@ a.ni{ text-decoration:none }
       </div>
     </button>
 
+  </div>
+</div>
+
+<!-- ══════════ ЧАТ З МУШТАРӢ (полноэкранный) ══════════ -->
+<div class="chat-page" id="chat-page">
+  <div class="chat-page-topbar">
+    <button class="chat-page-back" onclick="closeChat()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </button>
+    <div class="chat-page-av" id="chat-page-av">М</div>
+    <div class="chat-page-info">
+      <div class="chat-page-name" id="chat-page-name">Муштарӣ</div>
+      <div class="chat-page-sub" id="chat-page-sub">Чат оид ба фармоиш</div>
+    </div>
+  </div>
+
+  <div class="chat-page-messages" id="chat-page-messages"></div>
+
+  <div class="chat-page-input-row">
+    <textarea class="chat-page-input" id="chat-page-input" rows="1" placeholder="Паём нависед…"
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMsg();}"></textarea>
+    <button class="chat-page-send" id="chat-page-send" onclick="sendChatMsg()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
   </div>
 </div>
 

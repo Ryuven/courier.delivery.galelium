@@ -27,9 +27,9 @@ import {
 } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js';
 
 import {
-  doc, getDoc, setDoc, updateDoc,
+  doc, getDoc, setDoc, updateDoc, addDoc,
   getDocs, collection, query, where,
-  orderBy, onSnapshot, serverTimestamp, limit,
+  orderBy, onSnapshot, serverTimestamp, limit, increment,
 } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js';
 
 import {
@@ -1005,6 +1005,11 @@ function renderStepBar(currentStep) {
   </div>`;
 }
 
+// Экранирование HTML для безопасного вывода текста (сообщения чата и т.п.)
+function escHtml(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 // Мини-шапка заказа (компактная, всегда видна)
 function renderOrderBadge(o) {
   const pay = o.paymentMethod === 'cash' ? 'Нақдӣ' : o.paymentMethod === 'card' ? 'Корт' : 'Онлайн';
@@ -1013,13 +1018,119 @@ function renderOrderBadge(o) {
       <div class="ob-num">#${o.orderNumber || o.id.slice(-6).toUpperCase()}</div>
       <div class="ob-client">${o.clientName || 'Муштарӣ'}</div>
     </div>
-    <div class="ob-chips">
-      <span class="ob-chip pay">${pay}</span>
-      <span class="ob-chip total">${o.total || 0} см</span>
-      <span class="ob-chip earn">+${getFee(o)} см</span>
+    <div class="ob-right">
+      <div class="ob-chips">
+        <span class="ob-chip pay">${pay}</span>
+        <span class="ob-chip total">${o.total || 0} см</span>
+        <span class="ob-chip earn">+${getFee(o)} см</span>
+      </div>
+      <button class="ob-chat-btn" onclick="openChat('${o.id}')" title="Чат бо муштарӣ">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+        ${o.courierUnread > 0 ? `<span class="ob-chat-badge">${o.courierUnread}</span>` : ''}
+      </button>
     </div>
   </div>`;
 }
+
+// ─── ЧАТ З МУШТАРӢ ────────────────────────────────────────
+let chatOid      = null;
+let chatUnsub    = null;
+let chatMessages = [];
+
+window.openChat = async function (oid) {
+  const o = activeOrder && activeOrder.id === oid ? activeOrder : null;
+  if (!o) return;
+  chatOid = oid;
+
+  const page = document.getElementById('chat-page');
+  if (page) page.classList.add('open');
+
+  const nameEl = document.getElementById('chat-page-name');
+  if (nameEl) nameEl.textContent = o.clientName || 'Муштарӣ';
+  const avEl = document.getElementById('chat-page-av');
+  if (avEl) avEl.textContent = (o.clientName || 'М').trim().charAt(0).toUpperCase() || 'М';
+  const subEl = document.getElementById('chat-page-sub');
+  if (subEl) subEl.textContent = 'Фармоиш ' + (o.orderNumber ? '#' + o.orderNumber : '#' + o.id.slice(-6).toUpperCase());
+
+  // Сбрасываем счётчик непрочитанных для курьера
+  try { await updateDoc(doc(db, COL.ORDERS, oid), { courierUnread: 0 }); } catch {}
+
+  listenChatMessages(oid);
+  setTimeout(() => document.getElementById('chat-page-input')?.focus(), 350);
+};
+
+window.closeChat = function () {
+  const page = document.getElementById('chat-page');
+  if (page) page.classList.remove('open');
+  if (chatUnsub) { chatUnsub(); chatUnsub = null; }
+  chatOid = null;
+  chatMessages = [];
+};
+
+function listenChatMessages(oid) {
+  if (chatUnsub) { chatUnsub(); chatUnsub = null; }
+  const q = query(collection(db, COL.ORDERS, oid, 'messages'), orderBy('createdAt', 'asc'));
+  chatUnsub = onSnapshot(q, snap => {
+    chatMessages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderChatMessages();
+  });
+}
+
+function renderChatMessages() {
+  const wrap = document.getElementById('chat-page-messages');
+  if (!wrap) return;
+
+  if (chatMessages.length === 0) {
+    wrap.innerHTML = `<div class="chat-page-empty">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+      <div class="chat-page-empty-t">Ҳанӯз паём нест</div>
+      <div class="chat-page-empty-s">Ба муштарӣ нависед, агар дар бораи фармоиш савол дошта бошед</div>
+    </div>`;
+    return;
+  }
+
+  wrap.innerHTML = chatMessages.map(m => {
+    const mine = m.senderRole === 'courier';
+    const time = m.createdAt?.toDate
+      ? m.createdAt.toDate().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
+      : '';
+    return `<div class="chat-msg ${mine ? 'chat-msg-me' : 'chat-msg-them'}">${escHtml(m.text)}<span class="chat-msg-time">${time}</span></div>`;
+  }).join('');
+
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+window.sendChatMsg = async function () {
+  const inp = document.getElementById('chat-page-input');
+  if (!inp || !chatOid) return;
+  const text = inp.value.trim();
+  if (!text) return;
+
+  inp.value = '';
+  inp.style.height = 'auto';
+  const btn = document.getElementById('chat-page-send');
+  if (btn) btn.disabled = true;
+
+  try {
+    await addDoc(collection(db, COL.ORDERS, chatOid, 'messages'), {
+      text,
+      senderId:   CU.uid,
+      senderRole: 'courier',
+      senderName: UD?.displayName || 'Курьер',
+      createdAt:  serverTimestamp(),
+    });
+    await updateDoc(doc(db, COL.ORDERS, chatOid), {
+      clientUnread:          increment(1),
+      lastMessage:           text.slice(0, 120),
+      lastMessageAt:         serverTimestamp(),
+      lastMessageSenderRole: 'courier',
+    });
+  } catch (e) {
+    toast('Хато ҳангоми фиристодани паём', 'err');
+  }
+  if (btn) btn.disabled = false;
+  inp.focus();
+};
 
 // ─── ШАГ 1: Ба дӯкон ──────────────────────────────────────
 function renderStep1(o) {
