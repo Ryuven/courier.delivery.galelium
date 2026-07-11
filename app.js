@@ -187,8 +187,8 @@ function updateMapRoute(order) {
   const PHASE1 = ['courier_heading','courier_arrived','collecting'];
   const PHASE2 = ['delivering','client_arrived'];
   const phase = PHASE1.includes(order.status) ? 1 : PHASE2.includes(order.status) ? 2 : 0;
-  const cLat = order.clientLat || order.deliveryLat || (order.coords && order.coords.lat);
-  const cLng = order.clientLng || order.deliveryLng || (order.coords && order.coords.lng);
+  const cLat = order.lat || order.clientLat || order.deliveryLat || (order.coords && order.coords.lat);
+  const cLng = order.lng || order.clientLng || order.deliveryLng || (order.coords && order.coords.lng);
 
   // Маркер клиента (всегда)
   if (cLat && cLng) {
