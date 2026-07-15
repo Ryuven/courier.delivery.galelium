@@ -3,231 +3,242 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
-<meta name="robots" content="noindex,nofollow"/>
-<title>Вход · Dastdaroz Courier</title>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>dastdaroz ID — Вуруд</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Inter:wght@300;400;500;600;700&display=swap"/>
 <style>
 :root{
-  --bg:#0b0f0c;--s1:#111712;--s2:#182019;--s3:#1f2a21;--s4:#263329;
-  --b0:rgba(62,207,142,.09);--b1:rgba(62,207,142,.16);--b2:rgba(62,207,142,.28);
-  --acc:#2db87a;--acc2:#3ecf8e;--accd:rgba(45,184,122,.10);--accg:rgba(45,184,122,.22);
-  --acc-shadow:rgba(45,184,122,.22);
-  --amber:#d97706;--amberd:rgba(217,119,6,.12);
-  --red:#e5455a;--redd:rgba(229,69,90,.10);--blue:#3b82f6;
-  --tx:#d4ede0;--tx2:#8bb59e;--tx3:#4d7260;
+  --bg:#f3f7f4;--s1:#ffffff;--s2:#edf4ef;--s3:#e0ede3;--s4:#c8dccb;
+  --b0:rgba(0,0,0,.07);--b1:rgba(0,0,0,.11);--b2:rgba(0,0,0,.18);
+  --acc:#1a9e4a;--acc2:#22c55e;--accd:rgba(26,158,74,.09);--accg:rgba(26,158,74,.22);
+  --acc-shadow:rgba(26,158,74,.25);
+  --red:#dc2626;--redd:rgba(220,38,38,.1);
+  --amber:#d97706;--amberd:rgba(217,119,6,.1);
+  --tx:#171f1a;--tx2:#3d5244;--tx3:#7a9882;
   --fd:'Nunito',sans-serif;--fs:'Inter',system-ui,sans-serif;
   --ease:cubic-bezier(.32,0,.18,1);--spring:cubic-bezier(.34,1.56,.64,1);
-  --t:.22s;--tf:.13s;
-  --shadow-md:0 4px 24px rgba(0,0,0,.4),0 1px 4px rgba(0,0,0,.2);
+  --tf:.13s;
+  --shadow:0 1px 3px rgba(0,0,0,.05),0 4px 14px rgba(0,0,0,.04);
+  --shadow-md:0 4px 24px rgba(0,0,0,.09),0 1px 4px rgba(0,0,0,.04);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{height:100%;-webkit-text-size-adjust:100%}
 body{
   background:var(--bg);color:var(--tx);font-family:var(--fs);font-weight:400;
-  min-height:100svh;overflow-y:auto;-webkit-font-smoothing:antialiased;
-  display:flex;align-items:center;justify-content:center;
-  padding:24px 16px calc(24px + env(safe-area-inset-bottom,0px));
+  min-height:100svh;-webkit-font-smoothing:antialiased;
+  display:flex;align-items:center;justify-content:center;padding:24px 16px;
 }
+::selection{background:var(--acc);color:#fff}
+
 body::before{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:linear-gradient(var(--b0) 1px,transparent 1px),linear-gradient(90deg,var(--b0) 1px,transparent 1px);
-  background-size:52px 52px;
+  content:'';position:fixed;inset:0;pointer-events:none;
+  background-image:radial-gradient(circle,rgba(26,158,74,.06) 1px,transparent 1px);
+  background-size:28px 28px;
 }
 body::after{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:radial-gradient(ellipse 55% 55% at 50% 38%,rgba(45,184,122,.055) 0%,transparent 70%);
+  content:'';position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(26,158,74,.07) 0%,transparent 65%);
 }
-/* ПРОГРЕСС */
-.fb-bar{
-  position:fixed;top:0;left:0;right:0;height:2px;z-index:999;
-  background:linear-gradient(90deg,var(--acc),var(--acc2),transparent);
-  transform-origin:left;transform:scaleX(0);transition:transform .4s var(--ease);
-}
-.fb-bar.loading{transform:scaleX(.65)}
+
+/* ── ПРОГРЕСС ── */
+.fb-bar{position:fixed;top:0;left:0;right:0;height:3px;z-index:999;
+  background:linear-gradient(90deg,var(--acc),var(--acc2));
+  transform-origin:left;transform:scaleX(0);transition:transform .4s var(--ease)}
+.fb-bar.loading{transform:scaleX(.6)}
 .fb-bar.done{transform:scaleX(1);opacity:0;transition:transform .2s,opacity .3s ease .2s}
-/* КАРТОЧКА */
+
+/* ── КАРТОЧКА ── */
 .card{
   position:relative;z-index:1;
-  width:min(440px,calc(100vw - 32px));
-  background:var(--s1);border:1px solid var(--b1);border-radius:18px;
-  overflow:hidden;box-shadow:var(--shadow-md);
-  animation:cardIn .36s var(--ease) both;
+  width:min(420px,calc(100vw - 32px));
+  background:var(--s1);border:1.5px solid var(--b0);border-radius:24px;
+  box-shadow:var(--shadow-md);
+  animation:fadeUp .35s var(--ease) both;
+  overflow:hidden;
 }
-@keyframes cardIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-.card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;z-index:2;
-  background:linear-gradient(90deg,var(--acc) 0%,var(--acc2) 50%,transparent 100%);
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── ШАПКА / БРЕНД dastdaroz ID ── */
+.card-head{padding:28px 28px 0}
+.idlogo{display:flex;align-items:center;gap:11px;margin-bottom:24px}
+.idlogo-mark{
+  width:40px;height:40px;border-radius:12px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  display:flex;align-items:center;justify-content:center;color:#fff;
+  box-shadow:0 4px 12px var(--acc-shadow);position:relative;
 }
-/* ШАПКА */
-.card-head{padding:28px 28px 0;border-bottom:1px solid var(--b0)}
-.card-logo{display:flex;align-items:center;gap:11px;margin-bottom:20px}
-.card-logo img{height:30px;width:auto;object-fit:contain}
-.card-badge{
-  display:inline-flex;align-items:center;gap:5px;
-  background:var(--accd);border:1px solid var(--b1);color:var(--acc2);
-  font-size:.52rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
-  padding:3px 9px;border-radius:99px;
-}
-.card-badge-dot{
-  width:5px;height:5px;border-radius:50%;background:var(--acc2);flex-shrink:0;
-  animation:bdot 2.2s ease-in-out infinite;
-}
-@keyframes bdot{0%,100%{box-shadow:0 0 0 0 rgba(62,207,142,.4)}50%{box-shadow:0 0 0 5px rgba(62,207,142,0)}}
-.card-title{
-  font-family:var(--fd);font-weight:900;font-size:1.5rem;
-  color:var(--tx);line-height:1.1;letter-spacing:-.02em;margin-bottom:5px;
-}
-.card-title em{color:var(--acc2);font-style:normal}
-.card-sub{font-size:.71rem;color:var(--tx3);line-height:1.5;margin-bottom:20px}
-/* ВКЛАДКИ */
-.tabs{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--b0)}
-.tab{
-  padding:11px 0;text-align:center;cursor:pointer;
-  font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;
-  color:var(--tx3);background:none;border:none;font-family:var(--fs);
-  border-bottom:2px solid transparent;
-  transition:color var(--tf),border-color var(--tf),background var(--tf);
-}
-.tab:hover:not(.active){color:var(--tx2);background:rgba(62,207,142,.03)}
-.tab.active{color:var(--acc2);border-bottom-color:var(--acc2)}
-/* ТЕЛО */
-.card-body{padding:22px 28px 26px}
-/* АЛЕРТ */
-.lock-alert{
-  display:none;align-items:flex-start;gap:9px;
-  padding:11px 13px;margin-bottom:16px;border-radius:10px;
-  font-size:.72rem;color:var(--tx2);line-height:1.55;border:1px solid;
-}
-.lock-alert.show{display:flex}
-.lock-alert.err{background:var(--redd);border-color:rgba(229,69,90,.25)}
-.lock-alert.ok{background:var(--accd);border-color:var(--b1)}
-.lock-alert strong{display:block;font-size:.72rem;margin-bottom:2px}
-.lock-alert.err strong{color:var(--red)}
-.lock-alert.ok strong{color:var(--acc2)}
-.lock-alert svg{flex-shrink:0;margin-top:1px}
-/* ПОЛЯ */
+.idlogo-mark svg{position:relative;z-index:1}
+.idlogo-name{font-family:var(--fd);font-weight:900;font-size:1.02rem;color:var(--tx);line-height:1.15}
+.idlogo-name span{color:var(--acc)}
+.idlogo-sub{font-size:.6rem;color:var(--tx3);font-weight:600;margin-top:2px;letter-spacing:.02em}
+
+.card-title{font-family:var(--fd);font-weight:900;font-size:1.5rem;color:var(--tx);letter-spacing:-.02em;line-height:1.15;margin-bottom:5px}
+.card-title em{color:var(--acc);font-style:normal}
+.card-sub{font-size:.76rem;color:var(--tx3);margin-bottom:20px;line-height:1.5}
+
+/* ── ТАБЫ ── */
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;
+  background:var(--s2);border-radius:13px;padding:4px;margin-bottom:0}
+.tab{padding:9px;text-align:center;cursor:pointer;border:none;background:none;
+  font-family:var(--fs);font-size:.72rem;font-weight:600;color:var(--tx3);
+  border-radius:10px;transition:all var(--tf)}
+.tab.active{background:var(--s1);color:var(--acc);box-shadow:0 1px 4px rgba(0,0,0,.08);font-weight:700}
+.tab:hover:not(.active){color:var(--tx2)}
+
+/* ── ТЕЛО ── */
+.card-body{padding:22px 28px 28px}
+
+/* ── АЛЕРТ ── */
+.alert{display:none;align-items:flex-start;gap:9px;padding:11px 13px;margin-bottom:14px;
+  border-radius:12px;font-size:.73rem;color:var(--tx2);line-height:1.5;border:1.5px solid}
+.alert.show{display:flex}
+.alert.err{background:rgba(220,38,38,.06);border-color:rgba(220,38,38,.2)}
+.alert.ok{background:rgba(26,158,74,.07);border-color:var(--accg)}
+.alert strong{display:block;font-size:.7rem;font-weight:700;margin-bottom:2px}
+.alert.err strong{color:var(--red)}
+.alert.ok  strong{color:var(--acc)}
+
+/* ── ПОЛЕ ── */
 .field{position:relative;margin-bottom:12px}
-.field-label{
-  font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;
-  color:var(--tx3);display:block;margin-bottom:6px;font-weight:600;
+.lbl{font-size:.5rem;letter-spacing:.18em;text-transform:uppercase;color:var(--tx3);
+  display:block;margin-bottom:5px;font-weight:600}
+.inp{
+  width:100%;background:var(--s2);border:1.5px solid var(--b0);border-radius:11px;
+  color:var(--tx);font-family:var(--fs);font-size:.85rem;font-weight:400;
+  padding:11px 14px;outline:none;transition:border-color var(--tf),box-shadow var(--tf);
 }
-.field-label em{color:var(--acc2);font-style:normal;margin-left:3px}
-.field-input{
-  width:100%;background:var(--s2);border:1px solid var(--b0);border-radius:9px;
-  color:var(--tx);font-family:var(--fs);font-size:.84rem;font-weight:400;
-  padding:11px 42px 11px 13px;outline:none;
-  transition:border-color var(--tf),background var(--tf);
-  -webkit-appearance:none;appearance:none;
-}
-.field-input.no-icon{padding-right:13px}
-.field-input:focus{border-color:var(--acc);background:var(--s3)}
-.field-input.err{border-color:rgba(229,69,90,.5);animation:shake .34s ease}
-.field-input::placeholder{color:var(--tx3)}
-select.field-input{cursor:pointer}
-select.field-input option{background:var(--s2)}
+.inp:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--accd)}
+.inp.has-eye{padding-right:44px}
+.inp.err{border-color:rgba(220,38,38,.5);animation:shake .32s ease}
+.inp::placeholder{color:var(--tx3)}
 @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
-.field-eye{
-  position:absolute;right:0;bottom:0;width:40px;height:40px;
-  background:none;border:none;cursor:pointer;color:var(--tx3);
-  display:flex;align-items:center;justify-content:center;transition:color var(--tf);
-}
-.field-eye:hover{color:var(--tx2)}
-.field-err{font-size:.62rem;color:var(--red);margin-top:4px;display:none;padding-left:2px}
+.field-err{font-size:.62rem;color:var(--red);margin-top:4px;display:none}
 .field-err.show{display:block}
-/* СИЛА ПАРОЛЯ */
-.pass-strength{display:flex;gap:3px;margin-top:7px}
-.ps-bar{flex:1;height:3px;border-radius:2px;background:var(--s4);transition:background .3s}
-.ps-label{font-size:.58rem;color:var(--tx3);margin-top:4px;display:none}
-/* ЗАПОМНИТЬ */
-.row-remember{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:16px;gap:10px;flex-wrap:wrap;
+
+/* ── ПОЛЕ ТЕЛЕФОНА (+992 префикс) ── */
+.phone-field{
+  display:flex;align-items:stretch;background:var(--s2);border:1.5px solid var(--b0);
+  border-radius:11px;overflow:hidden;transition:border-color var(--tf),box-shadow var(--tf);
 }
-.remember{display:flex;align-items:center;gap:7px;font-size:.7rem;color:var(--tx2);cursor:pointer;user-select:none}
-.remember input{accent-color:var(--acc2);cursor:pointer;width:14px;height:14px}
-.btn-forgot{
-  font-size:.65rem;color:var(--tx3);background:none;border:none;cursor:pointer;
-  padding:0;font-family:var(--fs);transition:color var(--tf);
+.phone-field:focus-within{border-color:var(--acc);box-shadow:0 0 0 3px var(--accd)}
+.phone-prefix{
+  display:flex;align-items:center;gap:6px;padding:0 12px;
+  background:var(--s3);border-right:1.5px solid var(--b0);
+  font-family:var(--fs);font-weight:700;font-size:.85rem;color:var(--tx2);
+  flex-shrink:0;user-select:none;
 }
-.btn-forgot:hover{color:var(--acc2)}
-/* ИНФО */
-.reg-info{
-  background:var(--s2);border:1px solid var(--b0);border-radius:10px;
-  padding:12px 14px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start;
+.phone-flag{width:16px;height:12px;border-radius:2px;overflow:hidden;flex-shrink:0;box-shadow:0 0 0 1px rgba(0,0,0,.08)}
+.phone-input{
+  flex:1;min-width:0;border:none;background:none;outline:none;
+  color:var(--tx);font-family:var(--fs);font-size:.85rem;font-weight:500;
+  padding:11px 14px 11px 10px;letter-spacing:.02em;
 }
-.reg-info svg{flex-shrink:0;color:var(--acc2);margin-top:1px}
-.reg-info-text{font-size:.7rem;color:var(--tx3);line-height:1.6}
-.reg-info-text strong{color:var(--tx2);font-size:.72rem;display:block;margin-bottom:2px}
-/* УСЛОВИЯ */
-.terms{font-size:.66rem;color:var(--tx3);margin-bottom:16px;line-height:1.6}
-.terms a{color:var(--tx3);text-decoration:underline;text-underline-offset:2px;
-  text-decoration-color:var(--b1);transition:color var(--tf)}
-.terms a:hover{color:var(--acc2)}
-/* КНОПКА */
+.phone-input::placeholder{color:var(--tx3);letter-spacing:.02em}
+
+/* ── ГЛАЗ ── */
+.eye{position:absolute;right:0;bottom:0;width:42px;height:42px;
+  background:none;border:none;cursor:pointer;color:var(--tx3);
+  display:flex;align-items:center;justify-content:center;transition:color var(--tf)}
+.eye:hover{color:var(--tx2)}
+
+/* ── СИЛА ПАРОЛЯ ── */
+.ps-bars{display:flex;gap:4px;margin-top:7px}
+.ps-bar{flex:1;height:3px;border-radius:2px;background:var(--s3);transition:background .3s}
+.ps-lbl{font-size:.58rem;color:var(--tx3);margin-top:4px;display:none}
+
+/* ── ШАГ 2 ВХОДА: подтверждённый номер (chip) ── */
+.phone-chip{
+  display:flex;align-items:center;gap:10px;
+  background:var(--accd);border:1.5px solid var(--accg);border-radius:12px;
+  padding:11px 13px;margin-bottom:16px;
+}
+.phone-chip-ico{
+  width:30px;height:30px;border-radius:9px;flex-shrink:0;
+  background:var(--s1);display:flex;align-items:center;justify-content:center;color:var(--acc);
+}
+.phone-chip-num{flex:1;font-family:var(--fs);font-weight:700;font-size:.84rem;color:var(--tx);letter-spacing:.02em}
+.phone-chip-edit{
+  background:none;border:none;cursor:pointer;color:var(--acc);
+  font-size:.68rem;font-weight:700;font-family:var(--fs);padding:4px 6px;
+  display:flex;align-items:center;gap:4px;transition:opacity var(--tf);
+}
+.phone-chip-edit:hover{opacity:.7}
+
+/* ── СТРОКА ОПЦИЙ ── */
+.opt-row{display:flex;align-items:center;justify-content:flex-end;margin-bottom:14px;gap:8px}
+.forgot{font-size:.68rem;color:var(--tx3);background:none;border:none;cursor:pointer;padding:0;
+  font-family:var(--fs);transition:color var(--tf);text-decoration:none}
+.forgot:hover{color:var(--acc)}
+
+/* ── ТЕРМИНЫ ── */
+.terms{font-size:.67rem;color:var(--tx3);margin-bottom:14px;line-height:1.6}
+.terms a{color:var(--acc);text-decoration:none}
+.terms a:hover{text-decoration:underline}
+
+/* ── КНОПКА САБМИТ ── */
 .btn-submit{
-  width:100%;padding:12px 16px;border:none;cursor:pointer;border-radius:10px;
-  background:linear-gradient(135deg,var(--acc) 0%,var(--acc2) 100%);
-  color:#0b0f0c;font-family:var(--fd);font-weight:900;
-  font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  transition:opacity var(--tf),transform var(--tf);
-  box-shadow:0 3px 14px var(--acc-shadow);
+  width:100%;padding:13px;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));border:none;border-radius:12px;
+  color:#fff;font-family:var(--fd);font-weight:900;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;
+  box-shadow:0 4px 16px var(--acc-shadow);transition:opacity var(--tf),transform var(--tf);
+  position:relative;overflow:hidden;
 }
-.btn-submit:hover:not(:disabled){opacity:.9;transform:translateY(-1px)}
-.btn-submit:active:not(:disabled){transform:translateY(0)}
-.btn-submit:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
-.btn-submit.loading .btn-submit-txt{opacity:.5}
-.btn-spinner{
-  width:14px;height:14px;border-radius:50%;
-  border:2px solid rgba(11,15,12,.2);border-top-color:#0b0f0c;
-  animation:spin .7s linear infinite;display:none;flex-shrink:0;
-}
+.btn-submit:hover:not(:disabled){opacity:.9;transform:translateY(-1px);box-shadow:0 6px 20px var(--acc-shadow)}
+.btn-submit:active{transform:scale(.98)}
+.btn-submit:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-submit.loading .btn-txt{opacity:.5}
+.spinner{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;animation:spin .7s linear infinite;display:none;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
-.btn-submit.loading .btn-spinner{display:block}
-/* OR */
-.or{
-  display:flex;align-items:center;gap:10px;margin:16px 0;
-  color:var(--tx3);font-size:.56rem;letter-spacing:.18em;text-transform:uppercase;
+.btn-submit.loading .spinner{display:block}
+
+.btn-back-step{
+  width:100%;padding:11px;margin-top:9px;
+  background:none;border:none;color:var(--tx3);
+  font-family:var(--fs);font-size:.72rem;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:color var(--tf);
 }
-.or::before,.or::after{content:'';flex:1;height:1px;background:var(--b0)}
-/* GOOGLE */
-.btn-google{
-  width:100%;padding:11px 16px;border-radius:10px;cursor:pointer;
-  background:var(--s2);border:1px solid var(--b0);
-  color:var(--tx2);font-family:var(--fs);font-size:.76rem;font-weight:500;
-  display:flex;align-items:center;justify-content:center;gap:9px;
-  transition:border-color var(--tf),color var(--tf),background var(--tf);
-}
-.btn-google:hover{border-color:var(--b1);color:var(--tx);background:var(--s3)}
-.btn-google:disabled{opacity:.45;cursor:not-allowed}
-/* ПЕРЕКЛЮЧАТЕЛЬ */
-.sw-link{text-align:center;margin-top:14px;font-size:.7rem;color:var(--tx3)}
-.sw-link button{
-  background:none;border:none;cursor:pointer;color:var(--acc2);
-  font-size:.7rem;font-family:var(--fs);font-weight:600;padding:0;
-  border-bottom:1px solid transparent;transition:border-color var(--tf);
-}
-.sw-link button:hover{border-color:var(--accg)}
-/* ПОДВАЛ */
-.card-foot{
-  padding:14px 28px 20px;border-top:1px solid var(--b0);
-  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
-}
-.client-link{font-size:.63rem;color:var(--tx3)}
-.client-link a{
-  color:var(--tx3);text-decoration:none;border-bottom:1px solid var(--b0);
-  transition:color var(--tf),border-color var(--tf);
-}
-.client-link a:hover{color:var(--acc2);border-color:var(--accg)}
-.status-row{display:flex;align-items:center;gap:6px;font-size:.58rem;color:var(--tx3);letter-spacing:.04em}
-.status-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;background:var(--amber)}
-.status-dot.ok{background:var(--acc2);animation:bdot 2.4s ease-in-out infinite}
+.btn-back-step:hover{color:var(--tx2)}
+
+/* ── ПЕРЕКЛЮЧАТЕЛЬ ── */
+.switch{text-align:center;margin-top:16px;font-size:.72rem;color:var(--tx3)}
+.switch button{background:none;border:none;cursor:pointer;color:var(--acc);
+  font-size:.72rem;font-family:var(--fs);font-weight:700;padding:0;transition:opacity var(--tf)}
+.switch button:hover{opacity:.75}
+
+/* ── СТАТУС ── */
+.status{margin-top:18px;display:flex;align-items:center;gap:7px;
+  font-size:.6rem;color:var(--tx3);letter-spacing:.04em;
+  padding:10px 13px;background:var(--s2);border-radius:10px}
+.status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;background:var(--s4);transition:background .3s}
+.status-dot.ok{background:var(--acc);animation:lp 2.4s ease-in-out infinite}
 .status-dot.err{background:var(--red)}
+@keyframes lp{0%,100%{box-shadow:0 0 0 0 rgba(26,158,74,.35)}50%{box-shadow:0 0 0 5px rgba(26,158,74,0)}}
+
+/* ── Индикатор шагов (для входа) ── */
+.step-dots{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:18px}
+.step-dot{width:6px;height:6px;border-radius:50%;background:var(--s3);transition:all .25s var(--ease)}
+.step-dot.active{width:18px;border-radius:99px;background:var(--acc)}
+.step-dot.done{background:var(--acc)}
+
+/* ── Экосистемные бейджи (client + courier) ── */
+.eco-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px}
+.eco-badge{
+  display:flex;align-items:center;gap:5px;padding:5px 11px;
+  background:var(--s2);border:1px solid var(--b0);border-radius:99px;
+  font-size:.6rem;font-weight:600;color:var(--tx3);
+}
+.eco-badge svg{color:var(--acc);flex-shrink:0}
+
 @media(max-width:480px){
-  .card-head,.card-body,.card-foot{padding-left:20px;padding-right:20px}
-  .card-title{font-size:1.3rem}
+  .card-head{padding:22px 20px 0}
+  .card-body{padding:18px 20px 24px}
+  .card-title{font-size:1.32rem}
 }
 </style>
 </head>
@@ -237,386 +248,463 @@ select.field-input option{background:var(--s2)}
 
 <div class="card" role="main">
 
+  <!-- ШАПКА / БРЕНД -->
   <div class="card-head">
-    <div class="card-logo">
-      <img src="/dastdaroz.png" alt="Dastdaroz"/>
-      <div class="card-badge"><div class="card-badge-dot"></div>Курьер</div>
+    <div class="idlogo">
+      <div class="idlogo-mark">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </div>
+      <div>
+        <div class="idlogo-name">dastdaroz <span>ID</span></div>
+        <div class="idlogo-sub">Як ҳисоб барои тамоми хидматҳо</div>
+      </div>
     </div>
-    <div class="card-title">Хуш омадед,<br><em>Курьер</em></div>
-    <div class="card-sub">Вход или регистрация в портале курьеров</div>
+
+    <div class="card-title" id="card-title">Хуш <em>омадед</em></div>
+    <div class="card-sub" id="card-sub">Бо рақами телефон ворид шавед</div>
+
     <div class="tabs">
-      <button class="tab active" id="tab-login" type="button">Вход</button>
-      <button class="tab"        id="tab-reg"   type="button">Регистрация</button>
+      <button class="tab active" id="tab-login" type="button">Вуруд</button>
+      <button class="tab"        id="tab-reg"   type="button">Ҳисоб кушодан</button>
     </div>
   </div>
 
+  <!-- ТЕЛО -->
   <div class="card-body">
 
-    <div class="lock-alert err" id="lock-alert" role="alert">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01" stroke-width="2"/></svg>
-      <div><strong id="alert-title">Хато</strong><span id="alert-msg"></span></div>
-    </div>
-
-    <!-- ВХОД -->
-    <div id="form-login">
-      <div class="field">
-        <label class="field-label" for="login-email">Email</label>
-        <input type="email" id="login-email" class="field-input no-icon" placeholder="courier@email.com" autocomplete="email" autofocus inputmode="email"/>
-        <div class="field-err" id="err-login-email">Некорректный email</div>
-      </div>
-      <div class="field">
-        <label class="field-label" for="login-pass">Пароль</label>
-        <input type="password" id="login-pass" class="field-input" placeholder="••••••••" autocomplete="current-password"/>
-        <button class="field-eye" id="eye-login" type="button" aria-label="Показать пароль">
-          <svg id="eye-login-show" width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 8c1.5-3.5 4-5.5 6.5-5.5s5 2 6.5 5.5c-1.5 3.5-4 5.5-6.5 5.5S3 11.5 1.5 8z" stroke="currentColor" stroke-width="1.3"/></svg>
-          <svg id="eye-login-hide" width="15" height="15" viewBox="0 0 16 16" fill="none" style="display:none"><path d="M2 2l12 12M6.5 6.6A2.5 2.5 0 0 0 9.4 9.5M4 4.3A6.4 6.4 0 0 0 1.5 8c1.5 3.5 4 5.5 6.5 5.5 1.3 0 2.5-.4 3.5-1.1M7 2.6c.3-.1.7-.1 1-.1 2.5 0 5 2 6.5 5.5a8.4 8.4 0 0 1-1.8 2.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-        </button>
-        <div class="field-err" id="err-login-pass">Введите пароль</div>
-      </div>
-      <div class="row-remember">
-        <label class="remember"><input type="checkbox" id="inp-remember"/> Запомнить меня</label>
-        <button class="btn-forgot" id="btn-forgot" type="button">Забыли пароль?</button>
-      </div>
-      <button class="btn-submit" id="btn-login" type="button">
-        <span class="btn-submit-txt">Войти</span>
-        <span class="btn-spinner" aria-hidden="true"></span>
-      </button>
-      <div class="sw-link">Нет аккаунта? <button id="sw-to-reg" type="button">Зарегистрироваться</button></div>
-    </div>
-
-    <!-- РЕГИСТРАЦИЯ -->
-    <div id="form-reg" style="display:none">
-      <div class="reg-info">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01" stroke-width="2"/></svg>
-        <div class="reg-info-text">
-          <strong>Регистрация курьера</strong>
-          После регистрации необходимо пройти верификацию личности. Среднее время — 1 рабочий день.
-        </div>
-      </div>
-      <div class="field">
-        <label class="field-label" for="reg-name">Ном ва насаб <em>*</em></label>
-        <input type="text" id="reg-name" class="field-input no-icon" placeholder="Аҳмад Назаров" autocomplete="name"/>
-        <div class="field-err" id="err-reg-name">Введите имя (минимум 2 символа)</div>
-      </div>
-      <div class="field">
-        <label class="field-label" for="reg-email">Email <em>*</em></label>
-        <input type="email" id="reg-email" class="field-input no-icon" placeholder="courier@email.com" autocomplete="email" inputmode="email"/>
-        <div class="field-err" id="err-reg-email">Некорректный email</div>
-      </div>
-      <div class="field">
-        <label class="field-label" for="reg-phone">Телефон <em>*</em></label>
-        <input type="tel" id="reg-phone" class="field-input no-icon" placeholder="+992 900 000-000" autocomplete="tel" inputmode="tel"/>
-        <div class="field-err" id="err-reg-phone">Введите номер телефона</div>
-      </div>
-      <div class="field">
-        <label class="field-label" for="reg-vehicle">Нақлиёт <em>*</em></label>
-        <select id="reg-vehicle" class="field-input no-icon">
-          <option value="">— Интихоб кунед —</option>
-          <option value="foot">🚶 Пиёда</option>
-          <option value="bicycle">🚴 Велосипед</option>
-          <option value="scooter">🛵 Скутер</option>
-          <option value="car">🚗 Автомобил</option>
-        </select>
-        <div class="field-err" id="err-reg-vehicle">Выберите тип транспорта</div>
-      </div>
-      <div class="field">
-        <label class="field-label" for="reg-pass">Парол <em>*</em></label>
-        <input type="password" id="reg-pass" class="field-input" placeholder="Камаш 8 аломат" autocomplete="new-password"/>
-        <button class="field-eye" id="eye-reg" type="button" aria-label="Показать пароль">
-          <svg id="eye-reg-show" width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 8c1.5-3.5 4-5.5 6.5-5.5s5 2 6.5 5.5c-1.5 3.5-4 5.5-6.5 5.5S3 11.5 1.5 8z" stroke="currentColor" stroke-width="1.3"/></svg>
-          <svg id="eye-reg-hide" width="15" height="15" viewBox="0 0 16 16" fill="none" style="display:none"><path d="M2 2l12 12M6.5 6.6A2.5 2.5 0 0 0 9.4 9.5M4 4.3A6.4 6.4 0 0 0 1.5 8c1.5 3.5 4 5.5 6.5 5.5 1.3 0 2.5-.4 3.5-1.1M7 2.6c.3-.1.7-.1 1-.1 2.5 0 5 2 6.5 5.5a8.4 8.4 0 0 1-1.8 2.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-        </button>
-        <div class="field-err" id="err-reg-pass">Пароль не менее 8 символов</div>
-        <div class="pass-strength" id="pass-strength" style="display:none">
-          <div class="ps-bar" id="ps1"></div><div class="ps-bar" id="ps2"></div>
-          <div class="ps-bar" id="ps3"></div><div class="ps-bar" id="ps4"></div>
-        </div>
-        <div class="ps-label" id="ps-label"></div>
-      </div>
-      <div class="terms">
-        Бо қайд шудан, шумо бо <a href="https://delivery.galelium.com/privacy.html" target="_blank">шартҳои кори курьер</a> розӣ мешавед.
-      </div>
-      <button class="btn-submit" id="btn-reg" type="button">
-        <span class="btn-submit-txt">Қайд шудан</span>
-        <span class="btn-spinner" aria-hidden="true"></span>
-      </button>
-      <div class="sw-link">Аккаунт дорид? <button id="sw-to-login" type="button">Даромадан</button></div>
-    </div>
-
-    <div class="or">ё</div>
-
-    <button class="btn-google" id="btn-google" type="button">
-      <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true">
-        <path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.6 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 20-9 20-20 0-1.3-.1-2.7-.4-4z"/>
-        <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 19 13 24 13c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.6 29.3 4 24 4 16.3 4 9.7 8.4 6.3 14.7z"/>
-        <path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5l-6.2-5.2C29.4 35.5 26.8 36 24 36c-5.2 0-9.6-3-11.4-7.4l-6.6 5.1C9.8 39.7 16.4 44 24 44z"/>
-        <path fill="#1976D2" d="M43.6 20H24v8h11.3c-1 3-3.5 5.5-6.5 7l6.2 5.2C39.3 37 44 31 44 24c0-1.3-.1-2.7-.4-4z"/>
+    <!-- Алерт -->
+    <div class="alert err" id="lock-alert" role="alert">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px">
+        <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16v.01" stroke-linecap="round"/>
       </svg>
-      <span id="google-btn-text">Тавассути Google даромадан</span>
-    </button>
-
-  </div>
-
-  <div class="card-foot">
-    <div class="client-link">
-      Шумо муштарӣ ед? <a href="https://delivery.galelium.com/login.html">Дарвозаи муштарӣ →</a>
+      <div><strong id="alert-title"></strong><span id="alert-msg"></span></div>
     </div>
-    <div class="status-row">
+
+    <!-- ═══════════ ФОРМА ВХОДА (2 шага) ═══════════ -->
+    <div id="form-login">
+
+      <div class="step-dots">
+        <div class="step-dot active" id="ldot-1"></div>
+        <div class="step-dot" id="ldot-2"></div>
+      </div>
+
+      <!-- Шаг 1: номер телефона -->
+      <div id="login-step-1">
+        <div class="field">
+          <label class="lbl" for="login-phone">Рақами телефон</label>
+          <div class="phone-field">
+            <div class="phone-prefix">
+              <span class="phone-flag">
+                <svg width="16" height="12" viewBox="0 0 16 12"><rect width="16" height="4" fill="#cc0000"/><rect y="4" width="16" height="4" fill="#ffffff"/><rect y="8" width="16" height="4" fill="#006600"/><circle cx="8" cy="6" r="1.6" fill="#f8b800"/></svg>
+              </span>
+              +992
+            </div>
+            <input type="tel" id="login-phone" class="phone-input"
+              placeholder="90 000 00 00" autocomplete="tel" autofocus inputmode="numeric" maxlength="12"/>
+          </div>
+          <div class="field-err" id="err-login-phone"></div>
+        </div>
+
+        <button class="btn-submit" id="btn-login-next" type="button" style="margin-top:6px">
+          <div class="spinner"></div>
+          <span class="btn-txt">Давом додан</span>
+        </button>
+      </div>
+
+      <!-- Шаг 2: пароль -->
+      <div id="login-step-2" style="display:none">
+        <div class="phone-chip">
+          <div class="phone-chip-ico">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          </div>
+          <div class="phone-chip-num" id="phone-chip-num">+992 —</div>
+          <button class="phone-chip-edit" type="button" id="btn-login-back">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Тағйир
+          </button>
+        </div>
+
+        <div class="field">
+          <label class="lbl" for="login-pass">Парол</label>
+          <input type="password" id="login-pass" class="inp has-eye"
+            placeholder="••••••••" autocomplete="current-password"/>
+          <button class="eye" id="eye-login" type="button" aria-label="Нишон додан">
+            <svg id="eye-login-show" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg id="eye-login-hide" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+          <div class="field-err" id="err-login-pass"></div>
+        </div>
+
+        <div class="opt-row">
+          <a class="forgot" id="link-forgot" href="https://t.me/dastdaroz_support" target="_blank" rel="noopener">Паролро фаромӯш кардед?</a>
+        </div>
+
+        <button class="btn-submit" id="btn-login" type="button">
+          <div class="spinner"></div>
+          <span class="btn-txt">Ворид шудан</span>
+        </button>
+      </div>
+
+      <div class="switch">Ҳисоб надоред? <button type="button" id="go-reg">Кушоед</button></div>
+    </div>
+
+    <!-- ═══════════ ФОРМА РЕГИСТРАЦИИ ═══════════ -->
+    <div id="form-reg" style="display:none">
+
+      <div class="field">
+        <label class="lbl" for="reg-name">Ном ва насаб</label>
+        <input type="text" id="reg-name" class="inp"
+          placeholder="Аҳмад Ваҳидов" autocomplete="name"/>
+        <div class="field-err" id="err-reg-name"></div>
+      </div>
+
+      <div class="field">
+        <label class="lbl" for="reg-phone">Рақами телефон</label>
+        <div class="phone-field">
+          <div class="phone-prefix">
+            <span class="phone-flag">
+              <svg width="16" height="12" viewBox="0 0 16 12"><rect width="16" height="4" fill="#cc0000"/><rect y="4" width="16" height="4" fill="#ffffff"/><rect y="8" width="16" height="4" fill="#006600"/><circle cx="8" cy="6" r="1.6" fill="#f8b800"/></svg>
+            </span>
+            +992
+          </div>
+          <input type="tel" id="reg-phone" class="phone-input"
+            placeholder="90 000 00 00" autocomplete="tel" inputmode="numeric" maxlength="12"/>
+        </div>
+        <div class="field-err" id="err-reg-phone"></div>
+      </div>
+
+      <div class="field">
+        <label class="lbl" for="reg-pass">Парол</label>
+        <input type="password" id="reg-pass" class="inp has-eye"
+          placeholder="Ҳадди ақал 6 аломат" autocomplete="new-password"/>
+        <button class="eye" id="eye-reg" type="button" aria-label="Нишон додан">
+          <svg id="eye-reg-show" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg id="eye-reg-hide" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+        </button>
+        <div class="ps-bars" id="ps-bars">
+          <div class="ps-bar"></div><div class="ps-bar"></div><div class="ps-bar"></div><div class="ps-bar"></div>
+        </div>
+        <div class="ps-lbl" id="ps-lbl"></div>
+        <div class="field-err" id="err-reg-pass"></div>
+      </div>
+
+      <div class="terms">Бо кушодани ҳисоб, шумо бо <a href="#" target="_blank">Шартҳои истифода</a> ва <a href="#" target="_blank">Сиёсати махфият</a>-и dastdaroz розӣ мешавед.</div>
+
+      <button class="btn-submit" id="btn-reg" type="button">
+        <div class="spinner"></div>
+        <span class="btn-txt">Ҳисоб кушодан</span>
+      </button>
+
+      <div class="switch">Ҳисоб доред? <button type="button" id="go-login">Ворид шавед</button></div>
+    </div>
+
+    <!-- Экосистема -->
+    <div class="eco-row">
+      <div class="eco-badge">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        Фармоиш
+      </div>
+      <div class="eco-badge">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="1"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>
+        Расониш
+      </div>
+    </div>
+
+    <!-- Статус -->
+    <div class="status">
       <span class="status-dot" id="status-dot"></span>
-      <span id="status-text">Пайвастшавӣ…</span>
+      <span id="status-text">Пайваст шудан ба dastdaroz…</span>
     </div>
-  </div>
 
+  </div>
 </div>
 
 <script type="module">
   import { auth, db } from './firebase.js';
   import {
-    onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,
-    signInWithPopup,GoogleAuthProvider,sendPasswordResetEmail,updateProfile,
-    setPersistence,browserLocalPersistence,browserSessionPersistence,
+    onAuthStateChanged,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    updateProfile,
+    setPersistence, browserLocalPersistence,
   } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js';
-  import { doc,getDoc,setDoc,serverTimestamp }
+  import { doc, getDoc, setDoc, serverTimestamp }
     from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js';
 
-  const HOME='home.html';
-  const fbBar=document.getElementById('fb-bar');
-  const alertEl=document.getElementById('lock-alert');
-  const alertTitle=document.getElementById('alert-title');
-  const alertMsg=document.getElementById('alert-msg');
-  const statusDot=document.getElementById('status-dot');
-  const statusText=document.getElementById('status-text');
-  const loginEmail=document.getElementById('login-email');
-  const loginPass=document.getElementById('login-pass');
-  const remEl=document.getElementById('inp-remember');
-  const btnLogin=document.getElementById('btn-login');
-  const btnForgot=document.getElementById('btn-forgot');
-  const regName=document.getElementById('reg-name');
-  const regEmail=document.getElementById('reg-email');
-  const regPhone=document.getElementById('reg-phone');
-  const regVehicle=document.getElementById('reg-vehicle');
-  const regPass=document.getElementById('reg-pass');
-  const btnReg=document.getElementById('btn-reg');
-  const btnGoogle=document.getElementById('btn-google');
-  const googleTxt=document.getElementById('google-btn-text');
+  const HOME = 'home.html';
 
-  async function ensureCourierProfile(user,extra={}){
-    const userRef=doc(db,'users',user.uid);
-    const courierRef=doc(db,'couriers',user.uid);
-    const snap=await getDoc(userRef);
-    if(!snap.exists()){
-      const base={
-        uid:user.uid,email:user.email||'',
-        displayName:extra.displayName||user.displayName||'',
-        phone:extra.phone||'',role:'courier',avatarUrl:'',
-        provider:extra.provider||'email',
-        createdAt:serverTimestamp(),updatedAt:serverTimestamp(),lastLoginAt:serverTimestamp(),
-      };
-      base.verificationStatus='unverified';
-      await setDoc(userRef,base);
-      await setDoc(courierRef,{
-        uid:user.uid,displayName:base.displayName,phone:base.phone,email:base.email,
-        vehicle:extra.vehicle||'foot',isActive:false,isOnline:false,
-        currentOrderId:null,rating:0,totalDeliveries:0,earnings:0,
-        verificationStatus:'unverified',
-        createdAt:serverTimestamp(),updatedAt:serverTimestamp(),
-      });
-    }else{
-      const data=snap.data();
-      if(data.role!=='courier')throw{code:'not-courier'};
-      await setDoc(userRef,{lastLoginAt:serverTimestamp(),updatedAt:serverTimestamp()},{merge:true});
-    }
+  // ── Псевдо-домен для перетворення телефону в email Firebase Auth ──
+  // Firebase Auth використовує email/password під капотом; реального
+  // email не існує — це чиста імітація "вхід за номером телефону".
+  const PHONE_DOMAIN = 'phone.dastdaroz.id';
+
+  function digitsOnly(v) { return (v || '').replace(/\D/g, ''); }
+
+  // Приймає будь-який ввід (з чи без +992/8) → повертає рівно 9 цифр або null
+  function normalizePhone(raw) {
+    let d = digitsOnly(raw);
+    if (d.startsWith('992')) d = d.slice(3);
+    else if (d.startsWith('8') && d.length === 10) d = d.slice(1);
+    if (d.length !== 9) return null;
+    return d;
   }
 
-  fbBar.classList.add('loading');
-  onAuthStateChanged(auth,async user=>{
-    fbBar.classList.remove('loading');fbBar.classList.add('done');
-    if(user){
-      try{
-        const snap=await getDoc(doc(db,'users',user.uid));
-        if(snap.exists()&&snap.data().role==='courier'){
-          statusDot.className='status-dot ok';
-          statusText.textContent='Авторизован · '+(user.email||'')+' — переход…';
-          setTimeout(()=>{window.location.href=HOME;},600);return;
-        }
-      }catch{}
-    }
-    statusDot.className='status-dot ok';
-    statusText.textContent='Firebase пайваст аст';
-  });
-
-  let currentMode='login';
-  const tabLogin=document.getElementById('tab-login');
-  const tabReg=document.getElementById('tab-reg');
-  const formLogin=document.getElementById('form-login');
-  const formReg=document.getElementById('form-reg');
-
-  function switchMode(mode){
-    currentMode=mode;const isLogin=mode==='login';
-    tabLogin.classList.toggle('active',isLogin);tabReg.classList.toggle('active',!isLogin);
-    formLogin.style.display=isLogin?'':'none';formReg.style.display=isLogin?'none':'';
-    googleTxt.textContent=isLogin?'Тавассути Google даромадан':'Тавассути Google қайд шудан';
-    hideAlert();clearAllErrors();
+  function formatPhoneDisplay(d9) {
+    return '+992 ' + d9.slice(0,2) + ' ' + d9.slice(2,5) + ' ' + d9.slice(5,7) + ' ' + d9.slice(7,9);
   }
-  tabLogin.addEventListener('click',()=>switchMode('login'));
-  tabReg.addEventListener('click',()=>switchMode('reg'));
-  document.getElementById('sw-to-reg').addEventListener('click',()=>switchMode('reg'));
-  document.getElementById('sw-to-login').addEventListener('click',()=>switchMode('login'));
 
-  function toggleEye(inp,show,hide){
-    const vis=inp.type==='password';inp.type=vis?'text':'password';
-    show.style.display=vis?'none':'';hide.style.display=vis?'':'none';inp.focus();
+  function phoneToPseudoEmail(d9) {
+    return `992${d9}@${PHONE_DOMAIN}`;
   }
-  document.getElementById('eye-login').addEventListener('click',()=>
-    toggleEye(loginPass,document.getElementById('eye-login-show'),document.getElementById('eye-login-hide')));
-  document.getElementById('eye-reg').addEventListener('click',()=>
-    toggleEye(regPass,document.getElementById('eye-reg-show'),document.getElementById('eye-reg-hide')));
 
-  const psWrap=document.getElementById('pass-strength');
-  const psLabel=document.getElementById('ps-label');
-  regPass.addEventListener('input',()=>{
-    const v=regPass.value;
-    if(!v){psWrap.style.display='none';psLabel.style.display='none';return;}
-    psWrap.style.display='flex';psLabel.style.display='block';
-    let score=0;
-    if(v.length>=8)score++;if(v.length>=12)score++;
-    if(/[A-Z]/.test(v)||/[а-яА-Я]/.test(v))score++;
-    if(/\d/.test(v)&&/[^a-zA-Zа-яА-Я0-9]/.test(v))score++;
-    const colors=['','#e5455a','#d97706','#3ecf8e','#3ecf8e'];
-    const labels=['','Суст','Миёна','Хуб','Боэтимод'];
-    ['ps1','ps2','ps3','ps4'].forEach((id,i)=>{
-      const b=document.getElementById(id);
-      if(b)b.style.background=i<score?colors[score]:'var(--s4)';
+  // Автоформатирование поля при вводе: "90 000 00 00"
+  function attachPhoneMask(input) {
+    input.addEventListener('input', () => {
+      let d = digitsOnly(input.value).slice(0, 9);
+      let out = '';
+      if (d.length > 0) out += d.slice(0,2);
+      if (d.length > 2) out += ' ' + d.slice(2,5);
+      if (d.length > 5) out += ' ' + d.slice(5,7);
+      if (d.length > 7) out += ' ' + d.slice(7,9);
+      input.value = out;
     });
-    psLabel.textContent=labels[score];psLabel.style.color=colors[score];
+  }
+
+  const fbBar      = document.getElementById('fb-bar');
+  const alertEl    = document.getElementById('lock-alert');
+  const alertTitle = document.getElementById('alert-title');
+  const alertMsg   = document.getElementById('alert-msg');
+  const statusDot  = document.getElementById('status-dot');
+  const statusText = document.getElementById('status-text');
+  const cardTitle  = document.getElementById('card-title');
+  const cardSub    = document.getElementById('card-sub');
+
+  const loginPhone  = document.getElementById('login-phone');
+  const loginPass   = document.getElementById('login-pass');
+  const btnLoginNext= document.getElementById('btn-login-next');
+  const btnLogin    = document.getElementById('btn-login');
+  const btnLoginBack= document.getElementById('btn-login-back');
+  const loginStep1  = document.getElementById('login-step-1');
+  const loginStep2  = document.getElementById('login-step-2');
+  const ldot1       = document.getElementById('ldot-1');
+  const ldot2       = document.getElementById('ldot-2');
+  const phoneChipNum= document.getElementById('phone-chip-num');
+
+  const regName  = document.getElementById('reg-name');
+  const regPhone = document.getElementById('reg-phone');
+  const regPass  = document.getElementById('reg-pass');
+  const btnReg   = document.getElementById('btn-reg');
+
+  attachPhoneMask(loginPhone);
+  attachPhoneMask(regPhone);
+
+  let loginPhoneDigits = null; // 9 цифр, подтверждённых на шаге 1
+
+  // ── Auth state: если уже вошли — сразу на главную ───────────
+  fbBar.classList.add('loading');
+  onAuthStateChanged(auth, async user => {
+    fbBar.classList.remove('loading');
+    fbBar.classList.add('done');
+    if (user) {
+      statusDot.className    = 'status-dot ok';
+      statusText.textContent = 'Шумо аллакай ворид шудед — гузариш…';
+      setTimeout(() => { window.location.href = HOME; }, 500);
+    } else {
+      statusDot.className    = 'status-dot ok';
+      statusText.textContent = 'dastdaroz ID пайваст аст';
+    }
   });
 
-  function setLoading(on){
-    [btnLogin,btnReg,btnGoogle].forEach(b=>b.disabled=on);
-    const ab=currentMode==='login'?btnLogin:btnReg;
-    ab.classList.toggle('loading',on);
+  // ── Переключение вкладок ─────────────────────────────────────
+  const tabLogin  = document.getElementById('tab-login');
+  const tabReg    = document.getElementById('tab-reg');
+  const formLogin = document.getElementById('form-login');
+  const formReg   = document.getElementById('form-reg');
+
+  function switchMode(mode) {
+    const isLogin = mode === 'login';
+    tabLogin.classList.toggle('active', isLogin);
+    tabReg.classList.toggle('active', !isLogin);
+    formLogin.style.display = isLogin ? '' : 'none';
+    formReg.style.display   = isLogin ? 'none' : '';
+    cardTitle.innerHTML = isLogin ? 'Хуш <em>омадед</em>' : 'Ҳисоб <em>кушоед</em>';
+    cardSub.textContent = isLogin ? 'Бо рақами телефон ворид шавед' : 'Танҳо 3 қадам — тез ва осон';
+    hideAlert();
+    clearAllErrors();
+    goLoginStep(1);
   }
-  function showAlert(title,msg,type='err'){
-    alertEl.className='lock-alert show '+type;
-    alertTitle.textContent=title;alertMsg.textContent=msg;
+  tabLogin.addEventListener('click', () => switchMode('login'));
+  tabReg.addEventListener('click',   () => switchMode('reg'));
+  document.getElementById('go-reg').addEventListener('click',   () => switchMode('reg'));
+  document.getElementById('go-login').addEventListener('click', () => switchMode('login'));
+
+  // ── Показ/скрытие пароля ─────────────────────────────────────
+  function bindEye(btnId, inpId, showId, hideId) {
+    const btn = document.getElementById(btnId);
+    const inp = document.getElementById(inpId);
+    const s   = document.getElementById(showId);
+    const h   = document.getElementById(hideId);
+    btn.addEventListener('click', () => {
+      const isPass = inp.type === 'password';
+      inp.type = isPass ? 'text' : 'password';
+      s.style.display = isPass ? 'none' : '';
+      h.style.display = isPass ? '' : 'none';
+    });
   }
-  function showSuccess(t,m){showAlert(t,m,'ok');}
-  function hideAlert(){alertEl.classList.remove('show');}
-  function fieldErr(el,errId,msg){
-    el.classList.add('err');
-    const e=document.getElementById(errId);
-    if(e){e.textContent=msg;e.classList.add('show');}
-    setTimeout(()=>el.classList.remove('err'),400);
+  bindEye('eye-login', 'login-pass', 'eye-login-show', 'eye-login-hide');
+  bindEye('eye-reg',   'reg-pass',   'eye-reg-show',   'eye-reg-hide');
+
+  // ── Сила пароля (для регистрации) ────────────────────────────
+  const psBars = document.querySelectorAll('#ps-bars .ps-bar');
+  const psLbl  = document.getElementById('ps-lbl');
+  regPass.addEventListener('input', () => {
+    const v = regPass.value;
+    if (!v) { psBars.forEach(b => b.style.background = 'var(--s3)'); psLbl.style.display = 'none'; return; }
+    let score = 0;
+    if (v.length >= 6) score++;
+    if (v.length >= 10) score++;
+    if (/[0-9]/.test(v) && /[a-zA-Zа-яА-Я]/.test(v)) score++;
+    if (/[^a-zA-Zа-яА-Я0-9]/.test(v)) score++;
+    const colors = ['var(--red)', 'var(--amber)', 'var(--acc2)', 'var(--acc)'];
+    const labels = ['Заиф', 'Миёна', 'Хуб', 'Мустаҳкам'];
+    psBars.forEach((b, i) => { b.style.background = i < score ? colors[Math.min(score,4)-1] : 'var(--s3)'; });
+    psLbl.style.display = 'block';
+    psLbl.textContent = labels[Math.min(score,4)-1] || '';
+    psLbl.style.color = colors[Math.min(score,4)-1] || 'var(--tx3)';
+  });
+
+  // ── Алерты / ошибки полей ────────────────────────────────────
+  function showAlert(title, msg) {
+    alertTitle.textContent = title; alertMsg.textContent = ' ' + msg;
+    alertEl.className = 'alert err show';
   }
-  function clearAllErrors(){
-    document.querySelectorAll('.field-input').forEach(el=>el.classList.remove('err'));
-    document.querySelectorAll('.field-err').forEach(el=>el.classList.remove('show'));
+  function hideAlert() { alertEl.className = 'alert err'; }
+  function showFieldErr(id, msg) {
+    const inp = document.getElementById(id);
+    const err = document.getElementById('err-' + id);
+    if (inp) inp.classList.add('err');
+    if (err) { err.textContent = msg; err.classList.add('show'); }
+  }
+  function clearFieldErr(id) {
+    const inp = document.getElementById(id);
+    const err = document.getElementById('err-' + id);
+    if (inp) inp.classList.remove('err');
+    if (err) { err.textContent = ''; err.classList.remove('show'); }
+  }
+  function clearAllErrors() {
+    ['login-phone','login-pass','reg-name','reg-phone','reg-pass'].forEach(clearFieldErr);
     hideAlert();
   }
-  function fbErr(code){
-    const m={
-      'auth/user-not-found':['Корбар ёфт нашуд','Аккаунте бо ин email вуҷуд надорад.'],
-      'auth/wrong-password':['Парол нодуруст','Паролро дуруст ворид кунед ё аз нав танзим кунед.'],
-      'auth/invalid-credential':['Маълумот нодуруст','Email ё парол нодуруст ворид шудааст.'],
-      'auth/invalid-email':['Email нодуруст','Суроғаи дурустро ворид кунед.'],
-      'auth/email-already-in-use':['Email аллакай дарж аст','Ин email аллакай қайд шудааст.'],
-      'auth/weak-password':['Парол суст аст','Камаш 6 аломат лозим аст.'],
-      'auth/too-many-requests':['Хеле зиёд кӯшиш','Аккаунт муваққатан баст шудааст.'],
-      'auth/network-request-failed':['Хатои шабака','Пайвастшавии интернетро санҷед.'],
-      'auth/popup-closed-by-user':['Тиреза пӯшида шуд','Боз кӯшиш кунед.'],
-      'auth/cancelled-popup-request':['Бекор карда шуд',''],
-      'not-courier':['Дастрас нест','Ин аккаунт ҳамчун муштарӣ қайд шудааст. Дарвозаи муштариро истифода баред.'],
+  [loginPhone, loginPass, regName, regPhone, regPass].forEach(inp => {
+    inp.addEventListener('input', () => { clearFieldErr(inp.id); hideAlert(); });
+  });
+
+  // ── Шаги входа ────────────────────────────────────────────────
+  function goLoginStep(n) {
+    loginStep1.style.display = n === 1 ? '' : 'none';
+    loginStep2.style.display = n === 2 ? '' : 'none';
+    ldot1.classList.toggle('active', n === 1);
+    ldot1.classList.toggle('done', n === 2);
+    ldot2.classList.toggle('active', n === 2);
+    ldot2.classList.remove('done');
+    if (n === 2) setTimeout(() => loginPass.focus(), 150);
+    if (n === 1) setTimeout(() => loginPhone.focus(), 150);
+  }
+
+  btnLoginNext.addEventListener('click', () => {
+    const d9 = normalizePhone(loginPhone.value);
+    if (!d9) { showFieldErr('login-phone', 'Рақами дуруст ворид кунед (9 рақам)'); return; }
+    loginPhoneDigits = d9;
+    phoneChipNum.textContent = formatPhoneDisplay(d9);
+    goLoginStep(2);
+  });
+  btnLoginBack.addEventListener('click', () => { loginPass.value = ''; goLoginStep(1); });
+  loginPhone.addEventListener('keydown', e => { if (e.key === 'Enter') btnLoginNext.click(); });
+  loginPass.addEventListener('keydown',  e => { if (e.key === 'Enter') btnLogin.click(); });
+
+  // ── Карта помилок Firebase → людяний текст ───────────────────
+  function fbErr(code) {
+    const map = {
+      'auth/user-not-found':        ['Ҳисоб ёфт нашуд', 'Бо ин рақами телефон ҳисоб вуҷуд надорад. Аввал сабти ном кунед.'],
+      'auth/wrong-password':        ['Парол нодуруст', 'Парол хато аст. Бори дигар кӯшиш кунед.'],
+      'auth/invalid-credential':    ['Маълумот нодуруст', 'Рақам ё парол нодуруст аст.'],
+      'auth/invalid-login-credentials': ['Маълумот нодуруст', 'Рақам ё парол нодуруст аст.'],
+      'auth/too-many-requests':     ['Хеле кӯшишҳо', 'Каме сабр кунед ва бори дигар кӯшиш кунед.'],
+      'auth/email-already-in-use':  ['Рақам аллакай сабт аст', 'Бо ин рақами телефон ҳисоб аллакай вуҷуд дорад. Ворид шавед.'],
+      'auth/weak-password':         ['Парол хеле сода', 'Парол бояд ҳадди ақал 6 аломат дошта бошад.'],
+      'auth/network-request-failed':['Хатои шабака', 'Пайвастшавӣ ба интернетро санҷед.'],
     };
-    return m[code]||['Хато','Чизе нодуруст шуд. Боз кӯшиш кунед.'];
+    return map[code] || ['Хатогӣ рӯй дод', 'Чизе нодуруст шуд. Бори дигар кӯшиш кунед.'];
   }
 
-  function validateLogin(){
-    clearAllErrors();let ok=true;
-    const email=loginEmail.value.trim();
-    if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){fieldErr(loginEmail,'err-login-email',email?'Формати нодуруст':'Email-ро ворид кунед');ok=false;}
-    if(!loginPass.value){fieldErr(loginPass,'err-login-pass','Паролро ворид кунед');ok=false;}
-    return ok;
-  }
-  function validateReg(){
-    clearAllErrors();let ok=true;
-    const name=regName.value.trim(),email=regEmail.value.trim(),phone=regPhone.value.trim(),vehicle=regVehicle.value,pass=regPass.value;
-    if(!name||name.length<2){fieldErr(regName,'err-reg-name','Ном ворид кунед (камаш 2 аломат)');ok=false;}
-    if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){fieldErr(regEmail,'err-reg-email',email?'Формати нодуруст':'Email-ро ворид кунед');ok=false;}
-    if(!phone||phone.length<6){fieldErr(regPhone,'err-reg-phone','Рақами телефонро ворид кунед');ok=false;}
-    if(!vehicle){fieldErr(regVehicle,'err-reg-vehicle','Навъи нақлиётро интихоб кунед');ok=false;}
-    if(!pass||pass.length<8){fieldErr(regPass,'err-reg-pass','Парол камаш 8 аломат бояд бошад');ok=false;}
-    return ok;
+  function setLoading(btn, on) {
+    btn.disabled = on;
+    btn.classList.toggle('loading', on);
   }
 
-  async function doLogin(){
-    if(!validateLogin())return;setLoading(true);
-    try{
-      const persistence=remEl.checked?browserLocalPersistence:browserSessionPersistence;
-      await setPersistence(auth,persistence);
-      const cred=await signInWithEmailAndPassword(auth,loginEmail.value.trim(),loginPass.value);
-      const snap=await getDoc(doc(db,'users',cred.user.uid));
-      if(snap.exists()&&snap.data().role!=='courier'){
-        await auth.signOut();showAlert('Дастрас нест','Ин аккаунт ҳамчун муштарӣ қайд шудааст.');
-        setLoading(false);return;
-      }
-      await ensureCourierProfile(cred.user,{provider:'email'});
-    }catch(err){
-      const[t,m]=fbErr(err.code);
-      showAlert(t,m);loginPass.value='';loginPass.focus();setLoading(false);
-    }
-  }
-  btnLogin.addEventListener('click',doLogin);
-  loginEmail.addEventListener('keydown',e=>{if(e.key==='Enter')loginPass.focus();});
-  loginPass.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
-  [loginEmail,loginPass].forEach(el=>el.addEventListener('input',()=>{hideAlert();el.classList.remove('err');}));
+  // ── Вхід ──────────────────────────────────────────────────────
+  btnLogin.addEventListener('click', async () => {
+    const pass = loginPass.value;
+    if (!pass) { showFieldErr('login-pass', 'Паролро ворид кунед'); return; }
+    if (!loginPhoneDigits) { goLoginStep(1); return; }
 
-  async function doRegister(){
-    if(!validateReg())return;setLoading(true);
-    try{
-      const cred=await createUserWithEmailAndPassword(auth,regEmail.value.trim(),regPass.value);
-      await updateProfile(cred.user,{displayName:regName.value.trim()});
-      await ensureCourierProfile(cred.user,{
-        displayName:regName.value.trim(),phone:regPhone.value.trim(),
-        vehicle:regVehicle.value,provider:'email',
-      });
-    }catch(err){
-      const[t,m]=fbErr(err.code);showAlert(t,m);setLoading(false);
-    }
-  }
-  btnReg.addEventListener('click',doRegister);
-  regPass.addEventListener('keydown',e=>{if(e.key==='Enter')doRegister();});
-  [regName,regEmail,regPhone].forEach(el=>el.addEventListener('input',()=>{hideAlert();el.classList.remove('err');}));
-
-  btnGoogle.addEventListener('click',async()=>{
-    clearAllErrors();setLoading(true);
-    try{
-      const provider=new GoogleAuthProvider();
-      provider.setCustomParameters({prompt:'select_account'});
-      const cred=await signInWithPopup(auth,provider);
-      const snap=await getDoc(doc(db,'users',cred.user.uid));
-      if(snap.exists()&&snap.data().role==='client'){
-        await auth.signOut();showAlert('Дастрас нест','Ин Google-аккаунт ҳамчун муштарӣ қайд шудааст.');
-        setLoading(false);return;
-      }
-      await ensureCourierProfile(cred.user,{displayName:cred.user.displayName||'',vehicle:'foot',provider:'google'});
-    }catch(err){
-      if(err.code!=='auth/cancelled-popup-request'&&err.code!=='auth/popup-closed-by-user'){
-        const[t,m]=fbErr(err.code);showAlert(t,m);
-      }
-      setLoading(false);
+    setLoading(btnLogin, true);
+    try {
+      await setPersistence(auth, browserLocalPersistence);
+      const email = phoneToPseudoEmail(loginPhoneDigits);
+      await signInWithEmailAndPassword(auth, email, pass);
+      statusText.textContent = 'Муваффақ! Гузариш…';
+      window.location.href = HOME;
+    } catch (e) {
+      const [t, m] = fbErr(e.code);
+      showAlert(t, m);
+      setLoading(btnLogin, false);
     }
   });
 
-  btnForgot.addEventListener('click',async()=>{
-    const email=loginEmail.value.trim();
-    if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-      fieldErr(loginEmail,'err-login-email','Барои аз нав танзим кардан email-ро ворид кунед');
-      loginEmail.focus();return;
+  // ── Реєстрація ───────────────────────────────────────────────
+  btnReg.addEventListener('click', async () => {
+    clearAllErrors();
+    const name = regName.value.trim();
+    const d9   = normalizePhone(regPhone.value);
+    const pass = regPass.value;
+    let bad = false;
+
+    if (name.length < 2) { showFieldErr('reg-name', 'Ном ва насабро ворид кунед'); bad = true; }
+    if (!d9) { showFieldErr('reg-phone', 'Рақами дуруст ворид кунед (9 рақам)'); bad = true; }
+    if (pass.length < 6) { showFieldErr('reg-pass', 'Ҳадди ақал 6 аломат лозим аст'); bad = true; }
+    if (bad) return;
+
+    setLoading(btnReg, true);
+    try {
+      await setPersistence(auth, browserLocalPersistence);
+      const email = phoneToPseudoEmail(d9);
+      const cred  = await createUserWithEmailAndPassword(auth, email, pass);
+      await updateProfile(cred.user, { displayName: name });
+
+      await setDoc(doc(db, 'users', cred.user.uid), {
+        uid: cred.user.uid,
+        phone: '+992' + d9,
+        email: '',
+        displayName: name,
+        role: 'client',
+        address: '', avatarUrl: '',
+        provider: 'phone',
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        lastLoginAt: serverTimestamp(),
+      });
+
+      statusText.textContent = 'Ҳисоб кушода шуд! Гузариш…';
+      window.location.href = HOME;
+    } catch (e) {
+      const [t, m] = fbErr(e.code);
+      showAlert(t, m);
+      setLoading(btnReg, false);
     }
-    try{
-      await sendPasswordResetEmail(auth,email);
-      showSuccess('Мактуб фиристода шуд','Почтаи '+email+' -ро санҷед — он ҷо пайванд барои аз нав танзим кардан аст.');
-    }catch(err){const[t,m]=fbErr(err.code);showAlert(t,m);}
   });
 </script>
 </body>
