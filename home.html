@@ -2012,6 +2012,94 @@ a.ni{ text-decoration:none }
   transition:all .12s;
 }
 .chat-page-back:active{ background:var(--s3) }
+
+/* ═══ ОНБОРДИНГ «СТАТЬ КУРЬЕРОМ» (для dastdaroz ID без couriers/{uid}) ═══ */
+.courier-ob-overlay{
+  position:fixed;inset:0;z-index:9500;
+  background:var(--bg);
+  display:none;align-items:center;justify-content:center;
+  padding:20px;overflow-y:auto;
+}
+.courier-ob-overlay.open{ display:flex }
+.courier-ob-card{
+  width:100%;max-width:400px;
+  background:var(--s1);border:1px solid var(--b0);border-radius:22px;
+  padding:30px 26px 26px;
+  box-shadow:var(--shadow-md);
+  animation:itemPageIn .3s var(--ease) both;
+  margin:auto;
+}
+.courier-ob-icon{
+  width:56px;height:56px;border-radius:16px;margin:0 auto 18px;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  display:flex;align-items:center;justify-content:center;color:#0b0f0c;
+  box-shadow:0 6px 18px var(--acc-shadow);
+}
+.courier-ob-title{
+  font-family:var(--fd);font-weight:900;font-size:1.2rem;color:var(--tx);
+  text-align:center;margin-bottom:6px;letter-spacing:-.01em;
+}
+.courier-ob-sub{
+  font-size:.76rem;color:var(--tx3);text-align:center;margin-bottom:20px;line-height:1.55;
+}
+.courier-ob-identity{
+  display:flex;align-items:center;gap:11px;
+  background:var(--s2);border:1px solid var(--b0);border-radius:14px;
+  padding:12px 14px;margin-bottom:20px;
+}
+.courier-ob-identity-ico{
+  width:36px;height:36px;border-radius:50%;flex-shrink:0;
+  background:var(--accd);border:1.5px solid var(--accg);
+  display:flex;align-items:center;justify-content:center;color:var(--acc2);
+}
+.courier-ob-identity-body{ flex:1;min-width:0 }
+.courier-ob-identity-name{ font-weight:700;font-size:.82rem;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis }
+.courier-ob-identity-phone{ font-size:.68rem;color:var(--tx3);margin-top:1px }
+
+.courier-ob-label{
+  font-size:.5rem;letter-spacing:.16em;text-transform:uppercase;color:var(--tx3);
+  font-weight:700;margin-bottom:10px;
+}
+.courier-ob-vehicles{
+  display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:22px;
+}
+.courier-ob-veh{
+  display:flex;flex-direction:column;align-items:center;gap:7px;
+  padding:15px 8px;border-radius:14px;
+  background:var(--s2);border:1.5px solid var(--b0);
+  cursor:pointer;transition:all .15s;color:var(--tx2);
+}
+.courier-ob-veh svg{ transition:transform .15s }
+.courier-ob-veh span{ font-size:.68rem;font-weight:600 }
+.courier-ob-veh:hover{ border-color:var(--b1) }
+.courier-ob-veh.active{
+  background:var(--accd);border-color:var(--acc);color:var(--acc2);
+}
+.courier-ob-veh.active svg{ transform:scale(1.1) }
+
+.courier-ob-btn{
+  width:100%;padding:14px;border-radius:13px;border:none;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  color:#0b0f0c;font-family:var(--fd);font-weight:900;font-size:.82rem;
+  letter-spacing:.03em;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  box-shadow:0 4px 16px var(--acc-shadow);
+  transition:opacity .15s,transform .15s;
+}
+.courier-ob-btn:hover:not(:disabled){ opacity:.9;transform:translateY(-1px) }
+.courier-ob-btn:disabled{ opacity:.5;cursor:not-allowed }
+.courier-ob-btn.loading .ob-btn-txt{ opacity:.5 }
+.courier-ob-spinner{
+  width:14px;height:14px;border-radius:50%;
+  border:2px solid rgba(11,15,12,.25);border-top-color:#0b0f0c;
+  animation:spin .7s linear infinite;display:none;flex-shrink:0;
+}
+.courier-ob-btn.loading .courier-ob-spinner{ display:block }
+@keyframes spin{ to{ transform:rotate(360deg) } }
+
+.courier-ob-note{
+  font-size:.6rem;color:var(--tx3);text-align:center;margin-top:14px;line-height:1.6;
+}
 .chat-page-av{
   width:34px;height:34px;border-radius:50%;flex-shrink:0;
   background:var(--accd);border:2px solid var(--accg);
@@ -2316,7 +2404,7 @@ a.ni{ text-decoration:none }
               <div class="prof-hero">
                 <div class="prof-av" id="p-av">?</div>
                 <div class="prof-name" id="p-name">—</div>
-                <div class="prof-email" id="p-email">—</div>
+                <div class="prof-email" id="p-phone">—</div>
                 <div class="prof-veh-chip" id="p-veh" style="display:none">—</div>
                 <div id="p-verif-badge-wrap"></div>
               </div>
@@ -2359,18 +2447,8 @@ a.ni{ text-decoration:none }
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01.06 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
                   </div>
                   <div class="prof-field-body">
-                    <div class="prof-field-label">Телефон</div>
-                    <input class="prof-field-input" type="tel" id="pf-phone" placeholder="+992 900 000-000"/>
-                  </div>
-                </div>
-
-                <div class="prof-field">
-                  <div class="prof-field-ico">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                  </div>
-                  <div class="prof-field-body">
-                    <div class="prof-field-label">Email</div>
-                    <input class="prof-field-input" type="email" id="pf-email" readonly placeholder="—"/>
+                    <div class="prof-field-label">Телефон (dastdaroz ID)</div>
+                    <input class="prof-field-input" type="tel" id="pf-phone" readonly style="opacity:.7;cursor:not-allowed"/>
                   </div>
                 </div>
 
@@ -2561,6 +2639,55 @@ a.ni{ text-decoration:none }
       </div>
     </button>
 
+  </div>
+</div>
+
+<!-- ══════════ ОНБОРДИНГ «СТАТЬ КУРЬЕРОМ» ══════════ -->
+<div class="courier-ob-overlay" id="courier-onboarding">
+  <div class="courier-ob-card">
+    <div class="courier-ob-icon">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="1"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>
+    </div>
+    <div class="courier-ob-title">Хуш омадед ба dastdaroz Courier</div>
+    <div class="courier-ob-sub">Ҳисоби dastdaroz ID-и шумо аллакай омода аст. Танҳо навъи нақлиётро интихоб кунед — ва оғоз кунед!</div>
+
+    <div class="courier-ob-identity">
+      <div class="courier-ob-identity-ico">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div class="courier-ob-identity-body">
+        <div class="courier-ob-identity-name" id="ob-name">—</div>
+        <div class="courier-ob-identity-phone" id="ob-phone">—</div>
+      </div>
+    </div>
+
+    <div class="courier-ob-label">Навъи нақлиёт</div>
+    <div class="courier-ob-vehicles" id="ob-vehicles-grid">
+      <div class="courier-ob-veh active" data-v="bicycle" onclick="obSelectVehicle('bicycle')">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 100-2 1 1 0 000 2zM12 17.5V14l-3-3 4-3 2 3h2"/></svg>
+        <span>Велосипед</span>
+      </div>
+      <div class="courier-ob-veh" data-v="scooter" onclick="obSelectVehicle('scooter')">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="1"/><circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>
+        <span>Мотор/Скутер</span>
+      </div>
+      <div class="courier-ob-veh" data-v="car" onclick="obSelectVehicle('car')">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17h14v-5l-2-5H7L5 12v5z"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/></svg>
+        <span>Автомобил</span>
+      </div>
+      <div class="courier-ob-veh" data-v="foot" onclick="obSelectVehicle('foot')">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="4" r="2"/><path d="M9 21l1-6 2-2 2 2 1 6M8 13l2-6 2 2 2-2 2 6"/></svg>
+        <span>Пиёда</span>
+      </div>
+    </div>
+    <input type="hidden" id="ob-vehicle" value="bicycle"/>
+
+    <button class="courier-ob-btn" id="ob-submit" onclick="completeCourierOnboarding()">
+      <div class="courier-ob-spinner"></div>
+      <span class="ob-btn-txt">Оғоз кардан</span>
+    </button>
+
+    <div class="courier-ob-note">Ин ҳамон ҳисоби dastdaroz ID-и шумост — паролатон тағйир намеёбад</div>
   </div>
 </div>
 
@@ -2764,13 +2891,11 @@ window.closeVerifModal = function() {
 window.sendVerifTelegram = function() {
   const uid   = window.__verifUID   || '—';
   const name  = window.__verifName  || '—';
-  const email = window.__verifEmail || '—';
   const phone = window.__verifPhone || '—';
   const text =
     `Дархости тасдиқи ҳувият\n\n` +
     `Ном: ${name}\n` +
     `UID: ${uid}\n` +
-    `Email: ${email}\n` +
     `Телефон: ${phone}\n\n` +
     `Аксҳои паспорт:\n` +
     `1. Рӯи паспорт\n2. Пушти паспорт\n3. Селфи бо паспорт\n\n` +

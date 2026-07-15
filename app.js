@@ -375,27 +375,92 @@ setInterval(tick, 1000);
 tick();
 
 // ─── Auth ────────────────────────────────────────────────────
+// Единый dastdaroz ID: любой авторизованный пользователь допускается
+// к курьерской части. Если документ couriers/{uid} ещё не создан —
+// показываем короткий онбординг «Стать курьером» (выбор транспорта),
+// а не блокируем вход, как раньше.
 onAuthStateChanged(auth, async u => {
   if (!u) { location.href = 'login.html'; return; }
   CU = u;
   const s = await getDoc(doc(db, COL.USERS, CU.uid));
-  if (!s.exists() || s.data().role !== 'courier') {
-    await signOut(auth);
-    location.href = 'login.html';
+  UD = s.exists() ? s.data() : { displayName: CU.displayName || '', phone: phoneFromPseudoEmail(CU.email), role: 'client' };
+
+  const cs = await getDoc(doc(db, COL.COURIERS, CU.uid));
+  if (!cs.exists()) {
+    showCourierOnboarding();
     return;
   }
-  UD = s.data();
-  const cs = await getDoc(doc(db, COL.COURIERS, CU.uid));
-  CD = cs.exists()
-    ? cs.data()
-    : { totalDeliveries: 0, earnings: 0, rating: 0, vehicle: 'foot', isOnline: false };
+
+  CD = cs.data();
+  enterCourierApp();
+});
+
+function enterCourierApp() {
   renderSB();
   renderProfile();
   calcStats();
   startListeners();
   updateDashUI();
   setTimeout(() => { initMap().then(startGPS); }, 400);
-});
+}
+
+// ─── Онбординг «Стать курьером» ────────────────────────────────
+// Показывается один раз для аккаунтов dastdaroz ID, у которых ещё
+// нет профиля couriers/{uid}. Имя/телефон уже известны из users/{uid} —
+// нужно лишь выбрать вид транспорта, чтобы активировать курьерский режим.
+function showCourierOnboarding() {
+  const ob = document.getElementById('courier-onboarding');
+  if (!ob) { console.error('courier-onboarding element missing'); return; }
+  const nameEl = document.getElementById('ob-name');
+  if (nameEl) nameEl.textContent = UD?.displayName || 'Корбар';
+  const phoneEl = document.getElementById('ob-phone');
+  if (phoneEl) phoneEl.textContent = UD?.phone || phoneFromPseudoEmail(CU.email) || '';
+  ob.classList.add('open');
+}
+
+window.obSelectVehicle = function (v) {
+  document.querySelectorAll('#ob-vehicles-grid .courier-ob-veh').forEach(el => {
+    el.classList.toggle('active', el.dataset.v === v);
+  });
+  const hidden = document.getElementById('ob-vehicle');
+  if (hidden) hidden.value = v;
+};
+
+window.completeCourierOnboarding = async function () {
+  const sel = document.getElementById('ob-vehicle');
+  const vehicle = sel ? sel.value : 'foot';
+  const btn = document.getElementById('ob-submit');
+  if (btn) { btn.disabled = true; btn.classList.add('loading'); }
+
+  try {
+    const courierData = {
+      uid: CU.uid,
+      displayName: UD?.displayName || '',
+      phone: UD?.phone || phoneFromPseudoEmail(CU.email) || '',
+      vehicle,
+      isOnline: false,
+      isActive: false,
+      currentOrderId: null,
+      totalDeliveries: 0,
+      earnings: 0,
+      rating: 0,
+      verificationStatus: 'unverified',
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    };
+    await setDoc(doc(db, COL.COURIERS, CU.uid), courierData);
+    CD = courierData;
+
+    const ob = document.getElementById('courier-onboarding');
+    if (ob) ob.classList.remove('open');
+
+    toast('Хуш омадед ба dastdaroz Courier!', 'ok');
+    enterCourierApp();
+  } catch (e) {
+    toast('Хато рӯй дод. Бори дигар кӯшиш кунед', 'err');
+  }
+  if (btn) { btn.disabled = false; btn.classList.remove('loading'); }
+};
 
 // ─── Проверка верификации ────────────────────────────────────
 function isVerified() {
@@ -411,9 +476,17 @@ window.doLogout = async function () {
   location.href = 'login.html';
 };
 
+// Пытается извлечь реальный номер телефона из псевдо-email dastdaroz ID
+// (992XXXXXXXXX@phone.dastdaroz.id) — используется только как аварийный
+// резерв, если документ users/{uid} почему-то не содержит поле phone.
+function phoneFromPseudoEmail(email) {
+  const m = /^992(\d{9})@phone\.dastdaroz\.id$/.exec(email || '');
+  return m ? '+992' + m[1] : '';
+}
+
 // ─── Сайдбар ─────────────────────────────────────────────────
 function renderSB() {
-  const name = UD?.displayName || CU.email || 'Курьер';
+  const name = UD?.displayName || 'Курьер';
   const init = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
   const avatarHtml = UD?.avatarUrl ? `<img src="${UD.avatarUrl}" alt="">` : init;
 
@@ -1901,7 +1974,8 @@ function renderProfile() {
   if (avSmall) avSmall.innerHTML = UD?.avatarUrl ? `<img src="${UD.avatarUrl}" alt="">` : init;
 
   const pn = document.getElementById('p-name');    if (pn) pn.textContent = name || 'Курьер';
-  const pe = document.getElementById('p-email');   if (pe) pe.textContent = CU.email || '';
+  const phone = UD?.phone || phoneFromPseudoEmail(CU.email);
+  const pp = document.getElementById('p-phone');   if (pp) pp.textContent = phone || '—';
 
   // Нақлиёт-чип
   const pv = document.getElementById('p-veh');
@@ -1913,8 +1987,7 @@ function renderProfile() {
 
   // Поля формы
   const pfn = document.getElementById('pf-name');    if (pfn) pfn.value = name;
-  const pfe = document.getElementById('pf-email');   if (pfe) pfe.value = CU.email || '';
-  const pfp = document.getElementById('pf-phone');   if (pfp) pfp.value = UD?.phone || '';
+  const pfp = document.getElementById('pf-phone');   if (pfp) pfp.value = phone;
   const pfv = document.getElementById('pf-vehicle'); if (pfv) pfv.value = CD?.vehicle || 'foot';
 
   // Статистика
@@ -1925,8 +1998,7 @@ function renderProfile() {
   // — Данные для модала
   window.__verifUID   = CU.uid;
   window.__verifName  = name;
-  window.__verifEmail = CU.email || '';
-  window.__verifPhone = UD?.phone || '';
+  window.__verifPhone = phone;
 
   // — Статус
   const vs = CD?.verificationStatus || UD?.verificationStatus || 'unverified';
@@ -2021,12 +2093,12 @@ function renderProfile() {
 
 window.saveProfile = async function () {
   const name    = document.getElementById('pf-name').value.trim();
-  const phone   = document.getElementById('pf-phone').value.trim();
   const vehicle = document.getElementById('pf-vehicle').value;
   try {
-    await setDoc(doc(db, COL.USERS,    CU.uid), { displayName: name, phone, updatedAt: serverTimestamp() }, { merge: true });
-    await setDoc(doc(db, COL.COURIERS, CU.uid), { displayName: name, phone, vehicle, updatedAt: serverTimestamp() }, { merge: true });
-    UD = { ...UD, displayName: name, phone };
+    // Телефон НЕ сохраняем — это идентификатор dastdaroz ID, менять его тут нельзя
+    await setDoc(doc(db, COL.USERS,    CU.uid), { displayName: name, updatedAt: serverTimestamp() }, { merge: true });
+    await setDoc(doc(db, COL.COURIERS, CU.uid), { displayName: name, vehicle, updatedAt: serverTimestamp() }, { merge: true });
+    UD = { ...UD, displayName: name };
     CD = { ...CD, vehicle };
     renderSB(); renderProfile();
     toast('Сақл шуд', 'ok');
